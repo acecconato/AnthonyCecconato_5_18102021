@@ -1,0 +1,55 @@
+@startuml
+skinparam packageStyle rectancle
+left to right direction
+
+actor Administrator
+actor Author
+
+
+package Server {
+
+  Database Database
+
+  package Backend {
+  }
+}
+
+package Frontend {
+  package Frontoffice {
+
+    usecase mbp as "Manage blog posts
+    --
+    EXT: If he's the owner 
+    or an administrator"
+
+    (Create a blog post)
+    (Edit a blog post)
+    (Delete a blog post)
+
+    (Fill the form)
+    (Select a post)
+    ("Are you sure" prompt)
+  }
+}
+
+Administrator -|> Author
+
+Author -- mbp
+
+mbp --> (Create a blog post)
+mbp <.. (Edit a blog post) : <<extends>>
+mbp <.. (Delete a blog post) : <<extends>>
+
+(Create a blog post) -- Backend
+(Edit a blog post) -- Backend
+(Delete a blog post) -- Backend
+
+(Delete a blog post) .-> ("Are you sure" prompt) : include
+(Delete a blog post) .-> (Select a post) : include
+(Edit a blog post) .-> (Select a post) : include
+(Edit a blog post) .-> (Fill the form) : include
+(Create a blog post) .-> (Fill the form) : include
+
+Backend --> Database
+
+@enduml

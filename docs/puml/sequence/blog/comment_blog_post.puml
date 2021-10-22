@@ -1,0 +1,36 @@
+@startuml
+
+actor Client
+
+entity Website
+entity Server
+
+Database Database
+
+Website -> Client: Display "Add comment" form
+Client -> Website: Fill form fields
+
+Website -> Website: Verify form fields dynamically
+
+alt A field is invalid 
+    Website -> Client: Display an error message
+end
+
+Client -> Website: Click on "add comment"
+
+Website -> Server: Add a comment request
+
+Server -> Server: Verify data sent
+
+alt A form value is invalid 
+    Server -> Website: Failed
+    Website -> Client: Display an error message
+end
+
+Server -> Database: Save comment
+
+Server -> Website: Successed
+
+Website -> Client: Display single post page
+
+@enduml

@@ -1,0 +1,47 @@
+@startuml
+left to right direction
+
+'  Actors
+actor Admin
+actor User
+actor Visitor
+
+' <<system>>
+Database Database <<system>>
+
+' Package definition
+package Blog {
+    usecase "Post listing" as PostListing
+    usecase "Add a blog post" as AddBlogPost
+    usecase "Delete a blog post" as DeleteBlogPost
+    usecase "Update a blog post" as UpdateBlogPost
+    usecase "Read a blog post" as ReadBlogPost
+    usecase "Comment a blog post" as CommentBlogPost
+    usecase "List reported comments" as ListReportedComments
+    usecase "Delete a comment" as DeleteComment
+    usecase "Delete a report" as DeleteReport
+    usecase "Report a comment" as ReportComment
+}
+
+' Extends
+ReadBlogPost <.. CommentBlogPost : extends
+ReadBlogPost <.. ReportComment : extends
+
+' Relations
+Admin -|> User
+User -|> Visitor
+
+Visitor -- ReadBlogPost
+Visitor -- PostListing
+
+User -- AddBlogPost
+User -- DeleteBlogPost
+User -- UpdateBlogPost
+
+Admin -- ListReportedComments
+Admin -- DeleteComment
+Admin -- DeleteReport
+
+Blog --- Database
+
+@enduml

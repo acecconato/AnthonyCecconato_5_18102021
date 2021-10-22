@@ -1,0 +1,30 @@
+@startuml
+left to right direction
+
+' Actors
+actor Visitor
+
+' <<system>>
+actor "Symfony Mailer" as SymfonyMailer <<system>>
+Database Database <<system>>
+
+' Package definition
+package "Security" {
+    usecase "Login"
+    usecase "Register"
+    usecase "Reset password" as ResetPassword
+}
+
+' Relations
+Visitor -- Register
+Visitor -- Login
+Visitor -- ResetPassword
+
+Register -- SymfonyMailer
+ResetPassword -- SymfonyMailer
+
+Login -- Database
+Register -- Database
+ResetPassword -- Database
+
+@enduml

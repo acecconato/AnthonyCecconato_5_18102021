@@ -1,0 +1,27 @@
+@startuml
+left to right direction
+
+' Actors
+actor Admin
+
+'  <<system>>
+Database Database <<system>>
+actor "Symfony Mailer" as SymfonyMailer <<system>>
+
+' Package definition
+package "Manage users" as ManageUsersPackage {
+    usecase "User listing" as UserListing
+    usecase "Validate a user" as ValidateUser
+    usecase "Delete a user" as DeleteUser
+}
+
+' Relations
+Admin -- UserListing
+Admin -- ValidateUser
+Admin -- DeleteUser
+
+ManageUsersPackage -- Database
+
+ValidateUser -- SymfonyMailer
+
+@enduml

@@ -1,0 +1,93 @@
+@startuml
+left to right direction
+
+class Comments {
+    - author: String
+    - content: String
+    - createdAt: Datetime
+    - updatedAt: Datetime
+    - reports: Reports
+
+    setAuthor(author: String): Self 
+    getAuthor(): String
+    setContent(content: String): Self
+    getContent(): String
+    setCreatedAt(createdAt: Datetime): Self
+    getCreatedAt(): Datetime
+    setUpdatedAt(updatedAt: Datetime): Self
+    getUpdatedAt(): Datetime
+    getReports(): Array<Reports>
+    getNbReports(): Integer
+    addReport(report: Reports): Self
+    deleteReport(report: Reports): Self
+}
+
+class Admin {
+    deleteComment(comment: Comments): Self
+    validateComment(comment: Comments): Self
+}
+
+class Users {
+    - username: String
+    - email: String
+    - password: String
+    - role: Array
+
+    getUsername(): String
+    setUsername(username: String): Self
+    getEmail(): String
+    setEmail(email: String): Self
+    setPassword(password: String): Self
+    verifyPassword(password: String): Boolean
+}
+
+class Visitors
+
+class Posts {
+    - title: String
+    - excerpt: String
+    - content: String 
+    - slug: String 
+    - author: String
+    - createdAt: Datetime
+    - updatedAt: Datetime
+
+    getTitle(): String
+    setTitle(title: String): Self
+    getExerpt(): String
+    setExerpt(exerpt: String): Self
+    getContent(): String
+    setContent(content: String): Self 
+    getSlug(): String
+    setSlug(slug: String): Self
+    getAuthor(): String
+    setAuthor(author: String): Self
+    getCreatedAt(): String
+    setCreatedAt(createdAt: Datetime): Self
+    getUpdatedAt(): String
+    setUpdatedAt(updatedAt: Datetime): Self
+}
+
+class Reports {
+    createdAt: Datetime
+    getAllReportedComments(): Array<Comments>
+    getComment(): Comments
+}
+
+' Relations
+Users <|- Admin
+
+Visitors "1" --> "0,n" Comments: add
+Visitors --> Reports: report
+
+Comments "1" <-> "0,n" Reports: contains
+
+Posts "1" *.. "0,n" Comments: contains
+
+Users "1" <--> "0,n" Posts: publish
+Users "1" <--> "0,n" Comments: add
+Users "1" --> "0,n" Reports: report
+
+Admin --> Reports: manage 
+
+@enduml

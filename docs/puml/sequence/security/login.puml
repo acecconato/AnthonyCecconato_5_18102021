@@ -1,0 +1,49 @@
+@startuml
+
+title Login
+autonumber
+
+actor Client 
+entity Server 
+Database Database
+
+Client -> Server : Login page request
+
+activate Server
+
+alt Client is already logged in 
+    Server --> Client : Redirect to "My account page"
+end
+
+Server --> Client : Display login form
+
+deactivate Server 
+
+activate Client
+
+Client -> Client : Fill form 
+Client -> Client : Validate form fields
+
+alt A form field is invalid 
+    Client -> Client : Display errors messages
+end
+
+Client -> Server : Login request
+
+deactivate Client
+
+activate Server
+
+Server -> Database : Verify credentials
+
+alt Credentials are invalid
+    Server --> Client : Display errors messages
+end
+
+Server -> Server : Login the user
+
+Server --> Client : Redirect to the "My account" page
+
+deactivate Server 
+
+@enduml

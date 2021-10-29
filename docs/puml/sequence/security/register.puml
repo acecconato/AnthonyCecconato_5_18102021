@@ -1,0 +1,51 @@
+@startuml
+
+title Register 
+autonumber
+
+actor Client 
+entity Server
+entity "Symfony Mailer" as SymfonyMailer
+Database Database
+
+Client -> Server : Register page request
+
+activate Server 
+
+alt Client is already logged in
+    Server --> Client : Redirect to "My account" page
+end
+
+Server -> Client : Display register form
+
+deactivate Server 
+
+activate Client
+
+Client -> Client : Fill register form
+Client -> Client : Validate form fields
+
+alt A form field is invalid 
+    Client -> Client : Display errors messages
+end
+
+Client -> Server : Register request
+
+deactivate Client
+
+activate Server 
+
+Server -> Server : Verify data sent
+
+alt A form value is invalid 
+    Server --> Client : Display errors messages
+end
+
+Server -> Database : Register the user
+Server ->> SymfonyMailer : Send success mail
+
+Server --> Client : Redirect to "Login" page
+
+deactivate Server
+
+@enduml

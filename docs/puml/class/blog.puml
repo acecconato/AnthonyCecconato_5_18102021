@@ -1,93 +1,57 @@
 @startuml
 left to right direction
 
-class Comments {
-    - author: String
-    - content: String
-    - createdAt: Datetime
-    - updatedAt: Datetime
-    - reports: Reports
+title Blog class diagram
 
-    setAuthor(author: String): Self 
-    getAuthor(): String
-    setContent(content: String): Self
-    getContent(): String
-    setCreatedAt(createdAt: Datetime): Self
-    getCreatedAt(): Datetime
-    setUpdatedAt(updatedAt: Datetime): Self
-    getUpdatedAt(): Datetime
-    getReports(): Array<Reports>
-    getNbReports(): Integer
-    addReport(report: Reports): Self
-    deleteReport(report: Reports): Self
+class Comment {
+    - id: uuidv4
+    - user: ?User
+    - author: string
+    - content: string
+    - createdAt: datetime
+    - updatedAt: datetime
+    - reports: array[Report]
+
+    addReport() : self
+    getReports() : array[Report]
 }
 
 class Admin {
-    deleteComment(comment: Comments): Self
-    validateComment(comment: Comments): Self
+
 }
 
-class Users {
-    - username: String
-    - email: String
-    - password: String
-    - role: Array
-
-    getUsername(): String
-    setUsername(username: String): Self
-    getEmail(): String
-    setEmail(email: String): Self
-    setPassword(password: String): Self
-    verifyPassword(password: String): Boolean
+class User {
+    - id: uuidv4
+    - username: string
+    - email: string
+    - password: string
+    - role: array
 }
 
-class Visitors
-
-class Posts {
-    - title: String
-    - excerpt: String
-    - content: String 
-    - slug: String 
-    - author: String
-    - createdAt: Datetime
-    - updatedAt: Datetime
-
-    getTitle(): String
-    setTitle(title: String): Self
-    getExerpt(): String
-    setExerpt(exerpt: String): Self
-    getContent(): String
-    setContent(content: String): Self 
-    getSlug(): String
-    setSlug(slug: String): Self
-    getAuthor(): String
-    setAuthor(author: String): Self
-    getCreatedAt(): String
-    setCreatedAt(createdAt: Datetime): Self
-    getUpdatedAt(): String
-    setUpdatedAt(updatedAt: Datetime): Self
+class Post {
+    - id: uuidv4
+    - title: string
+    - excerpt: string
+    - content: string 
+    - slug: string 
+    - user: User
+    - createdAt: datetime
+    - updatedAt: datetime
 }
 
-class Reports {
-    createdAt: Datetime
-    getAllReportedComments(): Array<Comments>
-    getComment(): Comments
+class Report {
+    - id: uuidv4
+    - createdAt: datetime
 }
 
 ' Relations
-Users <|- Admin
+User <|- Admin
 
-Visitors "1" --> "0,n" Comments: add
-Visitors --> Reports: report
+Comment "1" --> "0,n" Report : has
 
-Comments "1" <-> "0,n" Reports: contains
+Post "1" *.. "0,n" Comment : contains
 
-Posts "1" *.. "0,n" Comments: contains
-
-Users "1" <--> "0,n" Posts: publish
-Users "1" <--> "0,n" Comments: add
-Users "1" --> "0,n" Reports: report
-
-Admin --> Reports: manage 
+User "1" <--> "0,n" Post : publish
+User "0,1" <--> "0,n" Comment : add
 
 @enduml

@@ -1,0 +1,21 @@
+@startuml
+
+title Read a blog post 
+autonumber
+
+actor Client 
+entity Server 
+Database Database 
+
+activate Server
+
+Client -> Server : Show single blog post request
+
+Server -> Database : Get blog post by id 
+Server -> Database : Get blog post comments
+
+Server --> Client : Display single blog post page
+
+deactivate Server
+
+@enduml

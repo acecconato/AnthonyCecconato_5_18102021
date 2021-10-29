@@ -1,6 +1,8 @@
 @startuml
 left to right direction
 
+title Security use case
+
 ' Actors
 actor Visitor
 

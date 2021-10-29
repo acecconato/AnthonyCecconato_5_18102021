@@ -1,0 +1,46 @@
+@startuml
+
+title Update a blog post 
+autonumber
+
+actor Client 
+entity Server 
+Database Database 
+
+activate Server
+
+Client -> Server : Update a blog post request
+
+Server --> Client : Display form
+
+deactivate Server
+
+activate Client
+
+Client -> Client : Fill form
+
+Client -> Client : Validate form fields 
+
+alt A form field is invalid
+    Client -> Client : Display errors messages
+end
+
+Client -> Server : Update a blog post request
+
+deactivate Client
+
+activate Server
+
+Server -> Server : Validate data sent 
+
+alt A form value is invalid 
+    Server --> Client : Display errors messages
+end
+
+Server -> Database : Update blog post
+
+Server -> Client : Redirect to the blog post page
+
+deactivate Server
+
+@enduml

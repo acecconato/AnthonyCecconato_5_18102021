@@ -1,0 +1,24 @@
+@startuml
+
+title Post listing 
+autonumber
+
+actor Client 
+entity Server 
+Database Database 
+
+activate Server
+
+Client -> Server : Post listing page request
+note left 
+Including GET pagination
+parameters
+end note
+
+Server -> Database : Get posts
+
+Server --> Client : Display post listing page
+
+deactivate Server
+
+@enduml

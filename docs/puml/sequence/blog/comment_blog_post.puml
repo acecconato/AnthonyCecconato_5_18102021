@@ -1,36 +1,45 @@
 @startuml
 
+title Comment a blog post
+autonumber 
+
 actor Client
-
-entity Website
 entity Server
-
 Database Database
 
-Website -> Client: Display "Add comment" form
-Client -> Website: Fill form fields
+activate Server
 
-Website -> Website: Verify form fields dynamically
+Client -> Server : Request single post page
+Server --> Client : Display single post page 
 
-alt A field is invalid 
-    Website -> Client: Display an error message
+deactivate Server
+
+activate Client
+
+Client -> Client : Fill "Add comment" form
+Client -> Client : Validate form fields
+
+alt A form field is invalid 
+    Client -> Client: Display errors messages
 end
 
-Client -> Website: Click on "add comment"
+Client -> Server : Add a new comment request
 
-Website -> Server: Add a comment request
+deactivate Client
 
-Server -> Server: Verify data sent
+activate Server
+
+Server -> Server : Validate data sent
 
 alt A form value is invalid 
-    Server -> Website: Failed
-    Website -> Client: Display an error message
+    Server -> Client: Display errors messages
 end
+
 
 Server -> Database: Save comment
 
-Server -> Website: Successed
+Server --> Client: Display single post page with the new post
 
-Website -> Client: Display single post page
+deactivate Server
 
 @enduml

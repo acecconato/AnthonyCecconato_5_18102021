@@ -1,6 +1,8 @@
 @startuml
 left to right direction
 
+title Manage users use case
+
 ' Actors
 actor Admin
 

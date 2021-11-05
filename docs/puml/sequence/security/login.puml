@@ -3,30 +3,23 @@
 title Login
 autonumber
 
-actor Client 
-entity Server 
+actor Client
+entity Server
 Database Database
 
 Client -> Server : Login page request
 
 activate Server
 
-alt Client is already logged in 
+alt Client is already logged in
     Server --> Client : Redirect to "My account page"
 end
 
 Server --> Client : Display login form
 
-deactivate Server 
+deactivate Server
 
 activate Client
-
-Client -> Client : Fill form 
-Client -> Client : Validate form fields
-
-alt A form field is invalid 
-    Client -> Client : Display errors messages
-end
 
 Client -> Server : Login request
 
@@ -34,16 +27,18 @@ deactivate Client
 
 activate Server
 
-Server -> Database : Verify credentials
+Server -> Database : Verify that the user exists
 
-alt Credentials are invalid
-    Server --> Client : Display errors messages
+Server -> Database : Verify password
+
+alt User doesn't exists or password is invalid
+    Server --> Client : Display error message
 end
 
-Server -> Server : Login the user
+Server -> Server : Create the user session
 
 Server --> Client : Redirect to the "My account" page
 
-deactivate Server 
+deactivate Server
 
 @enduml

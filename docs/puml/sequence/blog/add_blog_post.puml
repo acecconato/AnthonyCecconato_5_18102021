@@ -1,15 +1,15 @@
 @startuml
 
-title Add a blog post 
+title Add a blog post
 autonumber
 
-actor Client 
-entity Server 
-Database Database 
+actor Client
+entity Server
+Database Database
 
 activate Server
 
-Client -> Server : Add a blog post request 
+Client -> Server : Add a blog post request
 
 Server --> Client : Display Add a blog post page
 
@@ -17,26 +17,21 @@ deactivate Server
 
 activate Client
 
-Client -> Client : Fill form
-Client -> Client : Validate form fields
-
-alt Form is invalid
-    Client -> Client : Display errors messages
-end 
-
 Client -> Server : Add a blog post request
 
 deactivate Client
 
 activate Server
 
-Server -> Server : Verify data sent 
+Server -> Server : Verify data sent
 
-alt A form value is invalid 
+alt A form value is invalid
     Server --> Client : Display errors messages
 end
 
-Server -> Database : Save new blog post 
+Server -> Database : Save new blog post
+
+Server --> Client : Redirect to the new blog post
 
 deactivate Server
 

@@ -1,7 +1,7 @@
 @startuml
 
 title Comment a blog post
-autonumber 
+autonumber
 
 actor Client
 entity Server
@@ -10,18 +10,11 @@ Database Database
 activate Server
 
 Client -> Server : Request single post page
-Server --> Client : Display single post page 
+Server --> Client : Display single post page
 
 deactivate Server
 
 activate Client
-
-Client -> Client : Fill "Add comment" form
-Client -> Client : Validate form fields
-
-alt A form field is invalid 
-    Client -> Client: Display errors messages
-end
 
 Client -> Server : Add a new comment request
 
@@ -31,7 +24,7 @@ activate Server
 
 Server -> Server : Validate data sent
 
-alt A form value is invalid 
+alt A form value is invalid
     Server -> Client: Display errors messages
 end
 

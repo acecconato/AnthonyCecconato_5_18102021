@@ -45,6 +45,7 @@ Temporary Items
 
 .idea
 *.bak
+var/
 
 # User-specific stuff
 .idea/**/workspace.xml

@@ -1,0 +1,34 @@
+{
+  "get": {
+    "/": {
+      "name": "homepage"
+    },
+    "posts/:id": {
+      "name": "get_post",
+      "requirements": {
+        "id": "[0-9]+"
+      }
+    }
+  },
+  "post": {
+    "/posts": {
+      "name": "publish_post"
+    }
+  },
+  "patch": {
+    "/posts/:id": {
+      "name": "update_post",
+      "requirements": {
+        "id": "[0-9]+"
+      }
+    }
+  },
+  "delete": {
+    "/posts/:id": {
+      "name": "delete_post",
+      "requirements": {
+        "id": "[0-9]+"
+      }
+    }
+  }
+}

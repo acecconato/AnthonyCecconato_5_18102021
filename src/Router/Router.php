@@ -4,53 +4,92 @@ declare(strict_types=1);
 
 namespace Blog\Router;
 
-use ArrayIterator;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\RequestMatcherInterface;
+use Blog\Router\Exceptions\RouteAlreadyExistsException;
+use Blog\Router\Exceptions\RouteNotFoundException;
 
-final class Router
+class Router
 {
-    private const NO_ROUTE = 404;
+    /**
+     * @var Route[]
+     */
+    private array $routes = [];
 
-    public function __construct(
-        private ArrayIterator $routes,
-        private UrlGenerator $urlGenerator
-    ) {
-        foreach ($this->routes as $route) {
-            $this->add($route);
-        }
+    /**
+     * @return Route[]
+     */
+    public function getRouteCollection(): array
+    {
+        return $this->routes;
     }
 
-    /** Add a new route to the router
+    /**
+     * @param string $name
      *
-     * @param Route $route The route to add
+     * @return Route|null
+     * @throws RouteNotFoundException
+     */
+    public function get(string $name): ?Route
+    {
+        if ( ! $this->has($name)) {
+            throw new RouteNotFoundException();
+        }
+
+        return $this->routes[$name];
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has(string $name): bool
+    {
+        return isset($this->routes[$name]);
+    }
+
+    /**
+     * @param Route $route
      *
      * @return $this
+     * @throws RouteAlreadyExistsException
      */
-    private function add(Route $route): self
+    public function add(Route $route): self
     {
-        $this->routes->offsetSet($route->getName(), $route);
+        if ($this->has($route->getName())) {
+            throw new RouteAlreadyExistsException();
+        }
+
+        $this->routes[$route->getName()] = $route;
 
         return $this;
     }
 
-    public function match(Request $request): Route
+    /**
+     * @param string $path
+     *
+     * @return Route
+     * @throws RouteNotFoundException
+     */
+    public function match(string $path): Route
     {
+        foreach ($this->routes as $route) {
+            if ($route->test($path)) {
+                return $route;
+            }
+        }
 
+        throw new RouteNotFoundException();
     }
 
-    public function matchFromPath(string $path, string $method): Route
+    /**
+     * @param string $path
+     *
+     * @return false|mixed
+     * @throws RouteNotFoundException
+     * @throws \ReflectionException
+     */
+    public function call(string $path)
     {
-
-    }
-
-    public function generateUri(string $name, $parameters = []): string
-    {
-
-    }
-
-    public function getUrlGenerator(): UrlGenerator
-    {
-        return $this->urlGenerator;
+        return $this->match($path)->call($path);
     }
 }

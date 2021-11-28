@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use Blog\Router\Router;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\HttpFoundation\Request;
 

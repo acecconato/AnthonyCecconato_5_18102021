@@ -6,9 +6,12 @@ namespace Blog\Router;
 
 use ReflectionClass;
 use ReflectionException;
-use ReflectionFunction;
 
-class Route
+/**
+ * Class Route
+ * @package Blog\Routerd
+ */
+final class Route implements RouteInterface
 {
     /**
      * @var string
@@ -48,32 +51,91 @@ class Route
     }
 
     /**
+     * Test if the path match a route by transforming the path to a regex
+     * E.g /users/{id[\d+]} become /^\/users\/(.+)$/
+     *
      * @param string $path
      *
      * @return bool
      */
     public function test(string $path): bool
     {
-        $pattern = str_replace('/', '\/', $this->path);
+        $pattern = $this->path;
+
+        /* Extracts all route's variables, it should returns something like:
+            array(2) {
+              [0] =>
+              string(10) "{id:[\d+]}"
+              [1] =>
+              string(12) "{slug}"
+            }
+        */
+        preg_match_all('/{[^}]*}/i', $pattern, $routeVars);
+        $routeVars = array_shift($routeVars);
+
+        /* Check if there is one or many requiremenst. If yes, we return them, otherwise we return the
+        * (.+) regex to match all characters/digits.
+         *
+         * e.g for the /users/{id:[\d+]}/{slug} route:
+         * array(2) {
+              [0] =>
+              string(5) "[\d+]" // There is one requirement, we only want digits as id!
+              [1] =>
+              string(4) "(.+)" // No requirements, we are looking for anything
+            }
+         */
+        $routeVars = array_map(
+            function ($routeVar) {
+                $routeVar = preg_replace('/([{}])/', '', $routeVar);
+                $routeVar = explode(':', $routeVar);
+
+                return $routeVar[1] ?? '(.+)';
+            },
+            $routeVars
+        );
+
+        $explodedPattern = explode('/', $pattern);
+
+        // Replace route's variables by regex
+        $routeVarsIndex = 0;
+        foreach ($routeVars as $routeVar) {
+            foreach ($explodedPattern as $index => $item) {
+                if (preg_match('/{.+}/', $item)) {
+                    $explodedPattern[$index] = $routeVars[$routeVarsIndex];
+                    $routeVarsIndex++;
+                }
+            }
+        }
+
+        $pattern = implode('/', $explodedPattern);
+
+        // Add a \ after all / to prepare the regex
+        $pattern = str_replace('/', '\/', $pattern);
+
+        // Add ^ and $ delimiters
         $pattern = sprintf('/^%s$/', $pattern);
-        $pattern = preg_replace('/({.+})/', '(.+)', $pattern);
 
         return (bool)preg_match($pattern, $path);
     }
 
     /**
+     * Call a callable and retrieve the proper variables to send them through it
+     *
      * @param string $path
      *
-     * @return false|mixed
+     * @return mixed
      * @throws ReflectionException
      */
-    public function call(string $path)
+    public function call(string $path): mixed
     {
         $pattern = str_replace('/', '\/', $this->path);
         $pattern = sprintf('/^%s$/', $pattern);
         $pattern = preg_replace('/({\w+})/', '(.+)', $pattern);
+
+        // Get path's variables values
         preg_match($pattern, $path, $matches);
 
+        // Get path's variables name
         preg_match_all('/{(\w+)}/', $this->path, $paramMatches);
 
         array_shift($matches);
@@ -85,13 +147,7 @@ class Route
         if (count($parameters) > 0) {
             $parameters = array_combine($parameters, $matches);
 
-            if (is_array($this->callable)) {
-                $reflFunc = (new ReflectionClass($this->callable[0]))->getMethod($this->callable[1]);
-
-            } else {
-                $reflFunc = new ReflectionFunction($this->callable);
-
-            }
+            $reflFunc = (new ReflectionClass($this->callable[0]))->getMethod($this->callable[1]);
 
             $args = array_map(fn(\ReflectionParameter $param) => $param->getName(), $reflFunc->getParameters());
 
@@ -103,12 +159,6 @@ class Route
             );
         }
 
-        $callable = $this->callable;
-
-        if (is_array($callable)) {
-            $callable = [new $callable[0](), $callable[1]];
-        }
-
-        return call_user_func_array($callable, $argsValue);
+        return call_user_func_array([new $this->callable[0], $this->callable[1]], $argsValue);
     }
 }

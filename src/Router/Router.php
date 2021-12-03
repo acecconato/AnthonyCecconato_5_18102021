@@ -6,13 +6,31 @@ namespace Blog\Router;
 
 use Blog\Router\Exceptions\RouteAlreadyExistsException;
 use Blog\Router\Exceptions\RouteNotFoundException;
+use ReflectionException;
+use Symfony\Component\HttpFoundation\Request;
 
-class Router
+/**
+ * Class Router
+ * @package Blog\Router
+ */
+final class Router implements RouterInterface
 {
     /**
      * @var Route[]
      */
     private array $routes = [];
+
+    public function __construct(
+        private Request $request
+    ) {
+    }
+
+    public function getRouteByRequest(): Route
+    {
+//        if ($this->match()) {
+//
+//        }
+    }
 
     /**
      * @return Route[]
@@ -84,11 +102,11 @@ class Router
     /**
      * @param string $path
      *
-     * @return false|mixed
+     * @return mixed
      * @throws RouteNotFoundException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function call(string $path)
+    public function call(string $path): mixed
     {
         return $this->match($path)->call($path);
     }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Blog\Fixtures;
+namespace Tests\Fixtures;
 
 /**
  * Class HomeController
- * @package Blog\Fixtures
+ * @package Tests\Fixtures
  */
 class HomeController
 {

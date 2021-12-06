@@ -19,8 +19,6 @@ $dotenv->loadEnv(dirname(__DIR__).'/.env');
 
 $request = Request::createFromGlobals();
 
-var_dump($request->getUri());
-
 $router = new Router($request);
 
 $routes = require_once '../config/routes.php';

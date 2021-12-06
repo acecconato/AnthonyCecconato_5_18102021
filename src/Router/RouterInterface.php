@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Blog\Router;
 
+use Symfony\Component\HttpFoundation\Request;
+
 interface RouterInterface
 {
     /**
@@ -50,4 +52,11 @@ interface RouterInterface
      * @return Route
      */
     public function getRouteByRequest(): Route;
+
+    /**
+     * @param Request $request
+     *
+     * @return $this
+     */
+    public function setRequest(Request $request): self;
 }

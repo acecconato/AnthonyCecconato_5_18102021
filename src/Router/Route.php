@@ -6,6 +6,9 @@ namespace Blog\Router;
 
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Route
@@ -14,32 +17,17 @@ use ReflectionException;
 final class Route implements RouteInterface
 {
     /**
-     * @var string
-     */
-    private string $name;
-
-    /**
-     * @var string
-     */
-    private string $path;
-
-    /**
-     * @var array|callable
-     */
-    private $callable;
-
-    /**
      * Route constructor.
      *
      * @param string $name
      * @param string $path
-     * @param array|callable $callable
+     * @param array $callable $callable
      */
-    public function __construct(string $name, string $path, callable|array $callable)
-    {
-        $this->name     = $name;
-        $this->path     = $path;
-        $this->callable = $callable;
+    public function __construct(
+        private string $name,
+        private string $path,
+        private array $callable
+    ) {
     }
 
     /**
@@ -70,7 +58,7 @@ final class Route implements RouteInterface
               string(12) "{slug}"
             }
         */
-        preg_match_all('/{[^}]*}/i', $pattern, $routeVars);
+        preg_match_all('/{[^}]*}/', $pattern, $routeVars);
         $routeVars = array_shift($routeVars);
 
         /* Check if there is one or many requiremenst. If yes, we return them, otherwise we return the
@@ -120,23 +108,25 @@ final class Route implements RouteInterface
 
     /**
      * Call a callable and retrieve the proper variables to send them through it
+     * If the callable is using a Request or a Response object, we automatically send them.
      *
-     * @param string $path
+     * @param Request $request
+     * @param Response $response
      *
      * @return mixed
      * @throws ReflectionException
      */
-    public function call(string $path): mixed
+    public function call(Request $request, Response $response): mixed
     {
         $pattern = str_replace('/', '\/', $this->path);
         $pattern = sprintf('/^%s$/', $pattern);
-        $pattern = preg_replace('/({\w+})/', '(.+)', $pattern);
+        $pattern = preg_replace('/{([^}]*)}/', '(.+)', $pattern);
 
         // Get path's variables values
-        preg_match($pattern, $path, $matches);
+        preg_match($pattern, $request->getRequestUri(), $matches);
 
         // Get path's variables name
-        preg_match_all('/{(\w+)}/', $this->path, $paramMatches);
+        preg_match_all('/{([^}]*)}/', $this->path, $paramMatches);
 
         array_shift($matches);
 
@@ -145,20 +135,52 @@ final class Route implements RouteInterface
         $argsValue = [];
 
         if (count($parameters) > 0) {
+
+            // Remove requirement parts from the parameters
+            $parameters = array_map(
+                function ($param) {
+                    if (str_contains($param, ':')) {
+                        return substr($param, 0, (int)strpos($param, ':'));
+                    }
+
+                    return $param;
+                },
+                $parameters
+            );
+
             $parameters = array_combine($parameters, $matches);
 
             $reflFunc = (new ReflectionClass($this->callable[0]))->getMethod($this->callable[1]);
 
             $args = array_map(fn(\ReflectionParameter $param) => $param->getName(), $reflFunc->getParameters());
 
-            $argsValue = array_map(
-                function (string $name) use ($parameters) {
-                    return $parameters[$name];
-                },
-                $args
-            );
+            foreach ($args as $argName) {
+                if (array_key_exists($argName, $parameters)) {
+                    $argsValue[] = $parameters[$argName];
+                }
+            }
         }
 
-        return call_user_func_array([new $this->callable[0], $this->callable[1]], $argsValue);
+        $class  = $this->callable[0];
+        $method = $this->callable[1];
+
+        $reflMethod = new ReflectionMethod($class, $method);
+
+        $expectedParameters = $reflMethod->getParameters();
+
+        foreach ($expectedParameters as $param) {
+            $type = (string)$param->getType();
+
+            switch ($type) {
+                case Request::class:
+                    $argsValue[] = $request;
+                    break;
+                case Response::class:
+                    $argsValue[] = $response;
+                    break;
+            }
+        }
+
+        return call_user_func_array([new $class, $method], $argsValue);
     }
 }

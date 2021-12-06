@@ -8,6 +8,7 @@ use Blog\Router\Exceptions\RouteAlreadyExistsException;
 use Blog\Router\Exceptions\RouteNotFoundException;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Router
@@ -20,16 +21,15 @@ final class Router implements RouterInterface
      */
     private array $routes = [];
 
+    /**
+     * Router constructor.
+     *
+     * @param Request $request
+     */
     public function __construct(
-        private Request $request
+        private Request $request,
+//        private UrlGeneratorInterface $urlGenerator
     ) {
-    }
-
-    public function getRouteByRequest(): Route
-    {
-//        if ($this->match()) {
-//
-//        }
     }
 
     /**
@@ -53,6 +53,15 @@ final class Router implements RouterInterface
         }
 
         return $this->routes[$name];
+    }
+
+    /**
+     * @return Route
+     * @throws RouteNotFoundException
+     */
+    public function getRouteByRequest(): Route
+    {
+        return $this->match($this->request->getRequestUri());
     }
 
     /**
@@ -108,6 +117,30 @@ final class Router implements RouterInterface
      */
     public function call(string $path): mixed
     {
-        return $this->match($path)->call($path);
+        $response = new Response();
+
+        return $this->match($path)->call($this->request, $response);
+    }
+
+    /**
+     * @param Request $request
+     *
+     * @return $this
+     */
+    public function setRequest(Request $request): self
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    public function generateUri(string $name, array $parameters): string
+    {
+//        $this->urlGenerator->generate($name, $parameters);
+    }
+
+    public function getUrlGenerator(): UrlGeneratorInterface
+    {
+//        return $this->urlGenerator;
     }
 }

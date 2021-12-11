@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Blog\Router;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 
 interface RouterInterface
 {
@@ -16,9 +17,9 @@ interface RouterInterface
     /**
      * @param string $name
      *
-     * @return Route|null
+     * @return Route
      */
-    public function get(string $name): ?Route;
+    public function get(string $name): Route;
 
     /**
      * @param string $name
@@ -42,21 +43,14 @@ interface RouterInterface
     public function match(string $path): Route;
 
     /**
-     * @param string $path
-     *
-     * @return mixed
+     * @param Request $request
+     * @return Response
      */
-    public function call(string $path): mixed;
-
-    /**
-     * @return Route
-     */
-    public function getRouteByRequest(): Route;
+    public function call(Request $request): Response;
 
     /**
      * @param Request $request
-     *
-     * @return $this
+     * @return Route|null
      */
-    public function setRequest(Request $request): self;
+    public function getRouteByRequest(Request $request): ?Route;
 }

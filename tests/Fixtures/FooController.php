@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Tests\Fixtures;
 
+use Blog\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -11,59 +12,59 @@ use Symfony\Component\HttpFoundation\Response;
  * Class FooController
  * @package Tests\Fixtures
  */
-class FooController
+class FooController extends AbstractController
 {
-    /**
-     * @param string $bar
-     * @param string $foo
-     * @param Response $response
-     *
-     * @return Response
-     */
-    public function index(string $bar, string $foo, Response $response): Response
+    public function foo(): Response
     {
-        $response->setContent("$foo $bar");
-
-        return $response->send();
+        return $this->raw('Hello World!');
     }
 
     /**
-     * @param Response $response
-     *
+     * @param string $name
      * @return Response
      */
-    public function foo(Response $response): Response
+    public function fooWithVar(string $name): Response
     {
-        $response->setContent('Hello World!');
-
-        return $response->send();
+        return $this->raw("Hello $name!");
     }
 
     /**
-     * @param string $firstname
-     * @param string $lastname
-     * @param Response $response
-     *
+     * @param string $name
+     * @param int $age
      * @return Response
      */
-    public function getUserFullname(string $firstname, string $lastname, Response $response): Response
+    public function fooWithVars(string $name, int $age): Response
     {
-        $response->setContent("Hello $firstname $lastname!");
-
-        return $response->send();
+        return $this->raw("Hello $name! You are $age yo");
     }
 
     /**
-     * @param int $id
      * @param Request $request
-     * @param Response $response
-     *
      * @return Response
      */
-    public function testRequest(int $id, Request $request, Response $response): Response
+    public function fooWithReq(Request $request): Response
     {
-        $response->setContent('Hello World!');
+        return $this->raw('Hello for ' . $request->getRequestUri());
+    }
 
-        return $response->send();
+    /**
+     * @param Request $request
+     * @param string $name
+     * @return Response
+     */
+    public function fooWithReqAndVar(Request $request, string $name): Response
+    {
+        return $this->raw('Hello ' . $name . ' for ' . $request->getRequestUri());
+    }
+
+    /**
+     * @param Request $request
+     * @param string $name
+     * @param int $age
+     * @return Response
+     */
+    public function fooWithReqAndVars(Request $request, string $name, int $age): Response
+    {
+        return $this->raw('Hello ' . $name . ', ' . $age . ' for ' . $request->getRequestUri());
     }
 }

@@ -6,6 +6,7 @@ namespace Blog\Router;
 
 use Blog\Router\Exceptions\RouteAlreadyExistsException;
 use Blog\Router\Exceptions\RouteNotFoundException;
+use InvalidArgumentException;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,23 +15,12 @@ use Symfony\Component\HttpFoundation\Response;
  * Class Router
  * @package Blog\Router
  */
-final class Router implements RouterInterface
+final class Router implements RouterInterface, UrlGeneratorInterface
 {
     /**
      * @var Route[]
      */
     private array $routes = [];
-
-    /**
-     * Router constructor.
-     *
-     * @param Request $request
-     */
-    public function __construct(
-        private Request $request,
-//        private UrlGeneratorInterface $urlGenerator
-    ) {
-    }
 
     /**
      * @return Route[]
@@ -41,54 +31,13 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param string $name
-     *
+     * @param Request $request
      * @return Route|null
      * @throws RouteNotFoundException
      */
-    public function get(string $name): ?Route
+    public function getRouteByRequest(Request $request): ?Route
     {
-        if ( ! $this->has($name)) {
-            throw new RouteNotFoundException();
-        }
-
-        return $this->routes[$name];
-    }
-
-    /**
-     * @return Route
-     * @throws RouteNotFoundException
-     */
-    public function getRouteByRequest(): Route
-    {
-        return $this->match($this->request->getRequestUri());
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function has(string $name): bool
-    {
-        return isset($this->routes[$name]);
-    }
-
-    /**
-     * @param Route $route
-     *
-     * @return $this
-     * @throws RouteAlreadyExistsException
-     */
-    public function add(Route $route): self
-    {
-        if ($this->has($route->getName())) {
-            throw new RouteAlreadyExistsException();
-        }
-
-        $this->routes[$route->getName()] = $route;
-
-        return $this;
+        return $this->match($request->getRequestUri());
     }
 
     /**
@@ -109,38 +58,113 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param string $path
-     *
-     * @return mixed
-     * @throws RouteNotFoundException
-     * @throws ReflectionException
-     */
-    public function call(string $path): mixed
-    {
-        $response = new Response();
-
-        return $this->match($path)->call($this->request, $response);
-    }
-
-    /**
-     * @param Request $request
+     * @param Route $route
      *
      * @return $this
+     * @throws RouteAlreadyExistsException
      */
-    public function setRequest(Request $request): self
+    public function add(Route $route): self
     {
-        $this->request = $request;
+        if ($this->has($route->getName())) {
+            throw new RouteAlreadyExistsException();
+        }
+
+        $this->routes[$route->getName()] = $route;
 
         return $this;
     }
 
-    public function generateUri(string $name, array $parameters): string
+    /**
+     * @param string $name
+     *
+     * @return bool
+     */
+    public function has(string $name): bool
     {
-//        $this->urlGenerator->generate($name, $parameters);
+        return isset($this->routes[$name]);
     }
 
-    public function getUrlGenerator(): UrlGeneratorInterface
+    /**
+     * @param Request $request
+     * @return Response
+     * @throws ReflectionException
+     * @throws RouteNotFoundException
+     */
+    public function call(Request $request): Response
     {
-//        return $this->urlGenerator;
+        return $this->match($request->getRequestUri())->call($request);
+    }
+
+    /** Generate a route from route name and parameters
+     * @param string $name
+     * @param array<mixed> $parameters
+     * @return string
+     * @throws RouteNotFoundException
+     */
+    public function generateUri(string $name, array $parameters = []): string
+    {
+        $route = $this->get($name);
+
+        /* Check if the route contains variables */
+        $pattern = $route->getPath();
+
+        $hasVars = preg_match_all('/{([^}]*)}/', $pattern, $expectedVars);
+
+        /* No? Just return the route path */
+        if (!$hasVars) {
+            return $route->getPath();
+        }
+
+        // Extracts expected parameter's name (without regex part)
+        $expectedKeys = array_map(
+            function ($expectedVar) {
+                if (str_contains($expectedVar, ':')) {
+                    return substr($expectedVar, 0, (int)strpos($expectedVar, ':'));
+                }
+
+                return $expectedVar;
+            },
+            $expectedVars[1]
+        );
+
+        // Check that the parameters sent are expected by the route
+        foreach ($parameters as $paramName => $paramValue) {
+            if (!in_array($paramName, $expectedKeys)) {
+                throw new InvalidArgumentException(
+                    sprintf('Unknown `%s` parameter for the `%s` route', $paramName, $route->getName())
+                );
+            }
+        }
+
+        return (string)preg_replace_callback(
+            '/{([^}]*)}/',
+            function ($matches) use ($parameters) {
+                $routeVar = $matches[1]; // e.g: name:[a-zA-Z-_ ]+
+                $routeVarName = $routeVar;
+
+                // If the param contains a regex, remove it and keep only the parameter's name
+                if (str_contains($routeVar, ':')) {
+                    $routeVarName = substr($routeVar, 0, (int)strpos($routeVar, ':'));
+                }
+
+                return $parameters[$routeVarName];
+            },
+            $pattern
+        );
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return Route
+     * @throws RouteNotFoundException
+     */
+    public function get(string $name): Route
+    {
+        if (!$this->has($name)) {
+            throw new RouteNotFoundException();
+        }
+
+        return $this->routes[$name];
     }
 }

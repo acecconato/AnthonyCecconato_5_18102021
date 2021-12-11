@@ -23,9 +23,8 @@ interface RouteInterface
 
     /**
      * @param Request $request
-     * @param Response $response
      *
-     * @return mixed
+     * @return Response
      */
-    public function call(Request $request, Response $response): mixed;
+    public function call(Request $request): Response;
 }

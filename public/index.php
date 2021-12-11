@@ -19,10 +19,13 @@ $dotenv->loadEnv(dirname(__DIR__).'/.env');
 
 $request = Request::createFromGlobals();
 
-$router = new Router($request);
+$router = new Router();
 
 $routes = require_once '../config/routes.php';
 foreach ($routes as $route) {
     $router->add($route);
 }
 
+$response = $router->call($request);
+
+return $response->send();

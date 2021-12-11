@@ -9,8 +9,12 @@
   },
   "autoload": {
     "psr-4": {
-      "Blog\\": "src/",
-      "Tests\\":  "tests/"
+      "Blog\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
     }
   },
   "scripts": {
@@ -40,6 +44,7 @@
     "phpunit/phpunit": "^9.5",
     "squizlabs/php_codesniffer": "^3.6",
     "symfony/var-dumper": "^5.3",
-    "phpstan/phpstan": "^1.1"
+    "phpstan/phpstan": "^1.1",
+    "jetbrains/phpstorm-attributes": "^1.0"
   }
 }

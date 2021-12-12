@@ -15,7 +15,7 @@ use Symfony\Component\HttpFoundation\Response;
  * Class Router
  * @package Blog\Router
  */
-final class Router implements RouterInterface, UrlGeneratorInterface
+final class Router implements RouterInterface
 {
     /**
      * @var Route[]

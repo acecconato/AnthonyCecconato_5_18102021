@@ -7,7 +7,7 @@ namespace Blog\Router;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-interface RouterInterface
+interface RouterInterface extends UrlGeneratorInterface, UrlMatcherInterface
 {
     /**
      * @return Route[]

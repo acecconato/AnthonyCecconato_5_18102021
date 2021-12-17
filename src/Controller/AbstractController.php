@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractController
 {
     /**
-     * @param string $rawResponse
+     * @param  string $rawResponse
      * @return Response
      */
     public function raw(string $rawResponse): Response

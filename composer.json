@@ -19,17 +19,17 @@
     }
   },
   "scripts": {
-    "phpstan": "phpstan analyse --level=max src/",
+    "phpstan": "phpstan analyse --level=6 src/",
     "phpmd": "phpmd src/ text codesize cleancode design naming unused controversial",
     "phpcs": "phpcs --standard=PSR12 src/",
     "phpcpd": "phpcpd src/",
     "tests": "phpunit tests",
     "serve": "php -S localhost:8001 -t public/",
     "ci": [
-      "@phpstan",
       "@phpmd",
       "@phpcs",
       "@phpcpd",
+      "@phpstan",
       "@tests"
     ]
   },

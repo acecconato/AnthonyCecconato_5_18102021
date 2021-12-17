@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Router
+ *
  * @package Blog\Router
  */
 final class Router implements RouterInterface
@@ -31,7 +32,7 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param Request $request
+     * @param  Request $request
      * @return Route|null
      * @throws RouteNotFoundException
      */
@@ -85,7 +86,7 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param Request $request
+     * @param  Request $request
      * @return Response
      * @throws ReflectionException
      * @throws RouteNotFoundException
@@ -95,9 +96,11 @@ final class Router implements RouterInterface
         return $this->match($request->getRequestUri())->call($request);
     }
 
-    /** Generate a route from route name and parameters
-     * @param string $name
-     * @param array<mixed> $parameters
+    /**
+     * Generate a route from route name and parameters
+     *
+     * @param  string       $name
+     * @param  array<mixed> $parameters
      * @return string
      * @throws RouteNotFoundException
      */

@@ -43,13 +43,13 @@ interface RouterInterface extends UrlGeneratorInterface, UrlMatcherInterface
     public function match(string $path): Route;
 
     /**
-     * @param Request $request
+     * @param  Request $request
      * @return Response
      */
     public function call(Request $request): Response;
 
     /**
-     * @param Request $request
+     * @param  Request $request
      * @return Route|null
      */
     public function getRouteByRequest(Request $request): ?Route;

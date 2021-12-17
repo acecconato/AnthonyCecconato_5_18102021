@@ -11,15 +11,16 @@ use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Route
- * @package Blog\Routerd
+ *
+ * @package Blog\Router
  */
 final class Route implements RouteInterface
 {
     /**
      * Route constructor.
      *
-     * @param string $name
-     * @param string $path
+     * @param string       $name
+     * @param string       $path
      * @param array<mixed> $callable $callable
      */
     public function __construct(

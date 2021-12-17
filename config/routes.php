@@ -4,5 +4,5 @@ use Blog\Controller\HomeController;
 use Blog\Router\Route;
 
 return [
-    new Route('home', '/', [HomeController::class, 'showHome']),
+    new Route('home', '/', [HomeController::class, 'index']),
 ];

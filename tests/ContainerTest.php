@@ -4,30 +4,7 @@ declare(strict_types=1);
 
 namespace Tests;
 
-<<<<<<< Updated upstream
-use Blog\Container\Container;
-use Blog\Container\Exceptions\NotFoundException;
-use PHPUnit\Framework\TestCase;
-
-class ContainerTest extends TestCase
-{
-    public function testContainer()
-    {
-        $services = [
-            'my.service'   => fn($test) => 'Hello',
-            'my.parameter' => 42,
-        ];
-
-        $container = new Container($services);
-
-        $this->assertEquals('Hello', $container->get('my.service'));
-        $this->assertEquals(42, $container->get('my.parameter'));
-
-        $this->expectException(NotFoundException::class);
-        $container->get('unknown');
-=======
 use Blog\DependencyInjection\Container;
-use Blog\DependencyInjection\Exceptions\NotFoundException;
 use Blog\Router\RouterInterface;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixtures\Database;
@@ -62,6 +39,5 @@ class ContainerTest extends TestCase
         $foo2 = $container->get(Foo::class);
 
         $this->assertNotEquals(spl_object_id($foo1), spl_object_id($foo2));
->>>>>>> Stashed changes
     }
 }

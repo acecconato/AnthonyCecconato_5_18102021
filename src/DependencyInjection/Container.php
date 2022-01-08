@@ -41,7 +41,6 @@ final class Container implements ContainerInterface
 
         if ($reflectionClass->isInterface()) {
             $this->register($this->aliases[$id]);
-            // TODO Q/A: Pourquoi passer la variable ci-dessous en référence ?
             $this->definitions[$id] = &$this->definitions[$this->aliases[$id]];
             return $this;
         }
@@ -50,13 +49,16 @@ final class Container implements ContainerInterface
 
         if (null !== $reflectionClass->getConstructor()) {
             $dependencies = array_map(
-            // TODO Q/A Erreur PHPSTAN "Call to an undefined method ReflectionType::getName()." ??
-            /* @phpstan-ignore-next-line */
                 fn(ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
                 array_filter(
                     $reflectionClass->getConstructor()->getParameters(),
-                    // TODO Q/A Par quoi peut-on remplacer les getClass() depréciés ?
-                    fn(ReflectionParameter $parameter) => $parameter->getClass()
+                    function (ReflectionParameter $parameter) {
+                        if (!$parameter->getType()->isBuiltin()) {
+                            return new ReflectionClass($parameter->getType()->getName());
+                        }
+
+                        return null;
+                    }
                 )
             );
         }
@@ -72,7 +74,7 @@ final class Container implements ContainerInterface
      * Get a definition
      * If the excepted definition does not exist then we register it before returning it.
      *
-     * @param  string $id
+     * @param string $id
      * @return Definition
      * @throws ReflectionException
      */
@@ -103,6 +105,7 @@ final class Container implements ContainerInterface
         if (!isset($this->parameters[$id])) {
             throw new NotFoundException();
         }
+
         return $this->parameters[$id];
     }
 

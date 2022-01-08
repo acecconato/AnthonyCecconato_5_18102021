@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Blog;
 
+use Blog\Config\ConfigFactory;
+use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
+use Blog\Router\Router\Exceptions\RouteAlreadyExistsException;
 use Blog\Router\RouterInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+
+// TODO Q/A Comment implémenter l'OptionResolver correctement, et où l'utiliser pour que ce soit pertinent ?
 
 final class Kernel
 {
@@ -20,50 +25,70 @@ final class Kernel
     private RouterInterface $router;
 
     /**
-     * @param  ContainerInterface $container
-     * @param  array              $config
+     * @var ContainerInterface
+     */
+    private ContainerInterface $container;
+
+    /**
+     * @param string $env
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     public function __construct(
-        private ContainerInterface $container,
-        private array $config = [],
+        private string $env
+
     ) {
-        $this->config['routes'] = include_once '../config/routes.php';
-
-        /* TODO Q/A Il me semble que par convention, le constructeur doit normalement être utilisé que pour set
-         des variables, est-ce que je peux placer le init ici, ou vaut-il mieux l'appeler ailleurs, comme dans mon
-         index.php par exemple ? */
-        $this->init();
-    }
-
-    public function run(Request $request): Response
-    {
-        return $this->router->call($request);
+        $this->container = new Container();
+        $this->configureContainer();
+        $this->configureRoutes();
     }
 
     /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
+     * @param Request $request
+     * @return void
      */
-    private function init(): void
+    public function run(Request $request): void
     {
-        $this->configureRouter();
+        // TODO Q/A Ici on send mais est ce que ce ne serait pas plus simple de récupérer le controller pour y attacher le container
+        // et ensuite l'executer ? Ou passer par un Responder ?
+       $this->router->call($request)->send();
+    }
 
-        foreach ($this->config['routes'] as $route) {
-            $this->router->add($route);
-        }
+    /**
+     * @return void
+     */
+    public function configureContainer(): void
+    {
+        $this->container
+            ->addAlias(RouterInterface::class, Router::class);
+
+        $this->container
+            ->addParameter('env', $this->env)
+            ->addParameter('source_dir', __DIR__)
+            ->addParameter('cache_dir', sprintf('%s/../var/cache/%s', __DIR__, $this->env))
+            ->addParameter('templates_dir', dirname(__DIR__) . '/templates')
+            ->addParameter('config', ConfigFactory::getConfig());
     }
 
     /**
      * @return void
      * @throws ContainerExceptionInterface
+     * @throws DependencyInjection\Exceptions\NotFoundException
      * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws RouteAlreadyExistsException
      */
-    private function configureRouter(): void
+    public function configureRoutes(): void
     {
-        $this->container->addAlias(RouterInterface::class, Router::class);
-
+        /** @var Router $router */
         $this->router = $this->container->get(Router::class);
+
+        $routes = $this->container->getParameter('config')['routes'];
+
+        // TODO Q/A Plutôt passer par l'OptionResolver ?
+        foreach ($routes as $route) {
+            $this->router->add($route);
+        }
     }
 }

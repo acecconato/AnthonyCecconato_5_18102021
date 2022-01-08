@@ -13,7 +13,6 @@ use Tests\Fixtures\Router;
 
 class ContainerTest extends TestCase
 {
-
     public function test()
     {
         $container = new Container();

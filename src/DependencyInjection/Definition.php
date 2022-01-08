@@ -21,10 +21,10 @@ final class Definition
     /**
      * Definition constructor.
      *
-     * @param  string        $id
-     * @param  bool          $shared
-     * @param  array<string> $aliases
-     * @param  array<string> $dependencies
+     * @param string $id
+     * @param bool $shared
+     * @param array<string> $aliases
+     * @param array<string> $dependencies
      * @throws ReflectionException
      */
     public function __construct(
@@ -37,7 +37,7 @@ final class Definition
     }
 
     /**
-     * @param  bool $shared
+     * @param bool $shared
      * @return self
      */
     public function setShared(bool $shared): self
@@ -56,7 +56,7 @@ final class Definition
     }
 
     /**
-     * @param  ContainerInterface $container
+     * @param ContainerInterface $container
      * @return object
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
@@ -75,13 +75,13 @@ final class Definition
         return $this->class->newInstanceArgs(
             array_map(
                 function (ReflectionParameter $param) use ($container) {
-                    // Todo Q/A : Par quoi remplacer le getClass déprécié ?
-                    if ($param->getClass() === null) {
+                    if ($param->getType()->isBuiltin()) {
                         return $container->getParameter($param->getName());
                     }
 
                     return $container->get($param->getType()->getName());
-                }, $parameters
+                },
+                $parameters
             )
         );
     }

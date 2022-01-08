@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-use Blog\DependencyInjection\Container;
 use Blog\Kernel;
-use Blog\Router\Router;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,16 +17,9 @@ if (!file_exists(dirname(__DIR__) . '/.env')) {
 
 $dotenv->loadEnv(dirname(__DIR__) . '/.env');
 
-$request = Request::createFromGlobals();
-
-$container = new Container();
-
 try {
-    $kernel = new Kernel($container);
-
-    $response = $kernel->run($request);
-
-    $response->send();
+    $kernel = new Kernel($_ENV['APP_ENV']);
+    $kernel->run(Request::createFromGlobals());
 } catch (Exception $e) {
     dd($e->getMessage());
 }

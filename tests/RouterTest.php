@@ -9,11 +9,8 @@ use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Route;
 use Blog\Router\Router;
 use InvalidArgumentException;
-use JetBrains\PhpStorm\Pure;
 use PHPUnit\Framework\TestCase;
-use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Tests\Fixtures\FooController;
 
 /**
@@ -24,242 +21,120 @@ class RouterTest extends TestCase
 {
     private const ENDPOINT = 'http://localhost:8080';
 
-    /**
-     * @return void
-     * @throws RouteAlreadyExistsException
-     */
-    public function testAddRoutes(): void
+    public function testAddRoutes()
     {
         $router = new Router();
+        $router->add(new Route('home', '/', [FooController::class, 'index']));
 
-        foreach ($this->provideRoutesData() as $route) {
-            $router->add($route);
-        }
-
-        $this->assertCount(6, $router->getRouteCollection());
         $this->assertContainsOnlyInstancesOf(Route::class, $router->getRouteCollection());
+        $this->assertCount(1, $router->getRouteCollection());
+
+        $router->add(new Route('foo', '/foo', [FooController::class, 'index']));
+
+        $this->assertCount(2, $router->getRouteCollection());
+
+        $this->assertTrue($router->has('home'));
     }
 
-    /**
-     * @return Route[]
-     */
-    #[Pure] private function provideRoutesData(): array
+    public function testGetRouteByRequest()
     {
-        $homeRoute = new Route(
-            'home',
-            '/',
-            [FooController::class, 'foo']
-        );
+        $request = Request::create(self::ENDPOINT.'/foo');
 
-        $getUsersRoute = new Route(
-            'get_users',
-            '/users',
-            [FooController::class, 'foo']
-        );
-
-        $getUserByNameRoute = new Route(
-            'get_user_by_name',
-            '/users/{name:[a-zA-Z-_ ]+}',
-            [FooController::class, 'fooWithVar']
-        );
-
-        $getUserByNameAndReqRoute = new Route(
-            'get_user_by_name_req',
-            '/users/req/{name:[a-zA-Z-_ ]+}',
-            [FooController::class, 'fooWithReqAndVar']
-        );
-
-        $getUsernameAndAge = new Route(
-            'get_username_age',
-            '/users/{name:[a-zA-Z-_ ]+}/{age:\d+}',
-            [FooController::class, 'fooWithVars']
-        );
-
-        $getUsernameAndAgeWithReq = new Route(
-            'get_username_age_req',
-            '/users/req/{name:[a-zA-Z-_ ]+}/{age:\d+}',
-            [FooController::class, 'fooWithReqAndVars']
-        );
-
-        return [
-            $homeRoute,
-            $getUsersRoute,
-            $getUserByNameRoute,
-            $getUserByNameAndReqRoute,
-            $getUsernameAndAge,
-            $getUsernameAndAgeWithReq,
-        ];
-    }
-
-    /**
-     * @return void
-     * @throws RouteAlreadyExistsException
-     */
-    public function testRouteAlreadyExistsException(): void
-    {
-        $router = $this->generateRouter();
-
-        $alreadyExistsRoute = new Route(
-            'home',
-            '/',
-            [FooController::class, 'foo']
-        );
-
-        $this->expectException(RouteAlreadyExistsException::class);
-        $router->add($alreadyExistsRoute);
-    }
-
-    /**
-     * @return Router
-     * @throws RouteAlreadyExistsException
-     */
-    private function generateRouter(): Router
-    {
         $router = new Router();
 
-        foreach ($this->provideRoutesData() as $route) {
-            $router->add($route);
-        }
-
-        return $router;
-    }
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testSimpleResponse(): void
-    {
-        $request = Request::create(self::ENDPOINT);
-
-        $router = $this->generateRouter();
-
-        $this->assertEquals((new Response('Hello World!')), $router->call($request));
-    }
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testResponseWithArg(): void
-    {
-        $request = Request::create(self::ENDPOINT . '/users/john');
-
-        $router = $this->generateRouter();
-
-        $this->assertEquals((new Response('Hello john!')), $router->call($request));
-
-        $this->expectException(RouteNotFoundException::class);
-        $request = Request::create(self::ENDPOINT . '/users/42');
-        $router->call($request);
-    }
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testResponseWithArgAndReq(): void
-    {
-        $request = Request::create(self::ENDPOINT . '/users/req/john');
-
-        $router = $this->generateRouter();
-
-        $this->assertEquals((new Response('Hello john for /users/req/john')), $router->call($request));
-
-        $this->expectException(RouteNotFoundException::class);
-        $request = Request::create(self::ENDPOINT . '/users/42');
-        $router->call($request);
-    }
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testResponseWithArgs()
-    {
-        $request = Request::create(self::ENDPOINT . '/users/john/42');
-
-        $router = $this->generateRouter();
-
-        $this->assertEquals((new Response('Hello john! You are 42 yo')), $router->call($request));
-
-        $this->expectException(RouteNotFoundException::class);
-        $request = Request::create(self::ENDPOINT . '/users/john/invalid');
-        $router->call($request);
-    }
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testResponseWithArgsAndReq()
-    {
-        $request = Request::create(self::ENDPOINT . '/users/req/john/42');
-
-        $router = $this->generateRouter();
-
-        $this->assertEquals((new Response('Hello john, 42 for /users/req/john/42')), $router->call($request));
-
-        $this->expectException(RouteNotFoundException::class);
-        $request = Request::create(self::ENDPOINT . '/users/req/0/42');
-        $router->call($request);
-    }
-
-    /**
-     * @return void
-     * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testIncorrectRouteArgsException(): void
-    {
-        $router = $this->generateRouter();
-
-        $request = Request::create(self::ENDPOINT . '/users/42'); // excepts [a-zA-Z-_ ]+ instead of 42
-
-        $this->expectException(RouteNotFoundException::class);
-        $router->call($request);
-    }
-
-    /**
-     * @return void
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
-    public function testGenerateUri()
-    {
-        $router = $this->generateRouter();
-
-        $this->assertEquals('/', $router->generateUri('home'));
+        $router->add(new Route('home', '/', [FooController::class, 'index']));
+        $router->add(new Route('foo', '/foo', [FooController::class, 'index']));
 
         $this->assertEquals(
-            '/users/john/42',
-            $router->generateUri('get_username_age', ['name' => 'john', 'age' => 42])
+            new Route('foo', '/foo', [FooController::class, 'index']),
+            $router->getRouteByRequest($request)
         );
-
-        $this->assertEquals('/users/john', $router->generateUri('get_user_by_name', ['name' => 'john']));
     }
 
-    /**
-     * @return void
-     * @throws RouteAlreadyExistsException
-     * @throws RouteNotFoundException
-     */
+    public function testRouteMatch()
+    {
+        $router = new Router();
+
+        $router->add(new Route('home', '/', [FooController::class, 'index']));
+        $router->add(new Route('foo', '/foo', [FooController::class, 'index']));
+        $router->add(new Route('foo99', '/foo/{id:\d+}', [FooController::class, 'index']));
+        $router->add(new Route('foo99john', '/foo/{id:\d+}/{name}', [FooController::class, 'index']));
+
+        $match = $router->match('/foo');
+        $this->assertEquals(new Route('foo', '/foo', [FooController::class, 'index']), $match);
+
+        unset($match);
+        $match = $router->match('/foo/99');
+        $this->assertEquals(new Route('foo99', '/foo/{id:\d+}', [FooController::class, 'index']), $match);
+
+        unset($match);
+        $match = $router->match('/foo/99/john');
+        $this->assertEquals(new Route('foo99john', '/foo/{id:\d+}/{name}', [FooController::class, 'index']), $match);
+
+        unset($match);
+        $match = $router->match('/foo/99/john');
+        $this->assertEquals(new Route('foo99john', '/foo/{id:\d+}/{name}', [FooController::class, 'index']), $match);
+
+        unset($router, $match);
+        $router = new Router();
+        $router->add(new Route('foo99', '/foo/{id}', [FooController::class, 'index']));
+        $router->add(new Route('foo99john', '/foo/{id}/{name:\w+}', [FooController::class, 'index']));
+
+        $match = $router->match('/foo/99/john');
+        $this->assertEquals(new Route('foo99john', '/foo/{id}/{name:\w+}', [FooController::class, 'index']), $match);
+    }
+
+    public function testGenerateUri()
+    {
+        $router = new Router();
+
+        $router->add(new Route('home', '/', [FooController::class, 'index']));
+        $router->add(new Route('foo', '/foo', [FooController::class, 'index']));
+        $router->add(new Route('foo_with_id', '/foo/{id}', [FooController::class, 'index']));
+
+        $this->assertEquals('/foo', $router->generateUri('foo'));
+        $this->assertEquals('/foo/99', $router->generateUri('foo_with_id', ['id' => 99]));
+    }
+
+    public function testRouteAlreadyExistsException()
+    {
+        $router = new Router();
+
+        $route = new Route('home', '/', [FooController::class, 'index']);
+
+        $router->add($route);
+
+        $this->expectException(RouteAlreadyExistsException::class);
+        $router->add($route);
+    }
+
+    public function testRouteNotFoundException()
+    {
+        $router = new Router();
+
+        $router->add(new Route('home', '/', [FooController::class, 'index']));
+
+        $this->expectException(RouteNotFoundException::class);
+        $router->match(self::ENDPOINT . '/notfound');
+    }
+
+    public function testRouteNotFoundExceptionWithReq()
+    {
+        $router = new Router();
+
+        $router->add(new Route('home', '/{id:\d+}', [FooController::class, 'index']));
+
+        $this->expectException(RouteNotFoundException::class);
+        $router->match(self::ENDPOINT . '/notfound');
+    }
+
     public function testGenerateUriInvalidArgumentException()
     {
-        $router = $this->generateRouter();
+        $router = new Router();
+
+        $router->add(new Route('foo_with_id', '/foo/{id}', [FooController::class, 'index']));
 
         $this->expectException(InvalidArgumentException::class);
-        $router->generateUri('get_user_by_name', ['name' => 'John', 'invalid' => 42]);
+        $router->generateUri('foo_with_id', ['id' => 99, 'unknow' => 0]);
     }
 }

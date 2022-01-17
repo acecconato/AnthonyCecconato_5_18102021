@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace Blog;
 
-use Blog\Config\ConfigFactory;
 use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
-use Blog\Router\Router\Exceptions\RouteAlreadyExistsException;
 use Blog\Router\RouterInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
-
-// TODO Q/A Comment implémenter l'OptionResolver correctement, et où l'utiliser pour que ce soit pertinent ?
 
 final class Kernel
 {
@@ -31,6 +28,7 @@ final class Kernel
 
     /**
      * @param string $env
+     *
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
@@ -46,13 +44,62 @@ final class Kernel
 
     /**
      * @param Request $request
+     *
      * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
      */
     public function run(Request $request): void
     {
-        // TODO Q/A Ici on send mais est ce que ce ne serait pas plus simple de récupérer le controller pour y attacher le container
-        // et ensuite l'executer ? Ou passer par un Responder ?
-       $this->router->call($request)->send();
+        $route     = $this->router->match($request->getRequestUri());
+        $routeArgs = $route->getArgs($request);
+
+        $callable = $route->getCallable();
+
+        $class  = $callable[0];
+        $method = $callable[1];
+
+        $controller = $this->container->get($class::class);
+
+        $reflectionMethod = new ReflectionMethod($controller::class, $method);
+
+        $expectedFromMethod = array_filter(
+            $reflectionMethod->getParameters(),
+            fn($param) => ! array_key_exists($param->getName(), $routeArgs)
+        );
+
+        $methodArgs = [];
+        foreach ($expectedFromMethod as $param) {
+            if ($this->container->has($param->getName())) {
+                $methodArgs[$param->getName()] = $this->container->get($param->getName());
+                continue;
+            }
+
+            if ($param->getType() !== null) {
+                // It's a builtin parameter, or we need to instantiate it?
+                if ($this->container->has($param->getName())) {
+                    $methodArgs[$param->getName()] = $this->container->get($param->getName());
+                }
+
+                // Use the container to instantiate the required class
+                if ( ! $param->getType()?->isBuiltin()) {
+                    $methodArgs[$param->getName()] = $this->container->get($param->getType()->getName());
+                }
+            }
+        };
+
+        $args = array_merge($routeArgs, $methodArgs);
+
+        $expectedCallOrder = array_map(
+            fn($param) => $param->getName(),
+            $reflectionMethod->getParameters()
+        );
+
+        $args = array_merge(array_flip($expectedCallOrder), $args);
+
+        $response = call_user_func_array([$class, $method], $args);
+        $response->send();
     }
 
     /**
@@ -68,7 +115,7 @@ final class Kernel
             ->addParameter('source_dir', __DIR__)
             ->addParameter('cache_dir', sprintf('%s/../var/cache/%s', __DIR__, $this->env))
             ->addParameter('templates_dir', dirname(__DIR__) . '/templates')
-            ->addParameter('config', ConfigFactory::getConfig());
+            ->addParameter('age', 42);
     }
 
     /**
@@ -77,18 +124,14 @@ final class Kernel
      * @throws DependencyInjection\Exceptions\NotFoundException
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
-     * @throws RouteAlreadyExistsException
      */
     public function configureRoutes(): void
     {
+        $configRoute = require_once dirname(__DIR__) . '/config/routes.php';
+
         /** @var Router $router */
         $this->router = $this->container->get(Router::class);
 
-        $routes = $this->container->getParameter('config')['routes'];
-
-        // TODO Q/A Plutôt passer par l'OptionResolver ?
-        foreach ($routes as $route) {
-            $this->router->add($route);
-        }
+        $configRoute($this->router);
     }
 }

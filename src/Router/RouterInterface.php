@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Blog\Router;
 
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 interface RouterInterface extends UrlGeneratorInterface, UrlMatcherInterface
 {
@@ -15,25 +14,11 @@ interface RouterInterface extends UrlGeneratorInterface, UrlMatcherInterface
     public function getRouteCollection(): array;
 
     /**
-     * @param string $name
+     * @param Request $request
      *
-     * @return Route
+     * @return Route|null
      */
-    public function get(string $name): Route;
-
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    public function has(string $name): bool;
-
-    /**
-     * @param Route $route
-     *
-     * @return $this
-     */
-    public function add(Route $route): self;
+    public function getRouteByRequest(Request $request): ?Route;
 
     /**
      * @param string $path
@@ -43,14 +28,23 @@ interface RouterInterface extends UrlGeneratorInterface, UrlMatcherInterface
     public function match(string $path): Route;
 
     /**
-     * @param  Request $request
-     * @return Response
+     * @param Route $route
+     *
+     * @return $this
      */
-    public function call(Request $request): Response;
+    public function add(Route $route): self;
 
     /**
-     * @param  Request $request
-     * @return Route|null
+     * @param string $name
+     *
+     * @return bool
      */
-    public function getRouteByRequest(Request $request): ?Route;
+    public function has(string $name): bool;
+
+    /**
+     * @param string $name
+     *
+     * @return Route
+     */
+    public function get(string $name): Route;
 }

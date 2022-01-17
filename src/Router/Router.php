@@ -7,9 +7,7 @@ namespace Blog\Router;
 use Blog\Router\Exceptions\RouteAlreadyExistsException;
 use Blog\Router\Exceptions\RouteNotFoundException;
 use InvalidArgumentException;
-use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Router
@@ -83,17 +81,6 @@ final class Router implements RouterInterface
     public function has(string $name): bool
     {
         return isset($this->routes[$name]);
-    }
-
-    /**
-     * @param  Request $request
-     * @return Response
-     * @throws ReflectionException
-     * @throws RouteNotFoundException
-     */
-    public function call(Request $request): Response
-    {
-        return $this->match($request->getRequestUri())->call($request);
     }
 
     /**

@@ -22,15 +22,6 @@ abstract class AbstractController
     }
 
     /**
-     * @param ContainerInterface $container
-     * @return void
-     */
-    public function setContainer(ContainerInterface $container): void
-    {
-        $this->container = $container;
-    }
-
-    /**
      * @param string $to
      * @param int $status
      * @param array $headers

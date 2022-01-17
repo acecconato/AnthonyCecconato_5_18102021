@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace Tests;
 
 use Blog\DependencyInjection\Container;
+use Blog\Router\Router;
 use Blog\Router\RouterInterface;
 use PHPUnit\Framework\TestCase;
 use Tests\Fixtures\Database;
 use Tests\Fixtures\Foo;
-use Tests\Fixtures\Router;
 
 class ContainerTest extends TestCase
 {

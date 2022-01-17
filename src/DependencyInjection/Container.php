@@ -42,6 +42,7 @@ final class Container implements ContainerInterface
         if ($reflectionClass->isInterface()) {
             $this->register($this->aliases[$id]);
             $this->definitions[$id] = &$this->definitions[$this->aliases[$id]];
+
             return $this;
         }
 
@@ -53,7 +54,7 @@ final class Container implements ContainerInterface
                 array_filter(
                     $reflectionClass->getConstructor()->getParameters(),
                     function (ReflectionParameter $parameter) {
-                        if (!$parameter->getType()->isBuiltin()) {
+                        if ($parameter->getType() !== null && ! $parameter->getType()->isBuiltin()) {
                             return new ReflectionClass($parameter->getType()->getName());
                         }
 
@@ -75,12 +76,13 @@ final class Container implements ContainerInterface
      * If the excepted definition does not exist then we register it before returning it.
      *
      * @param string $id
+     *
      * @return Definition
      * @throws ReflectionException
      */
     public function getDefinition(string $id): Definition
     {
-        if (!isset($this->definitions[$id])) {
+        if ( ! isset($this->definitions[$id])) {
             $this->register($id);
         }
 
@@ -102,7 +104,7 @@ final class Container implements ContainerInterface
      */
     public function getParameter(string $id): mixed
     {
-        if (!isset($this->parameters[$id])) {
+        if ( ! isset($this->parameters[$id])) {
             throw new NotFoundException();
         }
 
@@ -113,16 +115,20 @@ final class Container implements ContainerInterface
      * @inheritDoc
      * @throws     ReflectionException
      */
-    public function get(string $id): object
+    public function get(string $id): mixed
     {
-        if (!$this->has($id)) {
-            if (!class_exists($id) && !interface_exists($id)) {
+        if (isset($this->parameters[$id])) {
+            return $this->parameters[$id];
+        }
+
+        if ( ! $this->has($id) && !isset($this->parameters[$id])) {
+            if ( ! class_exists($id) && ! interface_exists($id)) {
                 throw new NotFoundException();
             }
 
             $instance = $this->getDefinition($id)->newInstance($this);
 
-            if (!$this->getDefinition($id)->isShared()) {
+            if ( ! $this->getDefinition($id)->isShared()) {
                 return $instance;
             }
 
@@ -137,7 +143,7 @@ final class Container implements ContainerInterface
      */
     public function has(string $id): bool
     {
-        return isset($this->instances[$id]);
+        return isset($this->instances[$id]) || isset($this->parameters[$id]);
     }
 
     /**

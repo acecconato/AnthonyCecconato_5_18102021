@@ -2,7 +2,10 @@
 
 use Blog\Controller\HomeController;
 use Blog\Router\Route;
+use Blog\Router\RouterInterface;
 
-return [
-    new Route('home', '/', [HomeController::class, 'showHome']),
-];
+return function( RouterInterface $router) {
+	$router->add(
+		new Route('home', '/', [HomeController::class, 'index']),
+	);
+};

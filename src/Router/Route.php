@@ -7,19 +7,19 @@ namespace Blog\Router;
 use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 /**
  * Class Route
- * @package Blog\Routerd
+ *
+ * @package Blog\Router
  */
 final class Route implements RouteInterface
 {
     /**
      * Route constructor.
      *
-     * @param string $name
-     * @param string $path
+     * @param string       $name
+     * @param string       $path
      * @param array<mixed> $callable $callable
      */
     public function __construct(
@@ -76,7 +76,7 @@ final class Route implements RouteInterface
                 $routeVar = preg_replace('/([{}])/', '', $routeVar);
                 $routeVar = explode(':', $routeVar);
 
-                return $routeVar[1] ?? '(.+)';
+                return $routeVar[1] ?? '(?:(?!/).)+'; // (?:(?!\/).)+
             },
             $routeVars
         );
@@ -106,15 +106,28 @@ final class Route implements RouteInterface
     }
 
     /**
-     * Call a callable and retrieve the proper variables to send them through it
-     * If the callable is using a Request or a Response object, we automatically send them.
-     *
+     * @return callable
+     */
+    public function getCallable(): callable
+    {
+       return [new $this->callable[0], $this->callable[1]];
+    }
+
+    /**
+     * @return string
+     */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
      * @param Request $request
      *
-     * @return Response
+     * @return array
      * @throws ReflectionException
      */
-    public function call(Request $request): Response
+    public function getArgs(Request $request): array
     {
         $pattern = str_replace('/', '\/', $this->path);
         $pattern = sprintf('/^%s$/', $pattern);
@@ -155,28 +168,19 @@ final class Route implements RouteInterface
 
         $expectedParameters = $reflMethod->getParameters();
 
-        // Sort expected parameters before injecting them in the right order
         foreach ($expectedParameters as $param) {
             if (array_key_exists($param->getName(), $parameters)) {
-                $argsValue[] = $parameters[$param->getName()];
+                $argsValue[$param->getName()] = $parameters[$param->getName()];
             }
 
             $type = (string)$param->getType();
 
             // Auto-inject request if required
             if ($type === Request::class) {
-                $argsValue[] = $request;
+                $argsValue['request'] = $request;
             }
         }
 
-        return call_user_func_array([(new $class()), $method], $argsValue);
-    }
-
-    /**
-     * @return string
-     */
-    public function getPath(): string
-    {
-        return $this->path;
+        return $argsValue;
     }
 }

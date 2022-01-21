@@ -6,6 +6,7 @@ namespace Blog\Router\Exceptions;
 
 /**
  * Class RouteNotFoundException
+ *
  * @package Blog\Router\Exceptions
  */
 class RouteNotFoundException extends \Exception

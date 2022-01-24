@@ -22,9 +22,9 @@ interface RouteInterface
     public function test(string $path): bool;
 
     /**
-     * @return callable
+     * @return array
      */
-    public function getCallable(): callable;
+    public function getCallable(): array;
 
     /**
      * @return string

@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "@symfony/webpack-encore": "^1.8.1",
+    "sass": "^1.49.7"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.2",
+    "postcss-loader": "^6.2.1",
+    "sass-loader": "^12.4.0",
+    "webpack-notifier": "^1.15.0"
+  },
+  "scripts": {
+    "dev": "npx encore dev --watch",
+    "build": "npx encore production"
+  }
+}

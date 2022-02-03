@@ -8,6 +8,8 @@ use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
+use Blog\Templating\Templating;
+use Blog\Templating\TemplatingInterface;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -16,14 +18,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 final class Kernel
 {
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     private RouterInterface $router;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     private ContainerInterface $container;
 
     /**
@@ -52,21 +50,19 @@ final class Kernel
      */
     public function run(Request $request): void
     {
-        $route     = $this->router->match($request->getRequestUri());
+        $route = $this->router->match($request->getRequestUri());
         $routeArgs = $route->getArgs($request);
 
         $callable = $route->getCallable();
 
-        $class  = $callable[0];
+        $class = $this->container->get($callable[0]);
         $method = $callable[1];
 
-        $controller = $this->container->get($class::class);
-
-        $reflectionMethod = new ReflectionMethod($controller::class, $method);
+        $reflectionMethod = new ReflectionMethod($class::class, $method);
 
         $expectedFromMethod = array_filter(
             $reflectionMethod->getParameters(),
-            fn($param) => ! array_key_exists($param->getName(), $routeArgs)
+            fn($param) => !array_key_exists($param->getName(), $routeArgs)
         );
 
         $methodArgs = [];
@@ -83,7 +79,7 @@ final class Kernel
                 }
 
                 // Use the container to instantiate the required class
-                if ( ! $param->getType()?->isBuiltin()) {
+                if (!$param->getType()?->isBuiltin()) {
                     $methodArgs[$param->getName()] = $this->container->get($param->getType()->getName());
                 }
             }
@@ -108,14 +104,14 @@ final class Kernel
     public function configureContainer(): void
     {
         $this->container
-            ->addAlias(RouterInterface::class, Router::class);
+            ->addAlias(RouterInterface::class, Router::class)
+            ->addAlias(TemplatingInterface::class, Templating::class);
 
         $this->container
             ->addParameter('env', $this->env)
-            ->addParameter('source_dir', __DIR__)
-            ->addParameter('cache_dir', sprintf('%s/../var/cache/%s', __DIR__, $this->env))
-            ->addParameter('templates_dir', dirname(__DIR__) . '/templates')
-            ->addParameter('age', 42);
+            ->addParameter('sourceDir', __DIR__)
+            ->addParameter('cacheDir', sprintf('%s/../var/cache/%s', __DIR__, $this->env))
+            ->addParameter('templatesDirs', dirname(__DIR__) . '/templates');
     }
 
     /**

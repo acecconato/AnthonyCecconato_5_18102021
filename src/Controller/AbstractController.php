@@ -4,16 +4,19 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
-use Blog\DependencyInjection\ContainerInterface;
+use Blog\Templating\TemplatingInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 
 abstract class AbstractController
 {
-    protected ContainerInterface $container;
+    public function __construct(
+        private TemplatingInterface $templating
+    ) {
+    }
 
     /**
-     * @param  string $rawResponse
+     * @param string $rawResponse
      * @return Response
      */
     public function raw(string $rawResponse): Response
@@ -30,5 +33,10 @@ abstract class AbstractController
     public function redirect(string $to, int $status = 302, array $headers = []): RedirectResponse
     {
         return new RedirectResponse($to, $status, $headers);
+    }
+
+    public function render(string $view, array $context = []): Response
+    {
+        return new Response($this->templating->render($view, $context));
     }
 }

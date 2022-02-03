@@ -1,0 +1,15 @@
+{% extends "layouts/layout.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('home') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('home', {defer: true}) }}
+{% endblock %}
+
+{% block body %}
+    <h1>Hello World from Twig!</h1>
+{% endblock %}

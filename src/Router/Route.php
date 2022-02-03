@@ -106,11 +106,11 @@ final class Route implements RouteInterface
     }
 
     /**
-     * @return callable
+     * @return array
      */
-    public function getCallable(): callable
+    public function getCallable(): array
     {
-       return [new $this->callable[0], $this->callable[1]];
+       return [$this->callable[0], $this->callable[1]];
     }
 
     /**

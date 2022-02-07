@@ -105,7 +105,7 @@ final class Container implements ContainerInterface
     public function getParameter(string $id): mixed
     {
         if ( ! isset($this->parameters[$id])) {
-            throw new NotFoundException();
+            throw new NotFoundException("'$id' required parameter not found");
         }
 
         return $this->parameters[$id];

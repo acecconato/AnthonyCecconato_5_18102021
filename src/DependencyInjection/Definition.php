@@ -75,6 +75,7 @@ final class Definition
         return $this->class->newInstanceArgs(
             array_map(
                 function (ReflectionParameter $param) use ($container) {
+
                     if ($param->getType() !== null && $param->getType()->isBuiltin()) {
                         return $container->getParameter($param->getName());
                     }

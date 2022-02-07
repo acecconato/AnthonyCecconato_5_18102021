@@ -9,12 +9,14 @@ use InvalidArgumentException;
 
 class OptionsResolver
 {
-    /**
-     * @var ArrayObject $options
-     */
+    /** @var ArrayObject<string, Option> */
     private ArrayObject $options;
 
-    public function __construct(array $options = [])
+    /**
+     * @param array<Option> $options
+     * @return void
+     */
+    public function setOptions(array $options = []): void
     {
         $this->options = new ArrayObject();
         foreach ($options as $option) {

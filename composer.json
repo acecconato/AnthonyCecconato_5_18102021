@@ -10,7 +10,10 @@
     "twig/twig": "^3.3",
     "symfony/dependency-injection": "^6.0",
     "symfony/webpack-encore-bundle": "^1.13",
-    "lcharette/webpack-encore-twig": "^1.1"
+    "lcharette/webpack-encore-twig": "^1.1",
+    "ext-pdo": "*",
+    "ramsey/uuid": "^4.2",
+    "doctrine/orm": "^2.11"
   },
   "autoload": {
     "psr-4": {

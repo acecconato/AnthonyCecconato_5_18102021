@@ -8,6 +8,7 @@ use Blog\Database\DataMapper;
 use Blog\Database\MapperInterface;
 use Blog\DependencyInjection\Container;
 use Blog\Entity\EntityManager;
+use Blog\Entity\Post;
 use Blog\Entity\User;
 use Blog\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
@@ -49,8 +50,13 @@ class RepositoryTest extends TestCase
 
         // Then persist our entities
         $em
-            ->persist($john)
-            ->persist($sarah);
+            ->add($john)
+            ->add($sarah);
+
+        $myPost = new Post();
+        $myPost->setTitle('A simple title')->setContent('A short content');
+
+        $em->add($myPost);
 
         // Finally, save them into the database through the flush method
         $em->flush();

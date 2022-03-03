@@ -4,5 +4,9 @@ namespace Blog\Database;
 
 interface MapperInterface
 {
-    public function mapEntity(object $entity);
+    /**
+     * @param string $entity
+     * @return array<string>
+     */
+    public function mapEntity(string $entity): array;
 }

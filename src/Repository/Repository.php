@@ -18,8 +18,10 @@ abstract class Repository
         return $this->entityManager;
     }
 
-    public function findAll()
+    /**
+     * @return array
+     */
+    public function findAll(): array
     {
-
     }
 }

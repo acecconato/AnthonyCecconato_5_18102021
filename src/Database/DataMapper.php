@@ -2,22 +2,38 @@
 
 namespace Blog\Database;
 
+use ArrayObject;
 use Blog\Attribute\Entity;
 use Blog\Attribute\Table;
+use ReflectionException;
 
 class DataMapper implements MapperInterface
 {
-    /** @var string  */
     private string $tableName;
 
-    /** @var string  */
     private string $repositoryClass;
 
-    /** @var array<mixed>  */
+    /** @var array<array<string>> */
     private array $mapping = [];
 
-    public function mapEntity(object $entity): array
+    private ArrayObject $entities;
+
+    public function __construct()
     {
+        $this->entities = new ArrayObject();
+    }
+
+    /** Get the mapping of an entity
+     * @param string $entity FQCN
+     * @return array<string>
+     * @throws ReflectionException
+     */
+    public function mapEntity(string $entity): array
+    {
+        if ($this->entities->offsetExists($entity)) {
+            return $this->entities->offsetGet($entity);
+        }
+
         $reflClass = new \ReflectionClass($entity);
 
         $classAttributesName = [];
@@ -37,20 +53,26 @@ class DataMapper implements MapperInterface
             $args = $attribute->getArguments();
 
             foreach ($args as $key => $arg) {
-                $this->$key = $arg;
+                $this->{$key} = $arg;
             }
         }
 
+        $mapping = [];
         foreach ($reflClass->getProperties() as $property) {
             foreach ($property->getAttributes() as $attribute) {
-                $this->mapping[$attribute->getName()][] = $attribute->getArguments();
+                $mapping[] = array_merge(
+                    $attribute->getArguments(),
+                    ['propertyName' => $property->getName()]
+                );
             }
         }
 
-        return [
+        $this->entities->offsetSet($entity, [
             'tableName' => $this->tableName,
             'repositoryClass' => $this->repositoryClass,
-            'data ' => $this->mapping
-        ];
+            'columns' => $mapping
+        ]);
+
+        return $this->entities->offsetGet($entity);
     }
 }

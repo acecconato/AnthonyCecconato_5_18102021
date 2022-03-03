@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Blog\Database\Adapter;
 
 use PDO;
+use PDOException;
 use PDOStatement;
 
 class MySQLAdapter implements AdapterInterface
@@ -69,5 +70,27 @@ class MySQLAdapter implements AdapterInterface
         $statement->execute($bind);
 
         return $statement;
+    }
+
+    /**
+     * @param array<string, array<string>> $queries
+     * @return void
+     */
+    public function transactionQuery(array $queries): void
+    {
+        try {
+            $this->connect();
+            $this->connection->beginTransaction();
+
+            foreach ($queries as $query) {
+                $statement = $this->connection->prepare($query[0]);
+                $statement->execute($query[1] ?? []);
+            }
+
+            $this->connection->commit();
+        } catch (PDOException $e) {
+            $this->connection->rollBack();
+            throw $e;
+        }
     }
 }

@@ -4,65 +4,20 @@ declare(strict_types=1);
 
 namespace Blog\Entity;
 
+use Blog\Attribute\Column;
 use Blog\Attribute\Entity;
+use Blog\Attribute\Table;
+use Blog\Repository\PostRepository;
 
+#[Entity(repositoryClass: PostRepository::class)]
+#[Table(tableName: 'post')]
 class Post
 {
-    /**
-     * @var string
-     */
-    private string $content;
-
-    /**
-     * @var string
-     */
+    #[Column(name: 'title')]
     private string $title;
 
-    /**
-     * @var string
-     */
-    private string $excerpt;
-
-    /**
-     * @var string
-     */
-    private string $slug;
-
-    /**
-     * @return string
-     */
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    /**
-     * @param string $id
-     * @return Post
-     */
-    public function setId(string $id): Post
-    {
-        $this->id = $id;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getContent(): string
-    {
-        return $this->content;
-    }
-
-    /**
-     * @param string $content
-     * @return Post
-     */
-    public function setContent(string $content): Post
-    {
-        $this->content = $content;
-        return $this;
-    }
+    #[Column(name: 'content')]
+    private string $content;
 
     /**
      * @return string
@@ -85,38 +40,19 @@ class Post
     /**
      * @return string
      */
-    public function getExcerpt(): string
+    public function getContent(): string
     {
-        return $this->excerpt;
+        return $this->content;
     }
 
     /**
-     * @param string $excerpt
+     * @param string $content
      * @return Post
      */
-    public function setExcerpt(string $excerpt): Post
+    public function setContent(string $content): Post
     {
-        $this->excerpt = $excerpt;
+        $this->content = $content;
         return $this;
     }
-
-    /**
-     * @return string
-     */
-    public function getSlug(): string
-    {
-        return $this->slug;
-    }
-
-    /**
-     * @param string $slug
-     * @return Post
-     */
-    public function setSlug(string $slug): Post
-    {
-        $this->slug = $slug;
-        return $this;
-    }
-
 
 }

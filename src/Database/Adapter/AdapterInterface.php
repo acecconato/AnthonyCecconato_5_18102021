@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Blog\Database\Adapter;
 
+use PDO;
+
 interface AdapterInterface
 {
     /** Connect to a database
@@ -17,4 +19,12 @@ interface AdapterInterface
      * @return mixed
      */
     public function query(string $rawQuery, array $bind = []): mixed;
+
+    public function getConnection(): PDO;
+
+    /**
+     * @param array<string, array<string>> $queries
+     * @return void
+     */
+    public function transactionQuery(array $queries): void;
 }

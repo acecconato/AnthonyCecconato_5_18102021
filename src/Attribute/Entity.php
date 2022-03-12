@@ -10,7 +10,7 @@ use Attribute;
 final class Entity
 {
     public function __construct(
-        protected string $repositoryClass
+        public string $repositoryClass
     ) {
     }
 }

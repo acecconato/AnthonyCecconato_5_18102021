@@ -12,6 +12,7 @@ use Blog\Entity\Post;
 use Blog\Entity\User;
 use Blog\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class RepositoryTest extends TestCase
 {
@@ -48,7 +49,6 @@ class RepositoryTest extends TestCase
             ->setEmail('sarahdoe@gmail.com')
             ->setUsername('Sarah Doe');
 
-        // Then persist our entities
         $em
             ->add($john)
             ->add($sarah);
@@ -58,7 +58,8 @@ class RepositoryTest extends TestCase
 
         $em->add($myPost);
 
-        // Finally, save them into the database through the flush method
         $em->flush();
+
+        $this->assertTrue(UuidV4::isValid($john->getId()));
     }
 }

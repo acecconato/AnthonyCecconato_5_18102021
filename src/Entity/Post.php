@@ -6,6 +6,7 @@ namespace Blog\Entity;
 
 use Blog\Attribute\Column;
 use Blog\Attribute\Entity;
+use Blog\Attribute\Id;
 use Blog\Attribute\Table;
 use Blog\Repository\PostRepository;
 
@@ -13,46 +14,45 @@ use Blog\Repository\PostRepository;
 #[Table(tableName: 'post')]
 class Post
 {
+    #[Id()]
+    private string $id;
+
     #[Column(name: 'title')]
     private string $title;
 
     #[Column(name: 'content')]
     private string $content;
 
-    /**
-     * @return string
-     */
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): Post
+    {
+        $this->id = $id;
+        return $this;
+    }
+
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    /**
-     * @param string $title
-     * @return Post
-     */
     public function setTitle(string $title): Post
     {
         $this->title = $title;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getContent(): string
     {
         return $this->content;
     }
 
-    /**
-     * @param string $content
-     * @return Post
-     */
     public function setContent(string $content): Post
     {
         $this->content = $content;
         return $this;
     }
-
 }

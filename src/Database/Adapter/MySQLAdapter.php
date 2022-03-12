@@ -10,7 +10,10 @@ use PDOStatement;
 
 class MySQLAdapter implements AdapterInterface
 {
-    private PDO $connection;
+    private PDO|null $connection = null;
+
+    /** @var array<mixed> */
+    private array $transactions = [];
 
     /**
      * @param string $host
@@ -26,16 +29,13 @@ class MySQLAdapter implements AdapterInterface
     ) {
     }
 
-    /** @inheritDoc */
     public function connect(): PDO
     {
-        $this->setConnection(
-            new PDO(
-                "mysql:host=$this->host;dbname=$this->dbName",
-                $this->dbUser,
-                $this->dbPassword,
-                [PDO::FETCH_ASSOC]
-            )
+        $this->connection = new PDO(
+            "mysql:host=$this->host;dbname=$this->dbName",
+            $this->dbUser,
+            $this->dbPassword,
+            [PDO::FETCH_ASSOC]
         );
 
         return $this->connection;
@@ -49,18 +49,6 @@ class MySQLAdapter implements AdapterInterface
         return $this->connection;
     }
 
-    /**
-     * @param PDO $connection
-     * @return MySQLAdapter
-     */
-    public function setConnection(PDO $connection): self
-    {
-        $this->connection = $connection;
-
-        return $this;
-    }
-
-    /** @inheritDoc */
     public function query(string $rawQuery, array $bind = []): PDOStatement|false
     {
         $this->connect();
@@ -72,25 +60,41 @@ class MySQLAdapter implements AdapterInterface
         return $statement;
     }
 
-    /**
-     * @param array<string, array<string>> $queries
-     * @return void
-     */
-    public function transactionQuery(array $queries): void
+    public function transactionQuery(): int
     {
         try {
             $this->connect();
             $this->connection->beginTransaction();
 
-            foreach ($queries as $query) {
-                $statement = $this->connection->prepare($query[0]);
-                $statement->execute($query[1] ?? []);
+            $rowCount = 0;
+            foreach ($this->transactions as $transaction) {
+                $query = $transaction[0];
+                $bind = $transaction[1];
+
+                $statement = $this->connection->prepare($query);
+                $statement->execute($bind);
+                $rowCount += $statement->rowCount();
             }
 
             $this->connection->commit();
+            $this->clearTransaction();
+
+            return $rowCount;
         } catch (PDOException $e) {
             $this->connection->rollBack();
             throw $e;
         }
+    }
+
+    public function addToTransaction(string $query, array $bind = []): self
+    {
+        $this->transactions[] = [$query, $bind];
+        return $this;
+    }
+
+    public function clearTransaction(): void
+    {
+        unset($this->transactions);
+        $this->transactions = [];
     }
 }

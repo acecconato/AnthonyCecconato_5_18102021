@@ -6,6 +6,7 @@ namespace Blog\Entity;
 
 use Blog\Attribute\Column;
 use Blog\Attribute\Entity;
+use Blog\Attribute\Id;
 use Blog\Attribute\Table;
 use Blog\Repository\UserRepository;
 
@@ -13,11 +14,25 @@ use Blog\Repository\UserRepository;
 #[Table(tableName: 'user')]
 class User
 {
-    #[Column(name: 'ousername')]
+    #[Id()]
+    private string $id;
+
+    #[Column(name: 'username')]
     private string $username;
 
     #[Column(name: 'email', unique: true)]
     private string $email;
+
+    public function getId(): string
+    {
+        return $this->id;
+    }
+
+    public function setId(string $id): User
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     public function getUsername(): string
     {

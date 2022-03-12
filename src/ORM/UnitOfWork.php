@@ -4,68 +4,63 @@ declare(strict_types=1);
 
 namespace Blog\ORM;
 
+use Blog\Attribute\Enum\Type;
 use Blog\Database\MapperInterface;
 use Blog\Entity\EntityManager;
-use Blog\ORM\Persister\EntityPersister;
+use Ramsey\Uuid\Uuid;
 
 class UnitOfWork
 {
-    /** @var array<string, object> */
+    /** @var array<int, object> */
     private array $entityInsertions = [];
 
-    /** @var array<string, object> */
+    /** @var array<int, object> */
     private array $entityUpdates = [];
 
     /** @var array<string> */
     private array $entityDeletions = [];
 
-    private EntityPersister $entityPersister;
-
     public function __construct(
         private EntityManager $entityManager,
         private MapperInterface $mapper
     ) {
-        $this->entityPersister = new EntityPersister($this->entityManager, $this->entityManager->getAdapter());
     }
 
-    public function executeInserts(): void
+    public function executeInserts(): int
     {
         $adapter = $this->entityManager->getAdapter();
 
-        $toInsert = [];
-        $mapping = [];
+        foreach ($this->entityInsertions as $object) {
+            $mapping = $this->mapper->resolve($object::class);
 
-        foreach ($this->entityInsertions as $oid => $entity) {
-            $mapping[$entity::class] = $this->mapper->mapEntity($entity::class);
-            $toInsert[$entity::class][] = $entity;
-        }
+            $tableName = strip_tags($mapping->getTable()->tableName);
 
-        $queries = [];
-        foreach ($toInsert as $fqcn => $entities) {
-            $properties = array_map(fn($prop) => $prop['propertyName'], $mapping[$fqcn]['columns']);
-            $properties = ':' . implode(', :', $properties);
-            $rawProperties = explode(', ', str_replace([':'], '', $properties));
+            $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
 
-            foreach ($entities as $entity) {
-                $values = array_combine(
-                    $rawProperties,
-                    array_map(fn($prop) => strip_tags($entity->{'get' . ucfirst($prop)}()), $rawProperties)
-                );
+            $query = "
+                INSERT INTO $tableName 
+                VALUES ( :" . $mapping->getId() . ", " . strip_tags(implode(', ', $prepValues)) . " )
+            ";
 
-                $queries[] = [
-                    'INSERT INTO ' . $mapping[$fqcn]['tableName'] . ' VALUES ( ' . $properties . ' )',
-                    $values
-                ];
+            $bind = [];
+            $uuid = (string)Uuid::uuid4();
+            $bind[':' . $mapping->getId()] = $uuid;
+
+            $object->setId($uuid);
+
+            foreach ($mapping->getColumns() as $column) {
+                $bind[':' . $column->name] = match ($column->type) {
+                    // @phpstan-ignore-next-line
+                    Type::HTML => htmlspecialchars($object->{'get' . ucfirst($column->propertyName)}()),
+                    // @phpstan-ignore-next-line
+                    default => strip_tags($object->{'get' . ucfirst($column->propertyName)}())
+                };
             }
+
+            $adapter->addToTransaction($query, $bind);
         }
 
-        dump($queries);
-
-        die();
-
-        $adapter->transactionQuery($queries);
-
-        die();
+        return $adapter->transactionQuery();
     }
 
     public function executeUpdates(): void

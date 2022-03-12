@@ -10,7 +10,7 @@ use Attribute;
 final class Table
 {
     public function __construct(
-        private string $tableName
+        public string $tableName
     ) {
     }
 }

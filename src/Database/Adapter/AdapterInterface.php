@@ -8,23 +8,21 @@ use PDO;
 
 interface AdapterInterface
 {
-    /** Connect to a database
-     * @return mixed
-     */
+    /** Connect to the database */
     public function connect(): mixed;
 
-    /** Execute a database query
-     * @param string $rawQuery
+    /** Execute a raw database query
      * @param array<string> $bind
-     * @return mixed
      */
     public function query(string $rawQuery, array $bind = []): mixed;
 
     public function getConnection(): PDO;
 
-    /**
-     * @param array<string, array<string>> $queries
-     * @return void
+    /** Execute the transaction */
+    public function transactionQuery(): int;
+
+    /** Add a query and its bind to the transaction
+     * @param array<string> $bind
      */
-    public function transactionQuery(array $queries): void;
+    public function addToTransaction(string $query, array $bind = []): self;
 }

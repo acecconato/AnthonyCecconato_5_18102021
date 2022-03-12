@@ -3,76 +3,102 @@
 namespace Blog\Database;
 
 use ArrayObject;
+use Blog\Attribute\Column;
 use Blog\Attribute\Entity;
+use Blog\Attribute\Id;
 use Blog\Attribute\Table;
+use Exception;
+use ReflectionClass;
 use ReflectionException;
 
 class DataMapper implements MapperInterface
 {
-    private string $tableName;
-
-    private string $repositoryClass;
-
-    /** @var array<array<string>> */
-    private array $mapping = [];
-
-    private ArrayObject $entities;
+    /** @var ArrayObject<string, Metadata> $mapping */
+    private ArrayObject $mapping;
 
     public function __construct()
     {
-        $this->entities = new ArrayObject();
+        $this->mapping = new ArrayObject();
     }
 
-    /** Get the mapping of an entity
-     * @param string $entity FQCN
-     * @return array<string>
+    /**
      * @throws ReflectionException
      */
-    public function mapEntity(string $entity): array
+    public function resolve(string $entity): Metadata
     {
-        if ($this->entities->offsetExists($entity)) {
-            return $this->entities->offsetGet($entity);
+        if ($this->mapping->offsetExists($entity)) {
+            return $this->mapping->offsetGet($entity);
         }
 
-        $reflClass = new \ReflectionClass($entity);
+        $metadatas = $this->getClassMetadata($entity);
 
-        $classAttributesName = [];
-        foreach ($reflClass->getAttributes() as $attribute) {
-            $classAttributesName[] = $attribute->getName();
-        }
+        $this->mapping->offsetSet($entity, $metadatas);
+
+        return $metadatas;
+    }
+
+    /**
+     * @param string $fqcn
+     * @return Metadata
+     * @throws ReflectionException
+     * @throws Exception
+     */
+    public function getClassMetadata(string $fqcn): Metadata
+    {
+        $metadatas = new Metadata();
+        $reflClass = new ReflectionClass($fqcn);
+        $reflAttribute = $reflClass->getAttributes();
+
+        $classAttributesName = array_map(fn($reflAttribute) => $reflAttribute->getName(), $reflAttribute);
 
         if (!in_array(Entity::class, $classAttributesName)) {
-            throw new \Exception('Attribute ' . Entity::class . ' is missing from ' . $reflClass->getName());
+            throw new Exception('Attribute ' . Entity::class . ' is missing from ' . $fqcn);
         }
 
         if (!in_array(Table::class, $classAttributesName)) {
-            throw new \Exception('Attribute ' . Table::class . ' is missing from ' . $reflClass->getName());
+            throw new Exception('Attribute ' . Table::class . ' is missing from ' . $fqcn);
         }
 
-        foreach ($reflClass->getAttributes() as $attribute) {
-            $args = $attribute->getArguments();
+        $metadatas->setFqcn($fqcn);
 
-            foreach ($args as $key => $arg) {
-                $this->{$key} = $arg;
+        foreach ($reflAttribute as $attribute) {
+            $attributeInstance = $attribute->newInstance();
+
+            switch ($attribute->getName()) {
+                case Entity::class:
+                    /** @var Entity $attributeInstance */
+                    $metadatas->setEntity($attributeInstance);
+                    break;
+                case Table::class:
+                    /** @var Table $attributeInstance */
+                    $metadatas->setTable($attributeInstance);
+                    break;
+                default:
+                    throw new Exception('Unhandled attribute ' . $attribute->getName());
             }
         }
 
-        $mapping = [];
         foreach ($reflClass->getProperties() as $property) {
-            foreach ($property->getAttributes() as $attribute) {
-                $mapping[] = array_merge(
-                    $attribute->getArguments(),
-                    ['propertyName' => $property->getName()]
-                );
+            foreach ($property->getAttributes() as $propAttributes) {
+                switch ($propAttributes->getName()) {
+                    case Column::class:
+                        $propAttributesInstance = $propAttributes->newInstance();
+
+                        // Dynamically set
+                        $propAttributesInstance->propertyName = $property->getName();
+
+                        /** @var Column $propAttributesInstance */
+                        $metadatas->addColumns($propAttributesInstance);
+                        break;
+                    case Id::class:
+                        $metadatas->setId($property->getName());
+                        break;
+                    default:
+                        throw new Exception('Unhandled property attribute ' . $propAttributes->getName());
+                }
             }
         }
 
-        $this->entities->offsetSet($entity, [
-            'tableName' => $this->tableName,
-            'repositoryClass' => $this->repositoryClass,
-            'columns' => $mapping
-        ]);
-
-        return $this->entities->offsetGet($entity);
+        return $metadatas;
     }
 }

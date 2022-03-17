@@ -16,7 +16,7 @@ use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class RepositoryTest extends TestCase
 {
-    public function test()
+    public function loadContainer()
     {
         $container = new Container();
         $container
@@ -24,11 +24,16 @@ class RepositoryTest extends TestCase
             ->addAlias(MapperInterface::class, DataMapper::class);
 
         // TODO:: These parameters should be into the .env file
-        $container
+        return $container
             ->addParameter('host', 'localhost')
             ->addParameter('dbName', 'phpsf05')
             ->addParameter('dbUser', 'root')
             ->addParameter('dbPassword', 'root');
+    }
+
+    public function testEntityManagerAdd(): void
+    {
+        $container = $this->loadContainer();
 
         // A controller call the required repository (User here)
         /** @var UserRepository $userRepository */
@@ -53,13 +58,30 @@ class RepositoryTest extends TestCase
             ->add($john)
             ->add($sarah);
 
+        $em->flush();
+
         $myPost = new Post();
-        $myPost->setTitle('A simple title')->setContent('A short content');
+        $myPost
+            ->setTitle('A simple title')
+            ->setContent('A short content')
+            ->setUserId($john->getId());
 
         $em->add($myPost);
 
         $em->flush();
 
         $this->assertTrue(UuidV4::isValid($john->getId()));
+    }
+
+    public function testUserRepository(): void
+    {
+        $container = $this->loadContainer();
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $container->get(UserRepository::class);
+
+        $users = $userRepository->findAll();
+        $this->assertGreaterThan(0, count($users));
+        $this->assertContainsOnlyInstancesOf(User::class, $users);
     }
 }

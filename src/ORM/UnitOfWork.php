@@ -49,15 +49,12 @@ class UnitOfWork
             $object->setId($uuid);
 
             foreach ($mapping->getColumns() as $column) {
-                $bind[':' . $column->name] = match ($column->type) {
-                    // @phpstan-ignore-next-line
-                    Type::HTML => htmlspecialchars($object->{'get' . ucfirst($column->propertyName)}()),
-                    // @phpstan-ignore-next-line
-                    default => strip_tags($object->{'get' . ucfirst($column->propertyName)}())
-                };
+                // @phpstan-ignore-next-line
+                $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
 
             $adapter->addToTransaction($query, $bind);
+            $this->clearEntityInsertionsQueue();
         }
 
         return $adapter->transactionQuery();
@@ -103,5 +100,11 @@ class UnitOfWork
     public function commit(): void
     {
         $this->executeInserts();
+    }
+
+    public function clearEntityInsertionsQueue(): void
+    {
+        unset($this->entityInsertions);
+        $this->entityInsertions = [];
     }
 }

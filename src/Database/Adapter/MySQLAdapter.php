@@ -12,8 +12,8 @@ class MySQLAdapter implements AdapterInterface
 {
     private PDO|null $connection = null;
 
-    /** @var array<mixed> */
-    private array $transactions = [];
+    /** @var array<array-key, array{query: string, bind: array<string>}> */
+    private array $transactions;
 
     /**
      * @param string $host
@@ -68,8 +68,8 @@ class MySQLAdapter implements AdapterInterface
 
             $rowCount = 0;
             foreach ($this->transactions as $transaction) {
-                $query = $transaction[0];
-                $bind = $transaction[1];
+                $query = $transaction['query'];
+                $bind = $transaction['bind'];
 
                 $statement = $this->connection->prepare($query);
                 $statement->execute($bind);
@@ -88,7 +88,7 @@ class MySQLAdapter implements AdapterInterface
 
     public function addToTransaction(string $query, array $bind = []): self
     {
-        $this->transactions[] = [$query, $bind];
+        $this->transactions[] = ['query' => $query, 'bind' => $bind];
         return $this;
     }
 

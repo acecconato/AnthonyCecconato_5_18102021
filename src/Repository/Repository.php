@@ -9,7 +9,7 @@ use Blog\Entity\EntityManager;
 abstract class Repository
 {
     public function __construct(
-        private EntityManager $entityManager
+        private EntityManager $entityManager,
     ) {
     }
 
@@ -19,9 +19,14 @@ abstract class Repository
     }
 
     /**
-     * @return array
+     * @return array<object>
      */
-    public function findAll(): array
+    public function findAll(string $orderBy = 'id', string $orderWay = 'DESC'): array
     {
+        // Late static binding
+        preg_match("/(\w+)Repository$/", static::class, $matches);
+        $entityFqcn = 'Blog\\Entity\\' . $matches[1];
+
+        return $this->entityManager->findAll($entityFqcn, $orderBy, $orderWay);
     }
 }

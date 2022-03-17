@@ -6,6 +6,7 @@ namespace Blog\Entity;
 
 use Blog\Attribute\Column;
 use Blog\Attribute\Entity;
+use Blog\Attribute\Enum\Type;
 use Blog\Attribute\Id;
 use Blog\Attribute\Table;
 use Blog\Repository\UserRepository;
@@ -17,10 +18,10 @@ class User
     #[Id()]
     private string $id;
 
-    #[Column(name: 'username')]
+    #[Column(name: 'username', type: Type::STRING, nullable: false, unique:  true)]
     private string $username;
 
-    #[Column(name: 'email', unique: true)]
+    #[Column(name: 'email', type: Type::STRING, nullable: false, unique:  true)]
     private string $email;
 
     public function getId(): string

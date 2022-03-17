@@ -23,6 +23,10 @@ class Post
     #[Column(name: 'content')]
     private string $content;
 
+    #[Column(name: 'user_id')]
+    private string $userId;
+
+
     public function getId(): string
     {
         return $this->id;
@@ -53,6 +57,17 @@ class Post
     public function setContent(string $content): Post
     {
         $this->content = $content;
+        return $this;
+    }
+
+    public function getUserId(): string
+    {
+        return $this->userId;
+    }
+
+    public function setUserId(string $userId): Post
+    {
+        $this->userId = $userId;
         return $this;
     }
 }

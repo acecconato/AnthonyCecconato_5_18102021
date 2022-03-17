@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Blog\Database\Adapter;
 
 use PDO;
+use PDOStatement;
 
 interface AdapterInterface
 {
@@ -14,7 +15,7 @@ interface AdapterInterface
     /** Execute a raw database query
      * @param array<string> $bind
      */
-    public function query(string $rawQuery, array $bind = []): mixed;
+    public function query(string $rawQuery, array $bind = []): PDOStatement|false;
 
     public function getConnection(): PDO;
 

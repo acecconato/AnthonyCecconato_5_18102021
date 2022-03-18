@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\ORM\Hydration;
 
-use Blog\Database\DataMapper;
+use Blog\ORM\Mapping\DataMapper;
 
 abstract class AbstractHydrator
 {

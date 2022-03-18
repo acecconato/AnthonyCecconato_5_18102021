@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Blog\Attribute;
+namespace Blog\ORM\Mapping\Attribute;
 
 use Attribute;
 
@@ -10,7 +10,8 @@ use Attribute;
 final class Entity
 {
     public function __construct(
-        public string $repositoryClass
+        public string $repositoryClass,
+        public bool $timestamps = true
     ) {
     }
 }

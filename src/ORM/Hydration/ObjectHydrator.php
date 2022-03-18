@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Blog\ORM\Hydration;
 
-use Blog\Database\Metadata;
+use Blog\ORM\Mapping\Metadata;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionObject;
 
 class ObjectHydrator extends AbstractHydrator implements HydratorInterface
 {
@@ -40,7 +41,7 @@ class ObjectHydrator extends AbstractHydrator implements HydratorInterface
      * @param array<string> $result
      * @throws ReflectionException
      */
-    public function hydrateObject(Metadata $mapping, array $result): object
+    protected function hydrateObject(Metadata $mapping, array $result): object
     {
         $reflClass = new ReflectionClass($mapping->getFqcn());
         $object = $reflClass->newInstance();
@@ -54,5 +55,35 @@ class ObjectHydrator extends AbstractHydrator implements HydratorInterface
         $object->setId($result[$mapping->getId()]);
 
         return $object;
+    }
+
+    public function extract(object|array $entry): array
+    {
+        $output = [];
+
+        if (is_array($entry)) {
+            $i = 0;
+            foreach ($entry as $object) {
+                $reflObj = new ReflectionObject($object);
+
+                foreach ($reflObj->getProperties() as $prop) {
+                    $getterMethod = 'get' . ucfirst($prop->getName());
+                    $output[$i][$prop->name] = $object->{$getterMethod}();
+                }
+
+                $i++;
+            }
+        }
+
+        if (is_object($entry)) {
+            $reflObj = new ReflectionObject($entry);
+
+            foreach ($reflObj->getProperties() as $prop) {
+                $getterMethod = 'get' . ucfirst($prop->getName());
+                $output[$prop->name] = $entry->{$getterMethod}();
+            }
+        }
+
+        return $output;
     }
 }

@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Blog\Database;
+namespace Blog\ORM\Mapping;
 
-use Blog\Attribute\Column;
-use Blog\Attribute\Entity;
-use Blog\Attribute\Table;
-use Doctrine\ORM\Mapping\Id;
+use Blog\ORM\Mapping\Attribute\Column;
+use Blog\ORM\Mapping\Attribute\Entity;
+use Blog\ORM\Mapping\Attribute\Table;
 
 class Metadata
 {
@@ -49,7 +48,7 @@ class Metadata
     }
 
     /**
-     * @param Entity $entity
+     * @param \Blog\ORM\Mapping\Attribute\Entity $entity
      * @return Metadata
      */
     public function setEntity(Entity $entity): Metadata
@@ -67,7 +66,7 @@ class Metadata
     }
 
     /**
-     * @param Table $table
+     * @param \Blog\ORM\Mapping\Attribute\Table $table
      * @return Metadata
      */
     public function setTable(Table $table): Metadata

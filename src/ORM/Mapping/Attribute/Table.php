@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Blog\Attribute;
+namespace Blog\ORM\Mapping\Attribute;
 
 use Attribute;
 

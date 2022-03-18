@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
-use Blog\Entity\EntityManager;
+use Blog\ORM\EntityManager;
+use ReflectionException;
 
 abstract class Repository
 {
@@ -20,6 +21,7 @@ abstract class Repository
 
     /**
      * @return array<object>
+     * @throws ReflectionException
      */
     public function findAll(string $orderBy = 'id', string $orderWay = 'DESC'): array
     {

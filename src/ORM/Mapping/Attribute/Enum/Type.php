@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Blog\Attribute\Enum;
+namespace Blog\ORM\Mapping\Attribute\Enum;
 
 enum Type
 {

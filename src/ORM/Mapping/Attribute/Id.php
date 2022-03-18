@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Attribute;
+namespace Blog\ORM\Mapping\Attribute;
 
 #[\Attribute]
 final class Id

@@ -4,12 +4,13 @@ namespace Tests;
 
 use Blog\Database\Adapter\AdapterInterface;
 use Blog\Database\Adapter\MySQLAdapter;
-use Blog\Database\DataMapper;
-use Blog\Database\MapperInterface;
 use Blog\DependencyInjection\Container;
-use Blog\Entity\EntityManager;
 use Blog\Entity\Post;
 use Blog\Entity\User;
+use Blog\ORM\EntityManager;
+use Blog\ORM\Hydration\ObjectHydrator;
+use Blog\ORM\Mapping\DataMapper;
+use Blog\ORM\Mapping\MapperInterface;
 use Blog\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Rfc4122\UuidV4;
@@ -58,8 +59,6 @@ class RepositoryTest extends TestCase
             ->add($john)
             ->add($sarah);
 
-        $em->flush();
-
         $myPost = new Post();
         $myPost
             ->setTitle('A simple title')
@@ -81,7 +80,16 @@ class RepositoryTest extends TestCase
         $userRepository = $container->get(UserRepository::class);
 
         $users = $userRepository->findAll();
+
+        /** @var ObjectHydrator $hydrator */
+        $hydrator = $container->get(ObjectHydrator::class);
+
         $this->assertGreaterThan(0, count($users));
         $this->assertContainsOnlyInstancesOf(User::class, $users);
+    }
+
+    public function testUpdate()
+    {
+
     }
 }

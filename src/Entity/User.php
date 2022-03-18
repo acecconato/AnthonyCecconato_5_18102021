@@ -4,36 +4,22 @@ declare(strict_types=1);
 
 namespace Blog\Entity;
 
-use Blog\Attribute\Column;
-use Blog\Attribute\Entity;
-use Blog\Attribute\Enum\Type;
-use Blog\Attribute\Id;
-use Blog\Attribute\Table;
+use Blog\ORM\Mapping\Attribute\Column;
+use Blog\ORM\Mapping\Attribute\Entity;
+use Blog\ORM\Mapping\Attribute\Enum\Type;
+use Blog\ORM\Mapping\Attribute\Id;
+use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\UserRepository;
 
 #[Entity(repositoryClass: UserRepository::class)]
 #[Table(tableName: 'user')]
-class User
+class User extends AbstractEntity
 {
-    #[Id()]
-    private string $id;
-
-    #[Column(name: 'username', type: Type::STRING, nullable: false, unique:  true)]
+    #[Column(name: 'username', type: Type::STRING, nullable: false, unique: true)]
     private string $username;
 
-    #[Column(name: 'email', type: Type::STRING, nullable: false, unique:  true)]
+    #[Column(name: 'email', type: Type::STRING, nullable: false, unique: true)]
     private string $email;
-
-    public function getId(): string
-    {
-        return $this->id;
-    }
-
-    public function setId(string $id): User
-    {
-        $this->id = $id;
-        return $this;
-    }
 
     public function getUsername(): string
     {

@@ -2,19 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Blog\Entity;
+namespace Blog\ORM;
 
 use Blog\Database\Adapter\AdapterInterface;
-use Blog\Database\MapperInterface;
+use Blog\ORM\Hydration\HydratorInterface;
 use Blog\ORM\Hydration\ObjectHydrator;
-use Blog\ORM\UnitOfWork;
+use Blog\ORM\Mapping\MapperInterface;
 use JetBrains\PhpStorm\Pure;
 use PDO;
 use ReflectionException;
 
-/**
- * // TODO: Secure SQL transactions
- */
 class EntityManager
 {
     private UnitOfWork $unitOfWork;
@@ -53,6 +50,11 @@ class EntityManager
     public function getAdapter(): AdapterInterface
     {
         return $this->adapter;
+    }
+
+    public function getHydrator(): HydratorInterface
+    {
+        return $this->hydrator;
     }
 
     /**

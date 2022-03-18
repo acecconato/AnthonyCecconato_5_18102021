@@ -1,12 +1,12 @@
 <?php
 
-namespace Blog\Database;
+namespace Blog\ORM\Mapping;
 
 use ArrayObject;
-use Blog\Attribute\Column;
-use Blog\Attribute\Entity;
-use Blog\Attribute\Id;
-use Blog\Attribute\Table;
+use Blog\ORM\Mapping\Attribute\Column;
+use Blog\ORM\Mapping\Attribute\Entity;
+use Blog\ORM\Mapping\Attribute\Id;
+use Blog\ORM\Mapping\Attribute\Table;
 use Exception;
 use ReflectionClass;
 use ReflectionException;
@@ -66,7 +66,7 @@ class DataMapper implements MapperInterface
 
             switch ($attribute->getName()) {
                 case Entity::class:
-                    /** @var Entity $attributeInstance */
+                    /** @var \Blog\ORM\Mapping\Attribute\Entity $attributeInstance */
                     $metadatas->setEntity($attributeInstance);
                     break;
                 case Table::class:

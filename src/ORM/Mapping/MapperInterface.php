@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\Database;
+namespace Blog\ORM\Mapping;
 
 interface MapperInterface
 {

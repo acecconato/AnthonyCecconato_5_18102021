@@ -17,4 +17,10 @@ interface HydratorInterface
      * @return object
      */
     public function hydrateSingle(array $result, string $fqcnEntity): object;
+
+    /** Extract object(s) to array
+     * @param object|array<object> $entry
+     * @return array<string>
+     */
+    public function extract(object|array $entry): array;
 }

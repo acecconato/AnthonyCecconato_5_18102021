@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Blog\Attribute;
+namespace Blog\ORM\Mapping\Attribute;
 
 use Attribute;
-use Blog\Attribute\Enum\Type;
+use Blog\ORM\Mapping\Attribute\Enum\Type;
 
 #[Attribute]
 final class Column

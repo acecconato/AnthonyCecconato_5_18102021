@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\ORM;
 
-use Blog\Attribute\Enum\Type;
-use Blog\Database\MapperInterface;
-use Blog\Entity\EntityManager;
+use Blog\ORM\Mapping\MapperInterface;
 use Ramsey\Uuid\Uuid;
 
 class UnitOfWork
@@ -33,20 +31,19 @@ class UnitOfWork
         foreach ($this->entityInsertions as $object) {
             $mapping = $this->mapper->resolve($object::class);
 
-            $tableName = strip_tags($mapping->getTable()->tableName);
+            $tableName = addslashes($mapping->getTable()->tableName);
 
-            $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
+            $prepValues = array_map(fn($column) => ':' . addslashes($column->name), $mapping->getColumns());
 
             $query = "
                 INSERT INTO $tableName 
-                VALUES ( :" . $mapping->getId() . ", " . strip_tags(implode(', ', $prepValues)) . " )
+                VALUES ( :" . $mapping->getId() . ", " . addslashes(implode(', ', $prepValues)) . " )
             ";
 
             $bind = [];
-            $uuid = (string)Uuid::uuid4();
-            $bind[':' . $mapping->getId()] = $uuid;
 
-            $object->setId($uuid);
+            ($object->getId()) ?: $object->setId((string)Uuid::uuid4());
+            $bind[':' . $mapping->getId()] = $object->getId();
 
             foreach ($mapping->getColumns() as $column) {
                 // @phpstan-ignore-next-line

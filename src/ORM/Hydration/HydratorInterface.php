@@ -2,6 +2,8 @@
 
 namespace Blog\ORM\Hydration;
 
+use Blog\Entity\AbstractEntity;
+
 interface HydratorInterface
 {
     /**
@@ -14,9 +16,9 @@ interface HydratorInterface
     /**
      * @param array<string> $result
      * @param string $fqcnEntity
-     * @return object
+     * @return AbstractEntity
      */
-    public function hydrateSingle(array $result, string $fqcnEntity): object;
+    public function hydrateSingle(array $result, string $fqcnEntity): AbstractEntity;
 
     /** Extract object(s) to array
      * @param object|array<object> $entry

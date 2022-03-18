@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\ORM\Hydration;
 
+use Blog\Entity\AbstractEntity;
 use Blog\ORM\Mapping\Metadata;
 use ReflectionClass;
 use ReflectionException;
@@ -30,7 +31,7 @@ class ObjectHydrator extends AbstractHydrator implements HydratorInterface
     /**
      * @throws ReflectionException
      */
-    public function hydrateSingle(array $result, string $fqcnEntity): object
+    public function hydrateSingle(array $result, string $fqcnEntity): AbstractEntity
     {
         $mapping = $this->mapper->resolve($fqcnEntity);
 
@@ -41,9 +42,11 @@ class ObjectHydrator extends AbstractHydrator implements HydratorInterface
      * @param array<string> $result
      * @throws ReflectionException
      */
-    protected function hydrateObject(Metadata $mapping, array $result): object
+    protected function hydrateObject(Metadata $mapping, array $result): AbstractEntity
     {
         $reflClass = new ReflectionClass($mapping->getFqcn());
+
+        /** @var AbstractEntity $object */
         $object = $reflClass->newInstance();
 
         foreach ($mapping->getColumns() as $column) {

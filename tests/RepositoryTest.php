@@ -17,7 +17,7 @@ use Ramsey\Uuid\Rfc4122\UuidV4;
 
 class RepositoryTest extends TestCase
 {
-    public function loadContainer()
+    public function loadContainer(): Container
     {
         $container = new Container();
         $container
@@ -81,15 +81,19 @@ class RepositoryTest extends TestCase
 
         $users = $userRepository->findAll();
 
-        /** @var ObjectHydrator $hydrator */
-        $hydrator = $container->get(ObjectHydrator::class);
-
         $this->assertGreaterThan(0, count($users));
         $this->assertContainsOnlyInstancesOf(User::class, $users);
     }
 
-    public function testUpdate()
+    public function testFind(): void
     {
+        $container = $this->loadContainer();
 
+        /** @var UserRepository $userRepository */
+        $userRepository = $container->get(UserRepository::class);
+
+        $em = $userRepository->getEntityManager();
+
+        dd($userRepository->findOneBy(['id' => '303e9922-ae1b-4279-98d3-bca7452a2c4e', 'username' => 'John Doe']));
     }
 }

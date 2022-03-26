@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Blog\ORM;
 
 use Blog\Database\Adapter\AdapterInterface;
-use Blog\Entity\AbstractEntity;
 use Blog\ORM\Hydration\HydratorInterface;
 use Blog\ORM\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\MapperInterface;
@@ -24,27 +23,27 @@ class EntityManager
         $this->unitOfWork = new UnitOfWork($this, $this->mapper);
     }
 
-    public function add(AbstractEntity $entity): self
+    public function add(object $entity): self
     {
         $this->unitOfWork->add($entity);
         return $this;
     }
 
-    public function update(AbstractEntity $entity): self
+    public function update(object $entity): self
     {
         $this->unitOfWork->update($entity);
         return $this;
     }
 
-    public function delete(AbstractEntity $entity): self
+    public function delete(object $entity): self
     {
         $this->unitOfWork->delete($entity);
         return $this;
     }
 
-    public function flush(): void
+    public function flush(): int
     {
-        $this->unitOfWork->commit();
+        return $this->unitOfWork->commit();
     }
 
     public function getAdapter(): AdapterInterface
@@ -58,16 +57,14 @@ class EntityManager
     }
 
     /**
-     * @return array<AbstractEntity>
+     * @return array<object>
      * @throws ReflectionException
      */
     public function findAll(string $entityFqcn, string $orderBy, string $orderWay): array
     {
         $mapping = $this->mapper->resolve($entityFqcn);
 
-        $tableName = addslashes($mapping->getTable()->tableName);
-        $orderBy = addslashes($orderBy);
-        $orderWay = addslashes($orderWay);
+        $tableName = $mapping->getTable()->tableName;
 
         $query = "SELECT * FROM  $tableName ORDER BY $orderBy $orderWay";
         $rawResults = $this->adapter->query($query)->fetchAll(PDO::FETCH_ASSOC);
@@ -78,13 +75,12 @@ class EntityManager
     /**
      * @throws ReflectionException
      */
-    public function find(string $entityFqcn, string $id): AbstractEntity|false
+    public function find(string $entityFqcn, string $id): object|false
     {
         $mapping = $this->mapper->resolve($entityFqcn);
 
-        $tableName = addslashes($mapping->getTable()->tableName);
-        $idColumn = addslashes($mapping->getId());
-        $id = addslashes($id);
+        $tableName = $mapping->getTable()->tableName;
+        $idColumn = $mapping->getId();
 
         $query = "SELECT * FROM $tableName WHERE $idColumn='" . $id . "'";
 
@@ -100,15 +96,15 @@ class EntityManager
     /**
      * @param string $entityFqcn
      * @param array<string> $criteria
-     * @return AbstractEntity|false
+     * @return object|false
      * @throws ReflectionException
      */
-    public function findOneBy(string $entityFqcn, array $criteria = []): AbstractEntity|false
+    public function findOneBy(string $entityFqcn, array $criteria = []): object|false
     {
         $mapping = $this->mapper->resolve($entityFqcn);
 
-        $tableName = addslashes($mapping->getTable()->tableName);
-        array_walk($criteria, fn($value) => addslashes($value));
+        $tableName = $mapping->getTable()->tableName;
+        array_walk($criteria, fn(&$criterion) => $criterion = $criterion);
 
         $query = "SELECT * FROM $tableName";
 
@@ -127,5 +123,24 @@ class EntityManager
         }
 
         return $this->hydrator->hydrateSingle($rawResult, $entityFqcn);
+    }
+
+    /**
+     * @param string $entityFqcn
+     * @param array<string> $ids
+     * @return int
+     */
+    public function deleteById(string $entityFqcn, array $ids): int
+    {
+        $mapping = $this->mapper->resolve($entityFqcn);
+
+        $tableName = $mapping->getTable()->tableName;
+
+        foreach ($ids as $id) {
+            $query = "DELETE FROM $tableName WHERE " . $mapping->getId() . " = :id";
+            $this->adapter->addToTransaction($query, [':id' => $id]);
+        }
+
+        return $this->adapter->transactionQuery();
     }
 }

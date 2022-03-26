@@ -32,7 +32,7 @@ class RepositoryTest extends TestCase
             ->addParameter('dbPassword', 'root');
     }
 
-    public function testEntityManagerAdd(): void
+    public function testMain(): void
     {
         $container = $this->loadContainer();
 
@@ -70,6 +70,35 @@ class RepositoryTest extends TestCase
         $em->flush();
 
         $this->assertTrue(UuidV4::isValid($john->getId()));
+
+        $this->assertEquals($john->getId(), $myPost->getUserId());
+
+        $em->delete($sarah);
+        $em->flush();
+
+        $sarah = $userRepository->find($sarah->getId());
+
+        $this->assertFalse($sarah);
+
+        $userRepository->delete([$john->getId()]);
+        $john = $userRepository->find($john->getId());
+
+        $this->assertFalse($john);
+
+        $myPost = $em->find(Post::class, $myPost->getId());
+
+        $this->assertIsObject($myPost);
+
+        /** @phpstan-ignore-next-lines */
+        $this->assertNull($myPost->getUserId());
+
+        /** @phpstan-ignore-next-lines */
+        $em->deleteById(Post::class, [$myPost->getId()]);
+
+        $em->flush();
+
+        /** @phpstan-ignore-next-lines */
+        $this->assertFalse($em->findOneBy(Post::class, ['id' => $myPost->getId()]));
     }
 
     public function testUserRepository(): void
@@ -94,6 +123,36 @@ class RepositoryTest extends TestCase
 
         $em = $userRepository->getEntityManager();
 
-        dd($userRepository->findOneBy(['id' => '303e9922-ae1b-4279-98d3-bca7452a2c4e', 'username' => 'John Doe']));
+        dd($userRepository->findOneBy(['id' => '3680b3ba-3d48-4dba-9208-60119fd6fa58']));
+    }
+
+    public function testDeletion()
+    {
+        $container = $this->loadContainer();
+
+        /** @var UserRepository $userRepository */
+        $userRepository = $container->get(UserRepository::class);
+
+        /** @var EntityManager $em */
+        $em = $userRepository->getEntityManager();
+
+        $userRepository->delete(['51113fae-67fb-4615-90da-6095a79c6dc0', '8952c6de-6a02-46f1-aa22-049204c12f51']);
+
+//        $user = $userRepository->find('3680b3ba-3d48-4dba-9208-60119fd6fa58');
+//        if ($user) {
+//            $em->delete($user);
+//        }
+
+//        dd($em->flush());
+    }
+
+    public function testUpdates()
+    {
+        $container = $this->loadContainer();
+
+        $userRepository = $container->get(UserRepository::class);
+
+        /** @var EntityManager $em */
+        $em = $userRepository->getEntityManager();
     }
 }

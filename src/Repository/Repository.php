@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
-use Blog\Entity\AbstractEntity;
 use Blog\ORM\EntityManager;
 use ReflectionException;
 
@@ -36,7 +35,7 @@ abstract class Repository
     /**
      * @throws ReflectionException
      */
-    public function find(string $id): AbstractEntity|false
+    public function find(string $id): object|false
     {
         // Late static binding
         preg_match("/(\w+)Repository$/", static::class, $matches);
@@ -47,15 +46,28 @@ abstract class Repository
 
     /**
      * @param array<string> $criteria
-     * @return AbstractEntity|false
+     * @return object|false
      * @throws ReflectionException
      */
-    public function findOneBy(array $criteria): AbstractEntity|false
+    public function findOneBy(array $criteria): object|false
     {
         // Late static binding
         preg_match("/(\w+)Repository$/", static::class, $matches);
         $entityFqcn = 'Blog\\Entity\\' . $matches[1];
 
         return $this->entityManager->findOneBy($entityFqcn, $criteria);
+    }
+
+    /**
+     * @param array<string> $ids
+     * @return int
+     */
+    public function delete(array $ids): int
+    {
+        // Late static binding
+        preg_match("/(\w+)Repository$/", static::class, $matches);
+        $entityFqcn = 'Blog\\Entity\\' . $matches[1];
+
+        return $this->entityManager->deleteById($entityFqcn, $ids);
     }
 }

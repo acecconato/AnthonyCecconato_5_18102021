@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Blog\ORM;
 
 use Blog\ORM\Mapping\MapperInterface;
+use Exception;
 use Ramsey\Uuid\Uuid;
 
 class UnitOfWork
@@ -31,13 +32,13 @@ class UnitOfWork
         foreach ($this->entityInsertions as $object) {
             $mapping = $this->mapper->resolve($object::class);
 
-            $tableName = addslashes($mapping->getTable()->tableName);
+            $tableName = $mapping->getTable()->tableName;
 
-            $prepValues = array_map(fn($column) => ':' . addslashes($column->name), $mapping->getColumns());
+            $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
 
             $query = "
                 INSERT INTO $tableName 
-                VALUES ( :" . $mapping->getId() . ", " . addslashes(implode(', ', $prepValues)) . " )
+                VALUES ( :" . $mapping->getId() . ", " . implode(', ', $prepValues) . " )
             ";
 
             $bind = [];
@@ -51,9 +52,9 @@ class UnitOfWork
             }
 
             $adapter->addToTransaction($query, $bind);
-            $this->clearEntityInsertionsQueue();
         }
 
+        $this->clearEntityInsertionsQueue();
         return $adapter->transactionQuery();
     }
 
@@ -61,8 +62,37 @@ class UnitOfWork
     {
     }
 
-    public function executeDeletions(): void
+    /**
+     * @throws Exception
+     */
+    public function executeDeletions(): int
     {
+        $adapter = $this->entityManager->getAdapter();
+
+        /** @var mixed $item */
+        foreach ($this->entityDeletions as $item) {
+
+            if (!is_object($item) && !is_array($item)) {
+                throw new Exception('The ' . __CLASS__ . ' deletion method only accepts objects and array');
+            }
+
+            if (is_object($item)) {
+                /** @var object $item */
+                $mapping = $this->mapper->resolve($item::class);
+                $tableName = $mapping->getTable()->tableName;
+                $query = "DELETE FROM $tableName WHERE " . $mapping->getId() . " = :id";
+                $bind = [':id' => $item->getId()];
+            }
+
+            if (is_array($item)) {
+
+            }
+
+            $adapter->addToTransaction($query, $bind);
+        }
+
+        $this->clearEntityDeletionsQueue();
+        return $adapter->transactionQuery();
     }
 
     /**
@@ -94,14 +124,40 @@ class UnitOfWork
         $this->entityDeletions[] = $entity;
     }
 
-    public function commit(): void
+    public function commit(): int
     {
-        $this->executeInserts();
+        $rowCount = 0;
+
+        if (count($this->entityDeletions)) {
+            $rowCount += $this->executeDeletions();
+        }
+
+//        if (count($this->entityUpdates)) {
+//        $rowCount += $this->executeUpdates();
+//        }
+
+        if (count($this->entityInsertions)) {
+            $rowCount += $this->executeInserts();
+        }
+
+        return $rowCount;
     }
 
     public function clearEntityInsertionsQueue(): void
     {
         unset($this->entityInsertions);
         $this->entityInsertions = [];
+    }
+
+    public function clearEntityDeletionsQueue(): void
+    {
+        unset($this->entityDeletions);
+        $this->entityDeletions = [];
+    }
+
+    public function clearEntityUpdatesQueue(): void
+    {
+        unset($this->entityUpdates);
+        $this->entityUpdates = [];
     }
 }

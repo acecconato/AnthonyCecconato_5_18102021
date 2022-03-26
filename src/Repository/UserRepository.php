@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
-use Blog\Database\Adapter\MySQLAdapter;
 use Blog\Entity\Post;
 
 class UserRepository extends Repository

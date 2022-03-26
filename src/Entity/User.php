@@ -10,16 +10,38 @@ use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\Attribute\Id;
 use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\UserRepository;
+use Ramsey\Uuid\Uuid;
 
 #[Entity(repositoryClass: UserRepository::class)]
 #[Table(tableName: 'user')]
-class User extends AbstractEntity
+class User
 {
+    #[Id()]
+    protected string $id;
+
     #[Column(name: 'username', type: Type::STRING, nullable: false, unique: true)]
     private string $username;
 
     #[Column(name: 'email', type: Type::STRING, nullable: false, unique: true)]
     private string $email;
+
+    public function __construct()
+    {
+        if (!isset($this->id)) {
+            $this->id = (string)Uuid::uuid4();
+        }
+    }
+
+    public function getId(): string|false
+    {
+        return $this->id ?? false;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     public function getUsername(): string
     {

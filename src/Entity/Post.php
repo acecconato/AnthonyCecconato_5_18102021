@@ -9,11 +9,15 @@ use Blog\ORM\Mapping\Attribute\Entity;
 use Blog\ORM\Mapping\Attribute\Id;
 use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\PostRepository;
+use Ramsey\Uuid\Uuid;
 
 #[Entity(repositoryClass: PostRepository::class)]
 #[Table(tableName: 'post')]
-class Post extends AbstractEntity
+class Post
 {
+    #[Id()]
+    protected string $id;
+
     #[Column(name: 'title')]
     private string $title;
 
@@ -21,7 +25,25 @@ class Post extends AbstractEntity
     private string $content;
 
     #[Column(name: 'user_id')]
-    private string $userId;
+    private string|null $userId;
+
+    public function __construct()
+    {
+        if (!isset($this->id)) {
+            $this->id = (string)Uuid::uuid4();
+        }
+    }
+
+    public function getId(): string|false
+    {
+        return $this->id ?? false;
+    }
+
+    public function setId(string $id): self
+    {
+        $this->id = $id;
+        return $this;
+    }
 
     public function getTitle(): string
     {
@@ -45,12 +67,12 @@ class Post extends AbstractEntity
         return $this;
     }
 
-    public function getUserId(): string
+    public function getUserId(): string|null
     {
         return $this->userId;
     }
 
-    public function setUserId(string $userId): Post
+    public function setUserId(string|null $userId): Post
     {
         $this->userId = $userId;
         return $this;

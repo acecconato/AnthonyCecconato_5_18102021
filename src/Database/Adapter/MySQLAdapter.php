@@ -73,6 +73,7 @@ class MySQLAdapter implements AdapterInterface
 
                 $statement = $this->connection->prepare($query);
                 $statement->execute($bind);
+
                 $rowCount += $statement->rowCount();
             }
 
@@ -90,6 +91,14 @@ class MySQLAdapter implements AdapterInterface
     {
         $this->transactions[] = ['query' => $query, 'bind' => $bind];
         return $this;
+    }
+
+    /**
+     * @return array<array-key, array{query: string, bind: array<string>}>
+     */
+    public function getAwaitingTransactions(): array
+    {
+        return $this->transactions;
     }
 
     public function clearTransaction(): void

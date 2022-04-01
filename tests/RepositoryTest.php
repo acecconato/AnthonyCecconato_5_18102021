@@ -114,45 +114,36 @@ class RepositoryTest extends TestCase
         $this->assertContainsOnlyInstancesOf(User::class, $users);
     }
 
-    public function testFind(): void
-    {
-        $container = $this->loadContainer();
-
-        /** @var UserRepository $userRepository */
-        $userRepository = $container->get(UserRepository::class);
-
-        $em = $userRepository->getEntityManager();
-
-        dd($userRepository->findOneBy(['id' => '3680b3ba-3d48-4dba-9208-60119fd6fa58']));
-    }
-
-    public function testDeletion()
-    {
-        $container = $this->loadContainer();
-
-        /** @var UserRepository $userRepository */
-        $userRepository = $container->get(UserRepository::class);
-
-        /** @var EntityManager $em */
-        $em = $userRepository->getEntityManager();
-
-        $userRepository->delete(['51113fae-67fb-4615-90da-6095a79c6dc0', '8952c6de-6a02-46f1-aa22-049204c12f51']);
-
-//        $user = $userRepository->find('3680b3ba-3d48-4dba-9208-60119fd6fa58');
-//        if ($user) {
-//            $em->delete($user);
-//        }
-
-//        dd($em->flush());
-    }
-
     public function testUpdates()
     {
         $container = $this->loadContainer();
 
+        /** @var UserRepository $userRepository */
         $userRepository = $container->get(UserRepository::class);
 
         /** @var EntityManager $em */
         $em = $userRepository->getEntityManager();
+
+        $billy = new User();
+        $billy
+            ->setUsername('Billy The Kid')
+            ->setEmail('billy@thekid.com');
+
+        $em->add($billy);
+        $em->flush();
+
+        $this->assertInstanceOf(User::class, $userRepository->find($billy->getId()));
+
+        $billy->setUsername("Billy the updated");
+
+        $em->update($billy);
+        $em->flush();
+
+        $this->assertEquals('Billy the updated', $userRepository->find($billy->getId())?->getUsername());
+
+        $em->delete($billy);
+        $em->flush();
+
+        $this->assertFalse($userRepository->find($billy->getId()));
     }
 }

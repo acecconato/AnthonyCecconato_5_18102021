@@ -25,13 +25,16 @@ class UnitOfWork
     ) {
     }
 
-    public function executeInserts(): int
+    private function executeInserts(): int
     {
         $adapter = $this->entityManager->getAdapter();
 
         foreach ($this->entityInsertions as $object) {
-            $mapping = $this->mapper->resolve($object::class);
+            if (!is_object($object)) {
+                throw new Exception("$object is not a valid object");
+            }
 
+            $mapping = $this->mapper->resolve($object::class);
             $tableName = $mapping->getTable()->tableName;
 
             $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
@@ -58,35 +61,61 @@ class UnitOfWork
         return $adapter->transactionQuery();
     }
 
-    public function executeUpdates(): void
-    {
-    }
-
     /**
+     * @return int
      * @throws Exception
      */
-    public function executeDeletions(): int
+    private function executeUpdates(): int
     {
         $adapter = $this->entityManager->getAdapter();
 
-        /** @var mixed $item */
-        foreach ($this->entityDeletions as $item) {
-
-            if (!is_object($item) && !is_array($item)) {
-                throw new Exception('The ' . __CLASS__ . ' deletion method only accepts objects and array');
+        /** @var object $object */
+        foreach ($this->entityUpdates as $object) {
+            if (!is_object($object)) {
+                throw new Exception("$object is not a valid object");
             }
 
-            if (is_object($item)) {
-                /** @var object $item */
-                $mapping = $this->mapper->resolve($item::class);
-                $tableName = $mapping->getTable()->tableName;
-                $query = "DELETE FROM $tableName WHERE " . $mapping->getId() . " = :id";
-                $bind = [':id' => $item->getId()];
+            $mapping = $this->mapper->resolve($object::class);
+            $tableName = $mapping->getTable()->tableName;
+
+            $prepValues = array_map(fn($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
+
+            $query = "UPDATE $tableName SET " . implode(', ', $prepValues) . " WHERE " . $mapping->getId() . " = :id";
+
+            $bind = [];
+            $bind[':' . $mapping->getId()] = $object->getId();
+
+            foreach ($mapping->getColumns() as $column) {
+                // @phpstan-ignore-next-line
+                $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
 
-            if (is_array($item)) {
+            $adapter->addToTransaction($query, $bind);
+        }
 
+        $this->clearEntityUpdatesQueue();
+        return $adapter->transactionQuery();
+    }
+
+    /**
+     * @return int
+     * @throws Exception
+     */
+    private function executeDeletions(): int
+    {
+        $adapter = $this->entityManager->getAdapter();
+
+        /** @var mixed $object */
+        foreach ($this->entityDeletions as $object) {
+            if (!is_object($object)) {
+                throw new Exception("$object is not a valid object");
             }
+
+            /** @var object $object */
+            $mapping = $this->mapper->resolve($object::class);
+            $tableName = $mapping->getTable()->tableName;
+            $query = "DELETE FROM $tableName WHERE " . $mapping->getId() . " = :id";
+            $bind = [':id' => $object->getId()];
 
             $adapter->addToTransaction($query, $bind);
         }
@@ -124,6 +153,10 @@ class UnitOfWork
         $this->entityDeletions[] = $entity;
     }
 
+    /**
+     * @return int
+     * @throws Exception
+     */
     public function commit(): int
     {
         $rowCount = 0;
@@ -132,9 +165,9 @@ class UnitOfWork
             $rowCount += $this->executeDeletions();
         }
 
-//        if (count($this->entityUpdates)) {
-//        $rowCount += $this->executeUpdates();
-//        }
+        if (count($this->entityUpdates)) {
+            $rowCount += $this->executeUpdates();
+        }
 
         if (count($this->entityInsertions)) {
             $rowCount += $this->executeInserts();

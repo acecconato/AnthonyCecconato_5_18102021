@@ -6,6 +6,8 @@ namespace Blog;
 
 use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
+use Blog\ORM\Hydration\HydratorInterface;
+use Blog\ORM\Hydration\ObjectHydrator;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
 use Blog\Templating\Templating;

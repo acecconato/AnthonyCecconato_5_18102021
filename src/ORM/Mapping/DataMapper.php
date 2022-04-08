@@ -93,8 +93,6 @@ class DataMapper implements MapperInterface
                     case Id::class:
                         $metadatas->setId($property->getName());
                         break;
-                    default:
-                        throw new Exception('Unhandled property attribute ' . $propAttributes->getName());
                 }
             }
         }

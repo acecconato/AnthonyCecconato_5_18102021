@@ -10,6 +10,7 @@ use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\Attribute\Id;
 use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\UserRepository;
+use Blog\Validator\Constraint as Assert;
 use Ramsey\Uuid\Uuid;
 
 #[Entity(repositoryClass: UserRepository::class)]
@@ -23,6 +24,7 @@ class User
     private string $username;
 
     #[Column(name: 'email', type: Type::STRING, nullable: false, unique: true)]
+    #[Assert\NotNull()]
     private string $email;
 
     public function __construct()

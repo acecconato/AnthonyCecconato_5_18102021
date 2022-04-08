@@ -132,4 +132,9 @@ final class Kernel
 
         $configRoute($this->router);
     }
+
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
+    }
 }

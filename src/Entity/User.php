@@ -10,6 +10,7 @@ use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\Attribute\Id;
 use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\UserRepository;
+use Blog\Validator\Constraint as Assert;
 use Ramsey\Uuid\Uuid;
 
 #[Entity(repositoryClass: UserRepository::class)]
@@ -20,9 +21,16 @@ class User
     protected string $id;
 
     #[Column(name: 'username', type: Type::STRING, nullable: false, unique: true)]
+    #[Assert\NotBlank()]
+    #[Assert\MaxLength(
+        message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Il en possède actuellement %d",
+        maxLen: 20)
+    ]
     private string $username;
 
     #[Column(name: 'email', type: Type::STRING, nullable: false, unique: true)]
+    #[Assert\NotBlank()]
+    #[Assert\Email()]
     private string $email;
 
     public function __construct()

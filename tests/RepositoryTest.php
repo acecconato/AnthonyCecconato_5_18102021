@@ -8,7 +8,6 @@ use Blog\DependencyInjection\Container;
 use Blog\Entity\Post;
 use Blog\Entity\User;
 use Blog\ORM\EntityManager;
-use Blog\ORM\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
 use Blog\Repository\UserRepository;

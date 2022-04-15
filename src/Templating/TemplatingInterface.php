@@ -9,7 +9,7 @@ interface TemplatingInterface
     /** Render a template from a view.
      *
      * @param string $view
-     * @param array $context
+     * @param array<string> $context
      *
      * @return string
      */

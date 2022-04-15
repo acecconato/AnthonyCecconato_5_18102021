@@ -1,6 +1,6 @@
 <?php
 
-namespace Blog\ORM\Hydration;
+namespace Blog\Hydration;
 
 interface HydratorInterface
 {

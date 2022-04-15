@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractController
 {
     public function __construct(
-        private TemplatingInterface $templating
+        protected TemplatingInterface $templating
     ) {
     }
 
@@ -27,7 +27,7 @@ abstract class AbstractController
     /**
      * @param string $to
      * @param int $status
-     * @param array $headers
+     * @param array<string> $headers
      * @return RedirectResponse
      */
     public function redirect(string $to, int $status = 302, array $headers = []): RedirectResponse
@@ -35,8 +35,14 @@ abstract class AbstractController
         return new RedirectResponse($to, $status, $headers);
     }
 
+    /**
+     * @param string $view
+     * @param array<string> $context
+     * @return Response
+     */
     public function render(string $view, array $context = []): Response
     {
+
         return new Response($this->templating->render($view, $context));
     }
 }

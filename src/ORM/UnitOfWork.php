@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Blog\ORM;
 
+use Blog\ORM\Exception\NullableConstraintException;
+use Blog\ORM\Exception\UniqueConstraintException;
+use Blog\ORM\Mapping\Attribute\Column;
 use Blog\ORM\Mapping\MapperInterface;
 use Exception;
 use Ramsey\Uuid\Uuid;
@@ -39,6 +42,18 @@ class UnitOfWork
 
             $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
 
+            foreach ($mapping->getColumns() as $column) {
+                if ($column->unique) {
+                    $this->checkUniqueConstraint($tableName, $column, $object);
+                }
+
+                if (!$column->nullable) {
+                    $this->checkNullableConstraint($tableName, $column, $object);
+                }
+            }
+
+            die();
+
             $query = "
                 INSERT INTO $tableName 
                 VALUES ( :" . $mapping->getId() . ", " . implode(', ', $prepValues) . " )
@@ -59,6 +74,44 @@ class UnitOfWork
 
         $this->clearEntityInsertionsQueue();
         return $adapter->transactionQuery();
+    }
+
+    /**
+     * @param string $tableName
+     * @param Column $column
+     * @param object $object
+     * @throws NullableConstraintException
+     */
+    private function checkNullableConstraint(string $tableName, Column $column, object $object): void
+    {
+        // @phpstan-ignore-next-line
+        if (null === $object->{'get' . ucfirst($column->propertyName)}()) {
+            throw new NullableConstraintException("'" . $column->name ."' cannot be nullable");
+        }
+    }
+
+    /**
+     * @param string $tableName
+     * @param Column $column
+     * @param object $object
+     * @return void
+     * @throws UniqueConstraintException
+     */
+    private function checkUniqueConstraint(string $tableName, Column $column, object $object): void
+    {
+        $adapter = $this->entityManager->getAdapter();
+
+        // @phpstan-ignore-next-line
+        $value = $object->{'get' . ucfirst($column->propertyName)}();
+
+        $query = "SELECT COUNT(*) FROM $tableName WHERE " . $column->name . "=:columnName";
+        $bind = [':columnName' => $value];
+
+        $statement = $adapter->query($query, $bind);
+
+        if ($statement->rowCount() > 0) {
+            throw new UniqueConstraintException("'$value' already exists in the database");
+        }
     }
 
     /**

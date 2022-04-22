@@ -101,18 +101,18 @@ class RepositoryTest extends TestCase
         $this->assertFalse($em->findOneBy(Post::class, ['id' => $myPost->getId()]));
     }
 
-    public function testUserRepository(): void
-    {
-        $container = $this->loadContainer();
-
-        /** @var UserRepository $userRepository */
-        $userRepository = $container->get(UserRepository::class);
-
-        $users = $userRepository->findAll();
-
-        $this->assertGreaterThan(0, count($users));
-        $this->assertContainsOnlyInstancesOf(User::class, $users);
-    }
+//    public function testUserRepository(): void
+//    {
+//        $container = $this->loadContainer();
+//
+//        /** @var UserRepository $userRepository */
+//        $userRepository = $container->get(UserRepository::class);
+//
+//        $users = $userRepository->findAll();
+//
+//        $this->assertGreaterThan(0, count($users));
+//        $this->assertContainsOnlyInstancesOf(User::class, $users);
+//    }
 
     public function testUpdates()
     {

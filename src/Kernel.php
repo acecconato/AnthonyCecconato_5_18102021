@@ -6,8 +6,6 @@ namespace Blog;
 
 use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
-use Blog\ORM\Hydration\HydratorInterface;
-use Blog\ORM\Hydration\ObjectHydrator;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
 use Blog\Templating\Templating;
@@ -17,6 +15,8 @@ use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Throwable;
 
 final class Kernel
 {
@@ -42,16 +42,16 @@ final class Kernel
         $this->configureRoutes();
     }
 
+
     /**
-     * @param Request $request
-     *
-     * @return void
-     * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
      * @throws ReflectionException
      */
-    public function run(Request $request): void
+    public function run(Request $request, SessionInterface $session): void
     {
+        $request->setSession($session);
+
         $route = $this->router->match($request->getRequestUri());
         $routeArgs = $route->getArgs($request);
 
@@ -96,8 +96,17 @@ final class Kernel
 
         $args = array_merge(array_flip($expectedCallOrder), $args);
 
-        $response = call_user_func_array([$class, $method], $args);
-        $response->send();
+        try {
+            $response = call_user_func_array([$class, $method], $args);
+            $response->send();
+        } catch (Throwable $e) {
+            if ($this->env === 'development') {
+                dd($e);
+                // Todo call a 500 controller
+            }
+
+            exit('Internal server error: 500');
+        }
     }
 
     /**
@@ -131,5 +140,10 @@ final class Kernel
         $this->router = $this->container->get(Router::class);
 
         $configRoute($this->router);
+    }
+
+    public function getContainer(): ContainerInterface
+    {
+        return $this->container;
     }
 }

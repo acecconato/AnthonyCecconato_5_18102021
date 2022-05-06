@@ -8,7 +8,6 @@ use Blog\DependencyInjection\Container;
 use Blog\Entity\Post;
 use Blog\Entity\User;
 use Blog\ORM\EntityManager;
-use Blog\ORM\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
 use Blog\Repository\UserRepository;
@@ -101,18 +100,18 @@ class RepositoryTest extends TestCase
         $this->assertFalse($em->findOneBy(Post::class, ['id' => $myPost->getId()]));
     }
 
-    public function testUserRepository(): void
-    {
-        $container = $this->loadContainer();
-
-        /** @var UserRepository $userRepository */
-        $userRepository = $container->get(UserRepository::class);
-
-        $users = $userRepository->findAll();
-
-        $this->assertGreaterThan(0, count($users));
-        $this->assertContainsOnlyInstancesOf(User::class, $users);
-    }
+//    public function testUserRepository(): void
+//    {
+//        $container = $this->loadContainer();
+//
+//        /** @var UserRepository $userRepository */
+//        $userRepository = $container->get(UserRepository::class);
+//
+//        $users = $userRepository->findAll();
+//
+//        $this->assertGreaterThan(0, count($users));
+//        $this->assertContainsOnlyInstancesOf(User::class, $users);
+//    }
 
     public function testUpdates()
     {

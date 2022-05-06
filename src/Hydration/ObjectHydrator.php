@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Blog\ORM\Hydration;
+namespace Blog\Hydration;
 
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\Metadata;
@@ -39,7 +39,6 @@ class ObjectHydrator implements HydratorInterface
     public function hydrateSingle(array $result, string $fqcnEntity): object
     {
         $mapping = $this->mapper->resolve($fqcnEntity);
-
         return $this->hydrateObject($mapping, $result);
     }
 
@@ -59,7 +58,9 @@ class ObjectHydrator implements HydratorInterface
             $object->{$setterMethod}($result[$column->name]);
         }
 
-        $object->setId($result[$mapping->getId()]);
+        if (array_key_exists($mapping->getId(), $result)) {
+            $object->setId($result[$mapping->getId()]);
+        }
 
         return $object;
     }

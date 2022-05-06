@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Blog\ORM;
 
 use Blog\Database\Adapter\AdapterInterface;
-use Blog\ORM\Hydration\HydratorInterface;
-use Blog\ORM\Hydration\ObjectHydrator;
+use Blog\Hydration\HydratorInterface;
+use Blog\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\MapperInterface;
 use PDO;
 use ReflectionException;

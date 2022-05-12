@@ -4,35 +4,27 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
-use Blog\Entity\User;
-use Blog\Form\FormHandler;
-use Exception;
-use ReflectionException;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HomeController extends AbstractController
 {
-    /**
-     * @throws ReflectionException
-     * @throws Exception
-     */
-    public function index(Request $request, FormHandler $formHandler): Response
+    public function index(): Response
     {
-        $form = $formHandler->loadFromRequest($request, User::class);
+        return $this->render('pages/home.html.twig');
+    }
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            dd("Submitted & isValid");
-        }
+    public function about(): Response
+    {
+        return $this->render('pages/about.html.twig');
+    }
 
-        return $this->render(
-            'pages/home.html.twig',
-            [
-                'username' => $form->get('username'),
-                'email' => $form->get('email'),
-                'csrfToken' => $form->getCsrfToken(),
-                'errors' => $form->getErrors()
-            ]
-        );
+    public function contact(): Response
+    {
+        return $this->render('pages/contact.html.twig');
+    }
+
+    public function showSinglePost(): Response
+    {
+        return $this->render('pages/post.html.twig');
     }
 }

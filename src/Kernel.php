@@ -8,6 +8,7 @@ use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
+use Blog\Router\UrlGeneratorInterface;
 use Blog\Templating\Templating;
 use Blog\Templating\TemplatingInterface;
 use Psr\Container\ContainerExceptionInterface;
@@ -42,7 +43,6 @@ final class Kernel
         $this->configureRoutes();
     }
 
-
     /**
      * @throws NotFoundExceptionInterface
      * @throws ContainerExceptionInterface
@@ -56,7 +56,6 @@ final class Kernel
         $routeArgs = $route->getArgs($request);
 
         $callable = $route->getCallable();
-
         $class = $this->container->get($callable[0]);
         $method = $callable[1];
 
@@ -76,12 +75,15 @@ final class Kernel
 
             if ($param->getType() !== null) {
                 // It's a builtin parameter, or we need to instantiate it?
+                // @phpstan-ignore-next-line
                 if ($this->container->has($param->getName())) {
                     $methodArgs[$param->getName()] = $this->container->get($param->getName());
                 }
 
                 // Use the container to instantiate the required class
+                // @phpstan-ignore-next-line
                 if (!$param->getType()?->isBuiltin()) {
+                    // @phpstan-ignore-next-line
                     $methodArgs[$param->getName()] = $this->container->get($param->getType()->getName());
                 }
             }
@@ -111,6 +113,7 @@ final class Kernel
 
     /**
      * @return void
+     * @throws DependencyInjection\Exceptions\ContainerException
      */
     public function configureContainer(): void
     {
@@ -123,6 +126,8 @@ final class Kernel
             ->addParameter('sourceDir', __DIR__)
             ->addParameter('cacheDir', sprintf('%s/../var/cache/%s', __DIR__, $this->env))
             ->addParameter('templatesDirs', dirname(__DIR__) . '/templates');
+
+        $this->container->registerExisting($this->container, ContainerInterface::class);
     }
 
     /**
@@ -136,7 +141,6 @@ final class Kernel
     {
         $configRoute = require_once dirname(__DIR__) . '/config/routes.php';
 
-        /** @var Router $router */
         $this->router = $this->container->get(Router::class);
 
         $configRoute($this->router);

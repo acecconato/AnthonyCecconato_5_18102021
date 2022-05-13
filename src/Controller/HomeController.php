@@ -27,4 +27,14 @@ class HomeController extends AbstractController
     {
         return $this->render('pages/post.html.twig');
     }
+
+    public function login(): Response
+    {
+        return $this->render('pages/login.html.twig');
+    }
+
+    public function resetPassword(): Response
+    {
+        return $this->render('pages/reset_password.html.twig');
+    }
 }

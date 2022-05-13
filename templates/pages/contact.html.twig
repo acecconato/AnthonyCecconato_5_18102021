@@ -2,12 +2,12 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    {{ encore_entry_link_tags('home') }}
+    {{ encore_entry_link_tags('single') }}
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    {{ encore_entry_script_tags('home', {defer: true}) }}
+    {{ encore_entry_script_tags('single', {defer: true}) }}
 {% endblock %}
 
 {% block page_content %}

@@ -17,6 +17,15 @@
       "css": [
         "/build/home.css"
       ]
+    },
+    "single": {
+      "js": [
+        "/build/runtime.js",
+        "/build/single.js"
+      ],
+      "css": [
+        "/build/single.css"
+      ]
     }
   }
 }

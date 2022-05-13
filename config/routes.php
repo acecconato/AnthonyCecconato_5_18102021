@@ -9,5 +9,7 @@ return function( RouterInterface $router) {
         ->add(new Route('home', '/', [HomeController::class, 'index']))
 	    ->add(new Route('about', '/a-propos-de-anthony-cecconato', [HomeController::class, 'about']))
 	    ->add(new Route('contact', '/contactez-moi', [HomeController::class, 'contact']))
-	    ->add(new Route('single-post', '/article', [HomeController::class, 'showSinglePost']));
+	    ->add(new Route('single-post', '/article', [HomeController::class, 'showSinglePost']))
+	    ->add(new Route('login', '/connexion', [HomeController::class, 'login']))
+	    ->add(new Route('reset_password', '/mot-de-passe-oublie', [HomeController::class, 'resetPassword']));
 };

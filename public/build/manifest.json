@@ -3,5 +3,7 @@
   "build/app.js": "/build/app.js",
   "build/home.css": "/build/home.css",
   "build/home.js": "/build/home.js",
+  "build/single.css": "/build/single.css",
+  "build/single.js": "/build/single.js",
   "build/runtime.js": "/build/runtime.js"
 }

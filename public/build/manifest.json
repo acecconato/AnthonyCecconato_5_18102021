@@ -3,5 +3,9 @@
   "build/app.js": "/build/app.js",
   "build/home.css": "/build/home.css",
   "build/home.js": "/build/home.js",
-  "build/runtime.js": "/build/runtime.js"
+  "build/single.css": "/build/single.css",
+  "build/single.js": "/build/single.js",
+  "build/runtime.js": "/build/runtime.js",
+  "build/vendors-node_modules_feather-icons_dist_feather_js.js": "/build/vendors-node_modules_feather-icons_dist_feather_js.js",
+  "build/vendors-node_modules_core-js_modules_es_string_replace_js-node_modules_feather-icons_dist_fea-06ccd6.js": "/build/vendors-node_modules_core-js_modules_es_string_replace_js-node_modules_feather-icons_dist_fea-06ccd6.js"
 }

@@ -10,6 +10,13 @@
     {{ encore_entry_script_tags('home', {defer: true}) }}
 {% endblock %}
 
+{% block header_bg_style %}style="background-image: url('img/about-bg.jpg')"{% endblock %}
+
+{% block page_title %}
+    <h1>À propos de moi</h1>
+    <span class="subheading mt-5">Anthony Cecconato, développeur web, web mobile</span>
+{% endblock %}
+
 {% block page_content %}
     <!-- Main Content-->
     <main class="mb-4">

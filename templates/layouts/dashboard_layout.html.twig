@@ -3,7 +3,7 @@
 {% block header %}
     {% block header_nav %}
         <!-- Navigation-->
-        <nav class="navbar navbar-expand-lg navbar-light" id="mainNav">
+        <nav class="navbar navbar-expand-lg bg-primary" id="mainNav">
             <div class="container px-4 px-lg-5">
                 {% block navbar_brand %}
                     <p class="navbar-brand">Anthony Cecconato</p>
@@ -16,34 +16,22 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4"
-                                                href="{{ path('home') }}">Accueil</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('about') }}">À
-                                propos de moi</a></li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('single-post') }}">SinglePost
-                                View</a></li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('home') }}">
+                                Retour sur le site
+                            </a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('about') }}">
+                                Articles
+                            </a>
+                        </li>
+                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('single-post') }}">
+                                Commentaires
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </nav>
-    {% endblock %}
-
-    {% block header_content %}
-        <!-- Page Header-->
-        <header class="masthead" {% block header_bg_style %}style="background-image: url('img/home-bg.jpg')"{% endblock %}>
-            <div class="container position-relative px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-md-10 col-lg-8 col-xl-7">
-                        <div class="site-heading">
-                            {% block page_title %}
-                                <h2>Page title</h2>
-                                <span class="subheading mt-5">Default subheading</span>
-                            {% endblock %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </header>
     {% endblock %}
 
 {% endblock %}

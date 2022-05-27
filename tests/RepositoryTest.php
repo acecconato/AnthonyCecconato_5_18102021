@@ -10,9 +10,11 @@ use Blog\Entity\User;
 use Blog\ORM\EntityManager;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
+use Blog\Repository\PostRepository;
 use Blog\Repository\UserRepository;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Rfc4122\UuidV4;
+use Ramsey\Uuid\Uuid;
 
 class RepositoryTest extends TestCase
 {
@@ -26,7 +28,7 @@ class RepositoryTest extends TestCase
         // TODO:: These parameters should be into the .env file
         return $container
             ->addParameter('host', 'localhost')
-            ->addParameter('dbName', 'phpsf05')
+            ->addParameter('dbName', 'anthonyc5')
             ->addParameter('dbUser', 'root')
             ->addParameter('dbPassword', 'root');
     }
@@ -100,18 +102,25 @@ class RepositoryTest extends TestCase
         $this->assertFalse($em->findOneBy(Post::class, ['id' => $myPost->getId()]));
     }
 
-//    public function testUserRepository(): void
-//    {
-//        $container = $this->loadContainer();
-//
-//        /** @var UserRepository $userRepository */
-//        $userRepository = $container->get(UserRepository::class);
-//
-//        $users = $userRepository->findAll();
-//
-//        $this->assertGreaterThan(0, count($users));
-//        $this->assertContainsOnlyInstancesOf(User::class, $users);
-//    }
+    public function testPostRepository(): void
+    {
+        $container = $this->loadContainer();
+
+        /** @var PostRepository $postRepo */
+        $postRepo = $container->get(PostRepository::class);
+
+        $em = $postRepo->getEntityManager();
+
+        $post = new Post();
+        $post
+            ->setUserId((string) Uuid::uuid4())
+            ->setContent('Short content')
+            ->setTitle('Simple Title')
+            ->setSlug('short-content');
+
+        $em->add($post);
+        $em->flush();
+    }
 
     public function testUpdates()
     {

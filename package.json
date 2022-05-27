@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^34.0.0",
     "@symfony/webpack-encore": "^1.8.1",
     "sass": "^1.49.7"
   },

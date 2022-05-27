@@ -4,21 +4,59 @@
     <main id="dashboard" class="mt-5 pt-md-5 mb-5">
         <div class="container mt-5 pt-5 px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
-                <form method="post" id="comments-form">
-                    <div class="form-floating mb-4">
-                        <input class="form-control" id="name" type="text" placeholder="Votre pseudo" required/>
-                        <label for="name">Titre</label>
-                    </div>
+                <div class="col-md-10 col-xl-8">
+                    <form method="post" id="comments-form">
+                        <div class="form-floating mb-4">
+                            <input class="form-control"
+                                   id="title"
+                                   name="post[title]"
+                                   type="text"
+                                   placeholder="Titre"
+                                   required
+                            />
+                            <label for="title">Titre</label>
+                        </div>
 
-                    <div class="form-floating mb-4">
-                        <textarea class="form-control" placeholder="Votre commentaire" id="comment[content]"
-                                  required></textarea>
-                        <label for="comment[content]">Description blabla</label>
-                    </div>
+                        <div class="form-floating mb-4">
+                            <input class="form-control" id="excerpt" name="post[excerpt]" type="text"
+                                   placeholder="Résumé"
+                                   required/>
+                            <label for="excerpt">Résumé</label>
+                        </div>
 
-                    <button class="btn btn-primary" id="submitButton" type="submit">Envoyer</button>
-                </form>
+                        <div class=" mb-4">
+                            <label for="name" class="text-muted">Image mise en avant</label>
+                            <input class="form-control" id="image" type="file" name="post[image]" required/>
+                        </div>
+
+                        <label for="comment[content]" class="text-muted">Contenu de l'article</label>
+                        <div id="editor">
+                            <textarea
+                                    class="form-control"
+                                    placeholder="Votre commentaire"
+                                    id="comment[content]"
+                                    required>
+                            </textarea>
+                        </div>
+
+                        <button class="mt-4 btn btn-primary" id="submitButton" type="submit">Ajouter</button>
+                    </form>
+                </div>
             </div>
         </div>
     </main>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.ckeditor.com/ckeditor5/34.0.0/classic/ckeditor.js"></script>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            ClassicEditor
+                .create(document.querySelector('#editor'))
+                .catch(error => {
+                    console.error(error);
+                });
+        })
+    </script>
 {% endblock %}

@@ -14,7 +14,8 @@ final class Column
         public string $name,
         public Type $type = Type::STRING,
         public bool $nullable = false,
-        public bool $unique = false
+        public bool $unique = false,
+        public bool $timestamp = false
     ) {
     }
 }

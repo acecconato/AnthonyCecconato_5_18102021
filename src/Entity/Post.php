@@ -6,9 +6,11 @@ namespace Blog\Entity;
 
 use Blog\ORM\Mapping\Attribute\Column;
 use Blog\ORM\Mapping\Attribute\Entity;
+use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\Attribute\Id;
 use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\PostRepository;
+use DateTime;
 use Ramsey\Uuid\Uuid;
 
 #[Entity(repositoryClass: PostRepository::class)]
@@ -16,16 +18,29 @@ use Ramsey\Uuid\Uuid;
 class Post
 {
     #[Id()]
+    #[Column(name: 'id', unique: true)]
     protected string $id;
 
-    #[Column(name: 'title')]
+    #[Column(name: 'title', unique: true)]
     private string $title;
 
     #[Column(name: 'content')]
     private string $content;
 
-    #[Column(name: 'user_id')]
-    private string|null $userId;
+    #[Column(name: 'excerpt', nullable: true)]
+    private ?string $excerpt = null;
+
+    #[Column(name: 'slug', unique: true)]
+    private string $slug;
+
+    #[Column(name: 'created_at', type: Type::DATETIME, nullable: true)]
+    private ?string $createdAt = null;
+
+    #[Column(name: 'updated_at', type: Type::DATETIME, nullable: true)]
+    private ?string $updatedAt = null;
+
+    #[Column(name: 'user_id', nullable: true)]
+    private ?string $userId = null;
 
     public function __construct()
     {
@@ -50,7 +65,7 @@ class Post
         return $this->title;
     }
 
-    public function setTitle(string $title): Post
+    public function setTitle(string $title): self
     {
         $this->title = $title;
         return $this;
@@ -61,20 +76,64 @@ class Post
         return $this->content;
     }
 
-    public function setContent(string $content): Post
+    public function setContent(string $content): self
     {
         $this->content = $content;
         return $this;
     }
 
-    public function getUserId(): string|null
+    public function getUserId(): ?string
     {
         return $this->userId;
     }
 
-    public function setUserId(string|null $userId): Post
+    public function setUserId(string|null $userId): self
     {
         $this->userId = $userId;
+        return $this;
+    }
+
+    public function getSlug(): string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): self
+    {
+        $this->slug = $slug;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?string
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTime $createdAt): self
+    {
+        $this->createdAt = $createdAt ?? new DateTime();
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?string
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(string $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    public function getExcerpt(): ?string
+    {
+        return $this->excerpt;
+    }
+
+    public function setExcerpt(?string $excerpt): self
+    {
+        $this->excerpt = $excerpt;
         return $this;
     }
 }

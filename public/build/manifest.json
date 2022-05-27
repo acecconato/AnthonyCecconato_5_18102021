@@ -5,5 +5,6 @@
   "build/home.js": "/build/home.js",
   "build/single.css": "/build/single.css",
   "build/single.js": "/build/single.js",
-  "build/runtime.js": "/build/runtime.js"
+  "build/runtime.js": "/build/runtime.js",
+  "build/vendors-node_modules_ckeditor_ckeditor5-build-classic_build_ckeditor_js.js": "/build/vendors-node_modules_ckeditor_ckeditor5-build-classic_build_ckeditor_js.js"
 }

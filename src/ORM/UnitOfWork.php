@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Blog\ORM;
 
+use Blog\Kernel;
 use Blog\ORM\Exception\NullableConstraintException;
 use Blog\ORM\Exception\UniqueConstraintException;
 use Blog\ORM\Mapping\Attribute\Column;
+use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\MapperInterface;
+use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
 
@@ -45,7 +48,7 @@ class UnitOfWork
             $mapping = $this->mapper->resolve($object::class);
             $tableName = $mapping->getTable()->tableName;
 
-            $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
+            $prepValues = implode(', ', array_map(fn($column) => ':' . $column->name, $mapping->getColumns()));
 
             foreach ($mapping->getColumns() as $column) {
                 if ($column->unique) {
@@ -58,8 +61,8 @@ class UnitOfWork
             }
 
             $query = "
-                INSERT INTO $tableName 
-                VALUES ( :" . $mapping->getId() . ", " . implode(', ', $prepValues) . " )
+                INSERT INTO $tableName ( " . $mapping->getId() . ", " . str_replace(':', '', $prepValues) . " )
+                VALUES( :" . $mapping->getId() . ", " . $prepValues . " )
             ";
 
             $bind = [];
@@ -67,28 +70,25 @@ class UnitOfWork
             ($object->getId()) ?: $object->setId((string)Uuid::uuid4());
             $bind[':' . $mapping->getId()] = $object->getId();
 
-//            $object->setCreatedAt('KDUAZHDKAZUH');
-
             foreach ($mapping->getColumns() as $column) {
-                // Handle created_at
-//                if ($column->timestamp && !$object->{'get' . ucfirst($column->propertyName)}()) {
-//                    dump($object->getCreatedAt());
-//                    $bind[':' . $column->name] = 'NOW()';
-//                    continue;
-//                }
-//
-//                // Handle updated_at
-//                if ($column->timestamp) {
-//                    $bind[':' . $column->name] = 'NOW()';
-//                    continue;
-//                }
+                // DateTime to string conversion
+                if ($column->type === Type::DATE) {
+                    /** @var ?DateTime $datetime */
+                    $datetime = $object->{'get' . ucfirst($column->propertyName)}();
+
+                    $bind[':' . $column->name] = null;
+
+                    if ($datetime) {
+                        $bind[':' . $column->name] = $datetime->format(Kernel::DATE_FORMAT);
+                    }
+
+                    continue;
+                }
 
                 // @phpstan-ignore-next-line
                 $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
 
-
-            dd($bind);
             $adapter->addToTransaction($query, $bind);
         }
 
@@ -97,9 +97,6 @@ class UnitOfWork
     }
 
     /**
-     * @param string $tableName
-     * @param Column $column
-     * @param object $object
      * @throws NullableConstraintException
      */
     private function checkNullableConstraint(string $tableName, Column $column, object $object): void
@@ -111,21 +108,27 @@ class UnitOfWork
     }
 
     /**
-     * @param string $tableName
-     * @param Column $column
-     * @param object $object
-     * @return void
      * @throws UniqueConstraintException
      */
     private function checkUniqueConstraint(string $tableName, Column $column, object $object): void
     {
         $adapter = $this->entityManager->getAdapter();
+        $mapping = $this->mapper->resolve($object::class);
 
-        // @phpstan-ignore-next-line
+        if (null === $object->{'get' . ucfirst($column->propertyName)}()) {
+            dd("a");
+        }
+
         $value = $object->{'get' . ucfirst($column->propertyName)}();
 
-        $query = "SELECT COUNT(*) FROM $tableName WHERE " . $column->name . "=:columnValue";
-        $bind = [':columnValue' => $value];
+
+        $objectId = $object->{'get' . ucfirst($mapping->getId())}();
+
+        $query = " SELECT COUNT(*) 
+                FROM $tableName
+                WHERE " . $column->name . " =:columnValue AND " . $mapping->getId() . " != :" . $mapping->getId();
+
+        $bind = [':columnValue' => $value, ':' . $mapping->getId() => $objectId];
 
         $statement = $adapter->query($query, $bind);
 
@@ -135,7 +138,6 @@ class UnitOfWork
     }
 
     /**
-     * @return int
      * @throws Exception
      */
     private function executeUpdates(): int
@@ -169,6 +171,16 @@ class UnitOfWork
             $bind[':' . $mapping->getId()] = $object->getId();
 
             foreach ($mapping->getColumns() as $column) {
+                // DateTime to string conversion
+                if ($column->type === Type::DATE) {
+                    /** @var ?DateTime $datetime */
+                    $datetime = $object->{'get' . ucfirst($column->propertyName)}() ?? new DateTime();
+
+                    $bind[':' . $column->name] = $datetime?->format(Kernel::DATE_FORMAT);
+
+                    continue;
+                }
+
                 // @phpstan-ignore-next-line
                 $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
@@ -181,7 +193,6 @@ class UnitOfWork
     }
 
     /**
-     * @return int
      * @throws Exception
      */
     private function executeDeletions(): int
@@ -207,37 +218,24 @@ class UnitOfWork
         return $adapter->transactionQuery();
     }
 
-    /**
-     * @param object $entity
-     * @return void
-     */
     public function add(object $entity): void
     {
         $oid = spl_object_id($entity);
         $this->entityInsertions[$oid] = $entity;
     }
 
-    /**
-     * @param object $entity
-     * @return void
-     */
     public function update(object $entity): void
     {
         $oid = spl_object_id($entity);
         $this->entityUpdates[$oid] = $entity;
     }
 
-    /**
-     * @param object $entity
-     * @return void
-     */
     public function delete(object $entity): void
     {
         $this->entityDeletions[] = $entity;
     }
 
     /**
-     * @return int
      * @throws Exception
      */
     public function commit(): int

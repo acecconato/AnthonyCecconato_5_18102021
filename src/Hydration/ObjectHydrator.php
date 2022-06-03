@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Blog\Hydration;
 
+use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\Metadata;
+use DateTime;
+use Exception;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionObject;
@@ -45,6 +48,7 @@ class ObjectHydrator implements HydratorInterface
     /**
      * @param array<string> $result
      * @throws ReflectionException
+     * @throws Exception
      */
     protected function hydrateObject(Metadata $mapping, array $result): object
     {
@@ -55,6 +59,15 @@ class ObjectHydrator implements HydratorInterface
         foreach ($mapping->getColumns() as $column) {
             // @phpstan-ignore-next-line
             $setterMethod = 'set' . ucfirst($column->propertyName);
+
+            if ($column->type === Type::DATE) {
+                if ($result[$column->name]) {
+                    $object->{$setterMethod}(new DateTime($result[$column->name]));
+                }
+
+                continue;
+            }
+
             $object->{$setterMethod}($result[$column->name]);
         }
 

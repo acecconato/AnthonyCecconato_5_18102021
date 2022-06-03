@@ -90,6 +90,7 @@ class DataMapper implements MapperInterface
                         /** @var Column $propAttributesInstance */
                         $metadatas->addColumns($propAttributesInstance);
                         break;
+
                     case Id::class:
                         $metadatas->setId($property->getName());
                         break;

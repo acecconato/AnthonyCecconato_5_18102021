@@ -11,5 +11,4 @@ enum Type
     case INT;
     case UUID;
     case DATE;
-    case DATETIME;
 }

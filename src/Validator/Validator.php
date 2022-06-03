@@ -35,7 +35,7 @@ final class Validator implements ValidatorInterface
             }
         }
 
-        if (count($this->getErrors())) {
+        if (count($this->errors)) {
             return false;
         }
 
@@ -60,7 +60,14 @@ final class Validator implements ValidatorInterface
 
     public function getErrors(): array
     {
-        return $this->errors;
+        $tempErrors = $this->errors;
+        $this->clear();
+        return $tempErrors;
+    }
+
+    public function clear(): void
+    {
+        $this->errors = [];
     }
 
     public function addError(string $message, string $propertyPath = ''): self

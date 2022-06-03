@@ -12,6 +12,8 @@ use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
 use Blog\Repository\PostRepository;
 use Blog\Repository\UserRepository;
+use Blog\Validator\Validator;
+use Faker\Factory;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Rfc4122\UuidV4;
 use Ramsey\Uuid\Uuid;
@@ -28,9 +30,9 @@ class RepositoryTest extends TestCase
         // TODO:: These parameters should be into the .env file
         return $container
             ->addParameter('host', 'localhost')
-            ->addParameter('dbName', 'anthonyc5')
+            ->addParameter('dbName', 'anthony5')
             ->addParameter('dbUser', 'root')
-            ->addParameter('dbPassword', 'root');
+            ->addParameter('dbPassword', '');
     }
 
     public function testMain(): void
@@ -108,18 +110,56 @@ class RepositoryTest extends TestCase
 
         /** @var PostRepository $postRepo */
         $postRepo = $container->get(PostRepository::class);
+        /** @var UserRepository $userRepo */
+        $userRepo = $container->get(UserRepository::class);
+        /** @var EntityManager $em */
+        $em = $container->get(EntityManager::class);
+        /** @var Validator $validator */
+        $validator = $container->get(Validator::class);
 
-        $em = $postRepo->getEntityManager();
+        $faker = Factory::create();
+
+        $user = new User();
+        $user
+            ->setEmail('notanemail')
+            ->setUsername('a')
+            ->setPassword(User::encodePassword($faker->password));
+
+        if (!$validator->validateObject($user)) {
+            $this->assertCount(2, $validator->getErrors());
+        }
+
+        $user
+            ->setEmail($faker->email)
+            ->setUsername($faker->userName);
+
+        $this->assertTrue($validator->validateObject($user));
+
+        $em->add($user);
+        $em->flush();
+        $this->assertInstanceOf(User::class, $userRepo->find($user->getId()));
 
         $post = new Post();
         $post
-            ->setUserId((string) Uuid::uuid4())
-            ->setContent('Short content')
-            ->setTitle('Simple Title')
-            ->setSlug('short-content');
-
+            ->setUserId($user->getId())
+            ->setContent($faker->realText)
+            ->setTitle($faker->sentence);
         $em->add($post);
         $em->flush();
+//
+//        $this->assertTrue(Uuid::isValid($post->getId()));
+//
+//        /** @var Post $newPost */
+//        $newPost = $postRepo->find($post->getId());
+//        $newPost->setTitle('My new TITLE!!' . uniqid());
+//        $em->update($newPost);
+//        $em->flush();
+//
+//        $this->assertNotNull($newPost->getUpdatedAt());
+
+        $em->delete($user);
+        $em->flush();
+        $this->assertFalse($userRepo->find($user->getId()));
     }
 
     public function testUpdates()

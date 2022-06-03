@@ -10,7 +10,10 @@ use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\Attribute\Id;
 use Blog\ORM\Mapping\Attribute\Table;
 use Blog\Repository\PostRepository;
+use Blog\Validator\Constraint as Assert;
+use Cocur\Slugify\Slugify;
 use DateTime;
+use Exception;
 use Ramsey\Uuid\Uuid;
 
 #[Entity(repositoryClass: PostRepository::class)]
@@ -18,28 +21,42 @@ use Ramsey\Uuid\Uuid;
 class Post
 {
     #[Id()]
-    #[Column(name: 'id', unique: true)]
+    #[Assert\Uuid()]
     protected string $id;
 
     #[Column(name: 'title', unique: true)]
-    private string $title;
+    #[Assert\NotBlank()]
+    #[Assert\NotNull()]
+    #[Assert\MinLength(minLength: 10)]
+    #[Assert\MaxLength(maxLen: 255)]
+    private string $title = '';
 
     #[Column(name: 'content')]
-    private string $content;
+    #[Assert\NotBlank()]
+    #[Assert\NotNull()]
+    #[Assert\MaxLength(maxLen: 10000)]
+    private string $content = '';
 
     #[Column(name: 'excerpt', nullable: true)]
+    #[Assert\NotBlank()]
+    #[Assert\MaxLength(maxLen: 300)]
     private ?string $excerpt = null;
 
     #[Column(name: 'slug', unique: true)]
-    private string $slug;
+    #[Assert\NotBlank()]
+    #[Assert\NotNull()]
+    #[Assert\Slug()]
+    #[Assert\MaxLength(maxLen: 255)]
+    private string $slug = '';
 
-    #[Column(name: 'created_at', type: Type::DATETIME, nullable: true)]
-    private ?string $createdAt = null;
+    #[Column(name: 'created_at', type: Type::DATE)]
+    private DateTime $createdAt;
 
-    #[Column(name: 'updated_at', type: Type::DATETIME, nullable: true)]
-    private ?string $updatedAt = null;
+    #[Column(name: 'updated_at', type: Type::DATE, nullable: true)]
+    private ?DateTime $updatedAt = null;
 
     #[Column(name: 'user_id', nullable: true)]
+    #[Assert\Uuid()]
     private ?string $userId = null;
 
     public function __construct()
@@ -49,12 +66,12 @@ class Post
         }
     }
 
-    public function getId(): string|false
+    public function getId(): ?string
     {
-        return $this->id ?? false;
+        return $this->id;
     }
 
-    public function setId(string $id): self
+    public function setId(string $id): Post
     {
         $this->id = $id;
         return $this;
@@ -65,9 +82,10 @@ class Post
         return $this->title;
     }
 
-    public function setTitle(string $title): self
+    public function setTitle(string $title): Post
     {
         $this->title = $title;
+
         return $this;
     }
 
@@ -76,7 +94,7 @@ class Post
         return $this->content;
     }
 
-    public function setContent(string $content): self
+    public function setContent(string $content): Post
     {
         $this->content = $content;
         return $this;
@@ -87,7 +105,7 @@ class Post
         return $this->userId;
     }
 
-    public function setUserId(string|null $userId): self
+    public function setUserId(string|null $userId): Post
     {
         $this->userId = $userId;
         return $this;
@@ -98,31 +116,62 @@ class Post
         return $this->slug;
     }
 
-    public function setSlug(string $slug): self
+    public function setSlug(?string $slug): Post
     {
         $this->slug = $slug;
+
+        if (!$slug) {
+            $slugify = Slugify::create();
+            $this->slug = $slugify->slugify($this->title);
+        }
+
         return $this;
     }
 
-    public function getCreatedAt(): ?string
+    /**
+     * @throws Exception
+     */
+    public function getCreatedAt(): DateTime
     {
-        return $this->createdAt;
+        $createdAt = new DateTime();
+
+        if (isset($this->createdAt)) {
+            $createdAt = $this->createdAt;
+        }
+
+        return $createdAt;
     }
 
-    public function setCreatedAt(DateTime $createdAt): self
+    /**
+     * @throws Exception
+     */
+    public function setCreatedAt(?DateTime $createdAt): Post
     {
-        $this->createdAt = $createdAt ?? new DateTime();
+        $this->createdAt = new DateTime();
+
+        if ($createdAt) {
+            $this->createdAt = $createdAt;
+        }
+
         return $this;
     }
 
-    public function getUpdatedAt(): ?string
+    public function getUpdatedAt(): ?DateTime
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(string $updatedAt): self
+    /**
+     * @throws Exception
+     */
+    public function setUpdatedAt(?DateTime $updatedAt): Post
     {
-        $this->updatedAt = $updatedAt;
+        $this->updatedAt = new DateTime();
+
+        if ($updatedAt) {
+            $this->updatedAt = $updatedAt;
+        }
+
         return $this;
     }
 
@@ -131,7 +180,7 @@ class Post
         return $this->excerpt;
     }
 
-    public function setExcerpt(?string $excerpt): self
+    public function setExcerpt(?string $excerpt): Post
     {
         $this->excerpt = $excerpt;
         return $this;

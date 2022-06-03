@@ -8,6 +8,7 @@ use Blog\Database\Adapter\AdapterInterface;
 use Blog\Hydration\HydratorInterface;
 use Blog\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\MapperInterface;
+use Blog\Validator\Validator;
 use PDO;
 use ReflectionException;
 

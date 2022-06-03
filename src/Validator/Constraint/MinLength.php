@@ -11,7 +11,7 @@ use Attribute;
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class MinLength extends Constraint
 {
-    public function __construct(string $message = null, protected int $maxLen = 255)
+    public function __construct(string $message = null, protected int $minLength = 10)
     {
         $this->message = "la valeur '%s' doit faire au moins %d caractères. Caractères actuel : %d";
 
@@ -28,6 +28,6 @@ final class MinLength extends Constraint
      */
     public function validate(mixed $value, string $propertyPath): bool
     {
-        return Assertion::minLength($value, $this->maxLen, $this->message, $propertyPath);
+        return Assertion::minLength($value, $this->minLength, $this->message, $propertyPath);
     }
 }

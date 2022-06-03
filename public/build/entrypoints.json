@@ -3,6 +3,7 @@
     "app": {
       "js": [
         "/build/runtime.js",
+        "/build/vendors-node_modules_ckeditor_ckeditor5-build-classic_build_ckeditor_js.js",
         "/build/app.js"
       ],
       "css": [
@@ -16,6 +17,15 @@
       ],
       "css": [
         "/build/home.css"
+      ]
+    },
+    "single": {
+      "js": [
+        "/build/runtime.js",
+        "/build/single.js"
+      ],
+      "css": [
+        "/build/single.css"
       ]
     }
   }

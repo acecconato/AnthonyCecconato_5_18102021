@@ -1,0 +1,175 @@
+{% extends "layouts/layout.html.twig" %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('home') }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('home', {defer: true}) }}
+{% endblock %}
+
+
+{% block navbar_brand %}
+    <h1 class="navbar-brand">Anthony Cecconato</h1>
+{% endblock %}
+
+{% block header_content %}
+    <!-- Page Header-->
+    <header class="masthead" style="background-image: url('img/home-bg.jpg')">
+        <div class="container position-relative px-4 px-lg-5">
+            <div class="row gx-4 gx-lg-5 justify-content-center">
+                <div class="col-md-10 col-lg-8 col-xl-7">
+                    <div class="site-heading">
+                        {% block page_title %}
+                            <img src="img/pp.jpg" class="img-thumbnail rounded-circle"
+                                 alt="Anthony Cecconato">
+                            <h2 class="mt-3">Développer vos
+                                <span class="highlight-container"><span class="highlight">idées</span></span>,
+                                <br>
+                                ma
+                                <span class="highlight-container"><span class="highlight">priorité</span></span>.
+                            </h2>
+                            <ul class="list-group list-group-horizontal justify-content-center mt-5">
+                                <li class="list-group-item border-0">
+                                    <a href="" aria-label="Accès à mon compte twitter">
+                                        <i class="fa-brands fa-twitter-square fa-xl"></i>
+                                    </a>
+                                </li>
+                                <li class="list-group-item border-0">
+                                    <a href="" aria-label="Accès à mon compte linkedin">
+                                        <i class="fa-brands fa-linkedin fa-xl"></i>
+                                    </a>
+                                </li>
+                                <li class="list-group-item border-0">
+                                    <a href="" aria-label="Accès à mon compte github">
+                                        <i class="fa-brands fa-github-square fa-xl"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        {% endblock %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+{% endblock %}
+
+{% block page_content %}
+    <!-- Main Content-->
+    <div class="container px-4 px-lg-5">
+        <section class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-xl-8 my-5">
+                <h2>Articles récents</h2>
+                <hr>
+            </div>
+            <div class="col-md-10 col-xl-8">
+                <!-- Post preview-->
+                <div class="post-preview">
+                    <a href="post.html">
+                        <h3 class="">Man must explore, and this is exploration at its greatest</h3>
+                        <p class="post-subtitle">Problems look mighty small from 150 miles up</p>
+                    </a>
+                    <p class="post-meta">
+                        Posted by
+                        <a href="#!">Start Bootstrap</a>
+                        on September 24, 2022
+                    </p>
+                </div>
+                <!-- Divider-->
+                <hr class="my-4"/>
+                <!-- Post preview-->
+                <div class="post-preview">
+                    <a href="post.html"><h3 class="">I believe every human has a finite number of heartbeats.
+                            I don't intend to waste any of mine.</h3></a>
+                    <p class="post-meta">
+                        Posted by
+                        <a href="#!">Start Bootstrap</a>
+                        on September 18, 2022
+                    </p>
+                </div>
+                <!-- Divider-->
+                <hr class="my-4"/>
+                <!-- Post preview-->
+                <div class="post-preview">
+                    <a href="post.html">
+                        <h3 class="">Science has not yet mastered prophecy</h3>
+                        <p class="post-subtitle">We predict too much for the next year and yet far too little for the
+                            next ten.</p>
+                    </a>
+                    <p class="post-meta">
+                        Posted by
+                        <a href="#!">Start Bootstrap</a>
+                        on August 24, 2022
+                    </p>
+                </div>
+                <!-- Divider-->
+                <hr class="my-4"/>
+                <!-- Post preview-->
+                <div class="post-preview">
+                    <a href="post.html">
+                        <h2 class="">Failure is not an option</h2>
+                        <p class="post-subtitle">Many say exploration is part of our destiny, but it’s actually our
+                            duty to future generations.</p>
+                    </a>
+                    <p class="post-meta">
+                        Posted by
+                        <a href="#!">Start Bootstrap</a>
+                        on July 8, 2022
+                    </p>
+                </div>
+                <!-- Divider-->
+                <hr class="my-4"/>
+                <!-- Pager-->
+                <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older
+                        Posts →</a></div>
+            </div>
+        </section>
+    </div>
+
+    <div class="container px-4 px-lg-5 mt-5 pt-5 mb-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-xl-8">
+                <h2>Contactez-moi !</h2>
+            </div>
+            <div class="col-md-10 col-xl-8">
+                <p>Want to get in touch? Fill out the form below to send me a message and I will get back to you as soon as possible!</p>
+                <div class="my-5">
+                    <!-- * * * * * * * * * * * * * * *-->
+                    <!-- * * SB Forms Contact Form * *-->
+                    <!-- * * * * * * * * * * * * * * *-->
+                    <!-- This form is pre-integrated with SB Forms.-->
+                    <!-- To make this form functional, sign up at-->
+                    <!-- https://startbootstrap.com/solution/contact-forms-->
+                    <!-- to get an API token!-->
+                    <form id="contactForm" data-sb-form-api-token="API_TOKEN">
+                        <div class="form-floating">
+                            <input class="form-control" id="name" type="text" placeholder="Nom / Prénom" data-sb-validations="required" />
+                            <label for="name">Nom / Prénom</label>
+                        </div>
+                        <div class="form-floating">
+                            <input class="form-control" id="email" type="email" placeholder="Email" />
+                            <label for="email">Adresse mail</label>
+                        </div>
+                        <div class="form-floating">
+                            <textarea class="form-control" id="message"  placeholder="Message"></textarea>
+                            <label for="message">Message</label>
+                        </div>
+                        <br />
+                        <div class="d-none" id="submitSuccessMessage">
+                            <div class="text-center mb-3">
+                                <div class="fw-bolder">Form submission successful!</div>
+                                To activate this form, sign up at
+                                <br />
+                                <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
+                            </div>
+                        </div>
+                        <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3">Error sending message!</div></div>
+                        <button class="btn btn-primary text-uppercase disabled" id="submitButton" type="submit">Envoyer</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

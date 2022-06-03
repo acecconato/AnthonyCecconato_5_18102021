@@ -28,6 +28,11 @@ class UnitOfWork
     ) {
     }
 
+    /**
+     * @throws UniqueConstraintException
+     * @throws NullableConstraintException
+     * @throws Exception
+     */
     private function executeInserts(): int
     {
         $adapter = $this->entityManager->getAdapter();
@@ -52,8 +57,6 @@ class UnitOfWork
                 }
             }
 
-            die();
-
             $query = "
                 INSERT INTO $tableName 
                 VALUES ( :" . $mapping->getId() . ", " . implode(', ', $prepValues) . " )
@@ -64,11 +67,28 @@ class UnitOfWork
             ($object->getId()) ?: $object->setId((string)Uuid::uuid4());
             $bind[':' . $mapping->getId()] = $object->getId();
 
+//            $object->setCreatedAt('KDUAZHDKAZUH');
+
             foreach ($mapping->getColumns() as $column) {
+                // Handle created_at
+//                if ($column->timestamp && !$object->{'get' . ucfirst($column->propertyName)}()) {
+//                    dump($object->getCreatedAt());
+//                    $bind[':' . $column->name] = 'NOW()';
+//                    continue;
+//                }
+//
+//                // Handle updated_at
+//                if ($column->timestamp) {
+//                    $bind[':' . $column->name] = 'NOW()';
+//                    continue;
+//                }
+
                 // @phpstan-ignore-next-line
                 $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
 
+
+            dd($bind);
             $adapter->addToTransaction($query, $bind);
         }
 
@@ -86,7 +106,7 @@ class UnitOfWork
     {
         // @phpstan-ignore-next-line
         if (null === $object->{'get' . ucfirst($column->propertyName)}()) {
-            throw new NullableConstraintException("'" . $column->name ."' cannot be nullable");
+            throw new NullableConstraintException("'" . $column->name . "' cannot be nullable");
         }
     }
 
@@ -104,12 +124,12 @@ class UnitOfWork
         // @phpstan-ignore-next-line
         $value = $object->{'get' . ucfirst($column->propertyName)}();
 
-        $query = "SELECT COUNT(*) FROM $tableName WHERE " . $column->name . "=:columnName";
-        $bind = [':columnName' => $value];
+        $query = "SELECT COUNT(*) FROM $tableName WHERE " . $column->name . "=:columnValue";
+        $bind = [':columnValue' => $value];
 
         $statement = $adapter->query($query, $bind);
 
-        if ($statement->rowCount() > 0) {
+        if ($statement->fetchColumn() > 0) {
             throw new UniqueConstraintException("'$value' already exists in the database");
         }
     }
@@ -132,6 +152,16 @@ class UnitOfWork
             $tableName = $mapping->getTable()->tableName;
 
             $prepValues = array_map(fn($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
+
+            foreach ($mapping->getColumns() as $column) {
+                if ($column->unique) {
+                    $this->checkUniqueConstraint($tableName, $column, $object);
+                }
+
+                if (!$column->nullable) {
+                    $this->checkNullableConstraint($tableName, $column, $object);
+                }
+            }
 
             $query = "UPDATE $tableName SET " . implode(', ', $prepValues) . " WHERE " . $mapping->getId() . " = :id";
 

@@ -33,6 +33,11 @@ class User
     #[Assert\Email()]
     private string $email;
 
+    #[Column(name: 'password', type: Type::STRING, nullable: false)]
+    private string $password;
+
+    private string|null $plainPassword;
+
     public function __construct()
     {
         if (!isset($this->id)) {
@@ -45,7 +50,7 @@ class User
         return $this->id ?? false;
     }
 
-    public function setId(string $id): self
+    public function setId(string $id): User
     {
         $this->id = $id;
         return $this;
@@ -71,5 +76,32 @@ class User
     {
         $this->email = $email;
         return $this;
+    }
+
+    public function getPassword(): string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): User
+    {
+        $this->password = $password;
+        return $this;
+    }
+
+    public function getPlainPassword(): string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(string $plainPassword): User
+    {
+        $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public static function encodePassword(string $plainPassword): string
+    {
+        return password_hash($plainPassword, PASSWORD_ARGON2I);
     }
 }

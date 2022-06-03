@@ -13,9 +13,7 @@ use ReflectionParameter;
 
 final class Definition
 {
-    /**
-     * @var ReflectionClass $class
-     */
+    // @phpstan-ignore-next-line
     private ReflectionClass $class;
 
     /**
@@ -28,18 +26,17 @@ final class Definition
      * @throws ReflectionException
      */
     public function __construct(
+        // @phpstan-ignore-next-line
         private string $id,
         private bool $shared = true,
+        // @phpstan-ignore-next-line
         private array $aliases = [],
+        // @phpstan-ignore-next-line
         private array $dependencies = []
     ) {
         $this->class = new ReflectionClass($id);
     }
 
-    /**
-     * @param bool $shared
-     * @return self
-     */
     public function setShared(bool $shared): self
     {
         $this->shared = $shared;
@@ -47,17 +44,12 @@ final class Definition
         return $this;
     }
 
-    /**
-     * @return bool
-     */
     public function isShared(): bool
     {
         return $this->shared;
     }
 
     /**
-     * @param ContainerInterface $container
-     * @return object
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
@@ -76,10 +68,13 @@ final class Definition
             array_map(
                 function (ReflectionParameter $param) use ($container) {
 
+                    // @phpstan-ignore-next-line
                     if ($param->getType() !== null && $param->getType()->isBuiltin()) {
+                        // @phpstan-ignore-next-line
                         return $container->getParameter($param->getName());
                     }
 
+                    // @phpstan-ignore-next-line
                     return $container->get($param->getType()->getName());
                 },
                 $parameters

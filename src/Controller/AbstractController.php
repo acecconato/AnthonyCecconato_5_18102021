@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class AbstractController
 {
     public function __construct(
-        protected TemplatingInterface $templating
+        protected TemplatingInterface $templating,
     ) {
     }
 

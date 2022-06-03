@@ -4,7 +4,11 @@ declare(strict_types=1);
 
 namespace Blog\DependencyInjection;
 
+use Blog\DependencyInjection\Exceptions\ContainerException;
 use Blog\DependencyInjection\Exceptions\NotFoundException;
+use Blog\Router\Router;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionParameter;
@@ -32,8 +36,7 @@ final class Container implements ContainerInterface
     private array $aliases = [];
 
     /**
-     * @inheritDoc
-     * @throws     ReflectionException
+     * @throws ReflectionException
      */
     public function register(string $id): self
     {
@@ -50,11 +53,14 @@ final class Container implements ContainerInterface
 
         if (null !== $reflectionClass->getConstructor()) {
             $dependencies = array_map(
+            // @phpstan-ignore-next-line
                 fn(ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
                 array_filter(
                     $reflectionClass->getConstructor()->getParameters(),
                     function (ReflectionParameter $parameter) {
-                        if ($parameter->getType() !== null && ! $parameter->getType()->isBuiltin()) {
+                        // @phpstan-ignore-next-line
+                        if ($parameter->getType() !== null && !$parameter->getType()->isBuiltin()) {
+                            // @phpstan-ignore-next-line
                             return new ReflectionClass($parameter->getType()->getName());
                         }
 
@@ -72,26 +78,17 @@ final class Container implements ContainerInterface
     }
 
     /**
-     * Get a definition
-     * If the excepted definition does not exist then we register it before returning it.
-     *
-     * @param string $id
-     *
-     * @return Definition
      * @throws ReflectionException
      */
     public function getDefinition(string $id): Definition
     {
-        if ( ! isset($this->definitions[$id])) {
+        if (!isset($this->definitions[$id])) {
             $this->register($id);
         }
 
         return $this->definitions[$id];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function addParameter(string $id, mixed $value): self
     {
         $this->parameters[$id] = $value;
@@ -100,11 +97,11 @@ final class Container implements ContainerInterface
     }
 
     /**
-     * @inheritDoc
+     * @throws NotFoundException
      */
     public function getParameter(string $id): mixed
     {
-        if ( ! isset($this->parameters[$id])) {
+        if (!isset($this->parameters[$id])) {
             throw new NotFoundException("'$id' required parameter not found");
         }
 
@@ -112,8 +109,10 @@ final class Container implements ContainerInterface
     }
 
     /**
-     * @inheritDoc
-     * @throws     ReflectionException
+     * @throws NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     * @throws NotFoundException
      */
     public function get(string $id): mixed
     {
@@ -121,14 +120,14 @@ final class Container implements ContainerInterface
             return $this->parameters[$id];
         }
 
-        if ( ! $this->has($id) && !isset($this->parameters[$id])) {
-            if ( ! class_exists($id) && ! interface_exists($id)) {
+        if (!$this->has($id) && !isset($this->parameters[$id])) {
+            if (!class_exists($id) && !interface_exists($id)) {
                 throw new NotFoundException();
             }
 
             $instance = $this->getDefinition($id)->newInstance($this);
 
-            if ( ! $this->getDefinition($id)->isShared()) {
+            if (!$this->getDefinition($id)->isShared()) {
                 return $instance;
             }
 
@@ -138,21 +137,33 @@ final class Container implements ContainerInterface
         return $this->instances[$id];
     }
 
-    /**
-     * @inheritDoc
-     */
     public function has(string $id): bool
     {
         return isset($this->instances[$id]) || isset($this->parameters[$id]);
     }
 
-    /**
-     * @inheritDoc
-     */
     public function addAlias(string $id, string $class): self
     {
         $this->aliases[$id] = $class;
 
+        return $this;
+    }
+
+    /**
+     * @throws ContainerException
+     */
+    public function registerExisting(object $obj, string $alias = ''): self
+    {
+        if ($this->has($obj::class)) {
+            throw new ContainerException($obj::class . ' is already registered');
+        }
+
+        if ($alias) {
+            $this->aliases[$alias] = $obj::class;
+        }
+
+        $this->definitions[$obj::class] = $obj;
+        $this->instances[$alias] = $obj;
         return $this;
     }
 }

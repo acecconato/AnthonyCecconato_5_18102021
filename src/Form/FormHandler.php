@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 class FormHandler
 {
 
-    private object|null $formObject = null;
+    private ?object $formObject = null;
 
     private Request $request;
 
@@ -81,10 +81,5 @@ class FormHandler
     public function get(string $field): string
     {
         return (string)$this->request->request->get($field);
-    }
-
-    public function getCsrfToken()
-    {
-        return false;
     }
 }

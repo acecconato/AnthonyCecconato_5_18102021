@@ -5,9 +5,6 @@ declare(strict_types=1);
 namespace Blog\ORM;
 
 use Blog\Kernel;
-use Blog\ORM\Exception\NullableConstraintException;
-use Blog\ORM\Exception\UniqueConstraintException;
-use Blog\ORM\Mapping\Attribute\Column;
 use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\MapperInterface;
 use DateTime;
@@ -32,8 +29,6 @@ class UnitOfWork
     }
 
     /**
-     * @throws UniqueConstraintException
-     * @throws NullableConstraintException
      * @throws Exception
      */
     private function executeInserts(): int
@@ -49,16 +44,6 @@ class UnitOfWork
             $tableName = $mapping->getTable()->tableName;
 
             $prepValues = implode(', ', array_map(fn($column) => ':' . $column->name, $mapping->getColumns()));
-
-            foreach ($mapping->getColumns() as $column) {
-                if ($column->unique) {
-                    $this->checkUniqueConstraint($tableName, $column, $object);
-                }
-
-                if (!$column->nullable) {
-                    $this->checkNullableConstraint($tableName, $column, $object);
-                }
-            }
 
             $query = "
                 INSERT INTO $tableName ( " . $mapping->getId() . ", " . str_replace(':', '', $prepValues) . " )
@@ -97,47 +82,6 @@ class UnitOfWork
     }
 
     /**
-     * @throws NullableConstraintException
-     */
-    private function checkNullableConstraint(string $tableName, Column $column, object $object): void
-    {
-        // @phpstan-ignore-next-line
-        if (null === $object->{'get' . ucfirst($column->propertyName)}()) {
-            throw new NullableConstraintException("'" . $column->name . "' cannot be nullable");
-        }
-    }
-
-    /**
-     * @throws UniqueConstraintException
-     */
-    private function checkUniqueConstraint(string $tableName, Column $column, object $object): void
-    {
-        $adapter = $this->entityManager->getAdapter();
-        $mapping = $this->mapper->resolve($object::class);
-
-        if (null === $object->{'get' . ucfirst($column->propertyName)}()) {
-            dd("a");
-        }
-
-        $value = $object->{'get' . ucfirst($column->propertyName)}();
-
-
-        $objectId = $object->{'get' . ucfirst($mapping->getId())}();
-
-        $query = " SELECT COUNT(*) 
-                FROM $tableName
-                WHERE " . $column->name . " =:columnValue AND " . $mapping->getId() . " != :" . $mapping->getId();
-
-        $bind = [':columnValue' => $value, ':' . $mapping->getId() => $objectId];
-
-        $statement = $adapter->query($query, $bind);
-
-        if ($statement->fetchColumn() > 0) {
-            throw new UniqueConstraintException("'$value' already exists in the database");
-        }
-    }
-
-    /**
      * @throws Exception
      */
     private function executeUpdates(): int
@@ -154,16 +98,6 @@ class UnitOfWork
             $tableName = $mapping->getTable()->tableName;
 
             $prepValues = array_map(fn($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
-
-            foreach ($mapping->getColumns() as $column) {
-                if ($column->unique) {
-                    $this->checkUniqueConstraint($tableName, $column, $object);
-                }
-
-                if (!$column->nullable) {
-                    $this->checkNullableConstraint($tableName, $column, $object);
-                }
-            }
 
             $query = "UPDATE $tableName SET " . implode(', ', $prepValues) . " WHERE " . $mapping->getId() . " = :id";
 

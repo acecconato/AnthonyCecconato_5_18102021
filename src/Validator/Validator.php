@@ -5,20 +5,28 @@ declare(strict_types=1);
 namespace Blog\Validator;
 
 use Assert\InvalidArgumentException;
+use Blog\DependencyInjection\ContainerInterface;
 use Blog\Validator\Constraint\Constraint;
+use Blog\Validator\Constraint\ConstraintInterface;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 final class Validator implements ValidatorInterface
 {
+    public function __construct(
+        private ContainerInterface $container
+    ) {
+    }
+
     /** @var array<array-key, array{propertyPath: string, message: string}> */
     private array $errors = [];
 
     /**
-     * @param object $object
-     * @return bool|array<string>
-     * @throws Exception
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function validateObject(object $object): bool|array
+    public function validateObject(object $object): bool
     {
         $reflObj = new \ReflectionObject($object);
 
@@ -27,7 +35,7 @@ final class Validator implements ValidatorInterface
                 $pattern = '^' . __NAMESPACE__ . '\\Constraint\\(.*)$';
                 $pattern = '/' . str_replace('\\', '\/', $pattern) . '/';
 
-                if (preg_match($pattern, str_replace('\\', '/', $attribute->getName()), $matches)) {
+                if (preg_match($pattern, str_replace('\\', '/', $attribute->getName()))) {
                     /** @var Constraint $constraint */
                     $constraint = $attribute->newInstance();
                     $this->validate($property->getValue($object), $constraint, $property->getName());
@@ -43,17 +51,23 @@ final class Validator implements ValidatorInterface
     }
 
     /**
-     * @param mixed $value
-     * @param Constraint $constraint
-     * @param string $propertyPath
-     * @return bool
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception|ContainerExceptionInterface
      */
-    public function validate(mixed $value, Constraint $constraint, string $propertyPath = ''): bool
+    public function validate(mixed $value, ConstraintInterface $constraint, string $propertyPath = ''): bool
     {
+        /** @var ConstraintValidatorInterface $validator */
+        $validator = $this->container->get($constraint->getValidator());
+
+        if (!$validator) {
+            throw new Exception("Validator for " . $constraint::class . " cannot be loaded");
+        }
+
         try {
-            return $constraint->validate($value, $propertyPath);
+            return $validator->validate($value, $constraint, $propertyPath);
         } catch (InvalidArgumentException $e) {
-            $this->addError($e->getMessage(), $e->getPropertyPath());
+            $this->addError($e->getMessage(), $e->getPropertyPath() ?? $propertyPath);
             return false;
         }
     }
@@ -70,7 +84,7 @@ final class Validator implements ValidatorInterface
         $this->errors = [];
     }
 
-    public function addError(string $message, string $propertyPath = ''): self
+    public function addError(string $message, string $propertyPath = ''): Validator
     {
         $this->errors[] = ['propertyPath' => $propertyPath, 'message' => $message];
         return $this;

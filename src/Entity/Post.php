@@ -24,38 +24,39 @@ class Post
     #[Assert\Uuid()]
     protected string $id;
 
-    #[Column(name: 'title', unique: true)]
+    #[Column(name: 'title')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
     #[Assert\MinLength(minLength: 10)]
-    #[Assert\MaxLength(maxLen: 255)]
+    #[Assert\MaxLength(maxLength: 255)]
     private string $title = '';
 
     #[Column(name: 'content')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Assert\MaxLength(maxLen: 10000)]
+    #[Assert\MaxLength(maxLength: 10000)]
     private string $content = '';
 
-    #[Column(name: 'excerpt', nullable: true)]
+    #[Column(name: 'excerpt')]
     #[Assert\NotBlank()]
-    #[Assert\MaxLength(maxLen: 300)]
+    #[Assert\MaxLength(maxLength: 300)]
     private ?string $excerpt = null;
 
-    #[Column(name: 'slug', unique: true)]
+    #[Column(name: 'slug')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
     #[Assert\Slug()]
-    #[Assert\MaxLength(maxLen: 255)]
+    #[Assert\MaxLength(maxLength: 255)]
+    #[Assert\Unique()]
     private string $slug = '';
 
     #[Column(name: 'created_at', type: Type::DATE)]
     private DateTime $createdAt;
 
-    #[Column(name: 'updated_at', type: Type::DATE, nullable: true)]
+    #[Column(name: 'updated_at', type: Type::DATE)]
     private ?DateTime $updatedAt = null;
 
-    #[Column(name: 'user_id', nullable: true)]
+    #[Column(name: 'user_id')]
     #[Assert\Uuid()]
     private ?string $userId = null;
 

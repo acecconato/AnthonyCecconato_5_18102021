@@ -4,14 +4,13 @@ declare(strict_types=1);
 
 namespace Blog\Validator\Constraint;
 
-use Exception;
-
-abstract class Constraint implements ConstraintValidatorInterface
+abstract class Constraint implements ConstraintInterface
 {
-    protected string $message = 'Constraint validation error';
+    public string $message = 'Constraint validation error';
 
-    public function getMessage(): string
+    public static function getInstance(): ConstraintInterface
     {
-        return $this->message;
+        $constraint = static::class;
+        return new $constraint();
     }
 }

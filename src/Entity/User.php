@@ -21,12 +21,12 @@ class User
     #[Assert\Uuid()]
     protected string $id;
 
-    #[Column(name: 'username', type: Type::STRING, nullable: false, unique: true)]
+    #[Column(name: 'username', type: Type::STRING)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
     #[Assert\MaxLength(
         message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Il en possède actuellement %d",
-        maxLen: 20)
+        maxLength: 20)
     ]
     #[Assert\MinLength(
         message: "Le nom d'utilisateur '%s' doit faire au moins %d caractères. Il en possède actuellement %d",
@@ -34,13 +34,13 @@ class User
     ]
     private string $username = '';
 
-    #[Column(name: 'email', type: Type::STRING, nullable: false, unique: true)]
+    #[Column(name: 'email', type: Type::STRING)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
     #[Assert\Email()]
     private string $email = '';
 
-    #[Column(name: 'password', type: Type::STRING, nullable: false)]
+    #[Column(name: 'password', type: Type::STRING)]
     private string $password = '';
 
     private ?string $plainPassword;

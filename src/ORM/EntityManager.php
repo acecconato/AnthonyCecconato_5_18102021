@@ -126,6 +126,20 @@ class EntityManager
         return $this->hydrator->hydrateSingle($rawResult, $entityFqcn);
     }
 
+    public function count(string $entityFqcn, string $column, string $value): int
+    {
+        $mapping = $this->mapper->resolve($entityFqcn);
+
+        $tableName = $mapping->getTable()->tableName;
+
+        $query = "SELECT COUNT( " . $mapping->getId() . " ) FROM $tableName 
+                WHERE $column=:value";
+
+        $result = $this->adapter->query($query, [':value' => $value]);
+
+        dd($result->fetch(PDO::FETCH_COLUMN));
+    }
+
     /**
      * @param string $entityFqcn
      * @param array<string> $ids

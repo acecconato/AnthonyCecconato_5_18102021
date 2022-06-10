@@ -8,7 +8,6 @@ use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
-use Blog\Router\UrlGeneratorInterface;
 use Blog\Templating\Templating;
 use Blog\Templating\TemplatingInterface;
 use Psr\Container\ContainerExceptionInterface;

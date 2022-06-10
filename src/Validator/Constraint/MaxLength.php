@@ -4,30 +4,20 @@ declare(strict_types=1);
 
 namespace Blog\Validator\Constraint;
 
-use Assert\Assertion;
-use Assert\AssertionFailedException;
 use Attribute;
+use Blog\Validator\MaxLengthValidator;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
 final class MaxLength extends Constraint
 {
-    public function __construct(string $message = null, protected int $maxLen = 255)
-    {
-        $this->message = "la valeur '%s' ne peut excéder %d caractères. Caractères actuel : %d";
-
-        if ($message) {
-            $this->message = $message;
-        }
+    public function __construct(
+        public string $message = "la valeur '%s' ne peut excéder %d caractères. Caractères actuel : %d",
+        public int $maxLength = 255
+    ) {
     }
 
-    /**
-     * @param mixed $value
-     * @param string $propertyPath
-     * @return bool
-     * @throws AssertionFailedException
-     */
-    public function validate(mixed $value, string $propertyPath): bool
+    public function getValidator(): string
     {
-        return Assertion::maxLength($value, $this->maxLen, $this->message, $propertyPath);
+        return MaxLengthValidator::class;
     }
 }

@@ -140,7 +140,7 @@ final class Kernel
      */
     public function configureRoutes(): void
     {
-        $configRoute = require_once dirname(__DIR__) . '/config/routes.php';
+        $configRoute = require dirname(__DIR__) . '/config/routes.php';
 
         $this->router = $this->container->get(Router::class);
 

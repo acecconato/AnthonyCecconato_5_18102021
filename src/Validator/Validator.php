@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Blog\Validator;
 
 use Assert\InvalidArgumentException;
-use Blog\DependencyInjection\ContainerInterface;
+use Blog\DependencyInjection\Container;
 use Blog\Validator\Constraint\Constraint;
 use Blog\Validator\Constraint\ConstraintInterface;
 use Exception;
@@ -14,8 +14,9 @@ use Psr\Container\NotFoundExceptionInterface;
 
 final class Validator implements ValidatorInterface
 {
+    // TODO Q/A Ici lorsque je passe l'interface au lieu du container, j'ai une erreur dans l'injection de dépendnace
     public function __construct(
-        private ContainerInterface $container
+        private Container $container
     ) {
     }
 

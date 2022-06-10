@@ -13,6 +13,7 @@ use Blog\ORM\Mapping\MapperInterface;
 use Blog\Repository\PostRepository;
 use Blog\Repository\UserRepository;
 use Blog\Validator\Validator;
+use Blog\Validator\ValidatorInterface;
 use Faker\Factory;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Rfc4122\UuidV4;
@@ -22,6 +23,7 @@ class RepositoryTest extends TestCase
 {
     public function loadContainer(): Container
     {
+        // TODO Q/A Best way pour charger un environnement de test avec phpunit ?
         $container = new Container();
         $container
             ->addAlias(AdapterInterface::class, MySQLAdapter::class)
@@ -30,9 +32,9 @@ class RepositoryTest extends TestCase
         // TODO:: These parameters should be into the .env file
         return $container
             ->addParameter('host', 'localhost')
-            ->addParameter('dbName', 'anthony5')
+            ->addParameter('dbName', 'anthonyc5')
             ->addParameter('dbUser', 'root')
-            ->addParameter('dbPassword', '');
+            ->addParameter('dbPassword', 'root');
     }
 
     public function testMain(): void
@@ -46,6 +48,8 @@ class RepositoryTest extends TestCase
         // We retrieve the EntityManager from the proper repository
         $em = $userRepository->getEntityManager();
         $this->assertInstanceOf(EntityManager::class, $em);
+
+        $container->get(Validator::class);
 
         // We can create our entities
         $john = new User();
@@ -115,7 +119,7 @@ class RepositoryTest extends TestCase
         /** @var EntityManager $em */
         $em = $container->get(EntityManager::class);
         /** @var Validator $validator */
-        $validator = $container->get(Validator::class);
+        $validator = $container->get(ValidatorInterface::class);
 
         $faker = Factory::create();
 

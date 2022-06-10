@@ -137,7 +137,7 @@ class EntityManager
 
         $result = $this->adapter->query($query, [':value' => $value]);
 
-        dd($result->fetch(PDO::FETCH_COLUMN));
+        return $result->fetch(PDO::FETCH_COLUMN);
     }
 
     /**

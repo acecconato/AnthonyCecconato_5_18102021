@@ -47,7 +47,7 @@ class Post
     #[Assert\NotNull()]
     #[Assert\Slug()]
     #[Assert\MaxLength(maxLength: 255)]
-    #[Assert\Unique()]
+    #[Assert\Unique(entityFqcn: Post::class, column: 'slug', message: "Le slug '%s' existe déjà")]
     private string $slug = '';
 
     #[Column(name: 'created_at', type: Type::DATE)]

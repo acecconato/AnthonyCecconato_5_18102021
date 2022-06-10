@@ -150,7 +150,7 @@ final class Container implements ContainerInterface
     }
 
     /**
-     * @throws ContainerException
+     * @throws ContainerException|ReflectionException
      */
     public function registerExisting(object $obj, string $alias = ''): self
     {
@@ -159,11 +159,16 @@ final class Container implements ContainerInterface
         }
 
         if ($alias) {
-            $this->aliases[$alias] = $obj::class;
+            $this->addAlias($obj::class, $alias);
         }
 
-        $this->definitions[$obj::class] = $obj;
-        $this->instances[$alias] = $obj;
+        $this->instances[$obj::class ?? $alias] = $obj;
+
         return $this;
+    }
+
+    public function getAliases(): array
+    {
+        return $this->aliases;
     }
 }

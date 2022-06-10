@@ -18,5 +18,5 @@ interface ContainerInterface extends BaseContainerInterface
 
     public function addAlias(string $id, string $class): self;
 
-    public function registerExisting(object $class, string $alias = ''): self;
+    public function registerExisting(object $obj, string $alias = ''): self;
 }

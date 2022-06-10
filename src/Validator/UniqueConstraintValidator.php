@@ -23,12 +23,14 @@ class UniqueConstraintValidator implements ConstraintValidatorInterface
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
-        if (!$this->entityManager->count($constraint->entityFqcn, $constraint->column, $value)) {
+        if ($this->entityManager->count($constraint->entityFqcn, $constraint->column, $value) > 0) {
             throw new InvalidArgumentException(
                 sprintf($constraint->message ?: '%s is not unique', $value),
                 self::NOT_UNIQUE,
                 $propertyPath
             );
         };
+
+        return true;
     }
 }

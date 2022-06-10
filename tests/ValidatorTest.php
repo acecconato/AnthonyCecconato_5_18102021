@@ -4,7 +4,9 @@ namespace Tests;
 
 use Blog\Database\Adapter\AdapterInterface;
 use Blog\Database\Adapter\MySQLAdapter;
+use Blog\Entity\User;
 use Blog\Kernel;
+use Blog\ORM\EntityManager;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
 use Blog\Validator\Constraint\Email;
@@ -23,6 +25,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 class ValidatorTest extends TestCase
 {
     private Validator $validator;
+    private EntityManager $em;
 
     protected function setUp(): void
     {
@@ -35,8 +38,6 @@ class ValidatorTest extends TestCase
         $dotenv->loadEnv(dirname(__DIR__) . '/.env');
 
         $kernel = new Kernel('test');
-        $kernel->configureContainer();
-
         $container = $kernel->getContainer();
 
         $container
@@ -45,14 +46,13 @@ class ValidatorTest extends TestCase
 
         $container
             ->addParameter('host', 'localhost')
-            ->addParameter('dbName', 'anthonyc5')
+            ->addParameter('dbName', 'anthony5')
             ->addParameter('dbUser', 'root')
-            ->addParameter('dbPassword', 'root');
+            ->addParameter('dbPassword', '');
 
         $this->validator = $container->get(Validator::class);
+        $this->em = $container->get(EntityManager::class);
     }
-
-    // TODO Q/A Quand je lance les tests manuellement, un a un c'est ok; quand je les lance tous, ça plante
 
     public function testEmail()
     {
@@ -115,11 +115,22 @@ class ValidatorTest extends TestCase
 
     public function testUnique()
     {
-        /** @var Unique $constraint */
-        $constraint = Unique::getInstance();
-        $constraint->tableName = 'user';
-        $constraint->column = 'username';
+        $constraint = new Unique(User::class, 'username');
+        $user = new User();
+        $user
+            ->setUsername('johndoe')
+            ->setEmail('demo@demo.fr')
+            ->setPassword(User::encodePassword('plain_password'));
 
-        $this->validator->validate('shouldBeUnique', $constraint);
+        $this->em->add($user);
+        $this->em->flush();
+
+        $this->assertTrue($this->validator->validate('shouldBeUnique', $constraint));
+        $this->assertFalse($this->validator->validate('johndoe', $constraint));
+
+        $this->assertGreaterThan(0, count($this->validator->getErrors()));
+
+        $this->em->delete($user);
+        $this->em->flush();
     }
 }

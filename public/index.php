@@ -24,7 +24,7 @@ if ($_ENV['APP_ENV'] === 'development') {
 
 try {
     $kernel = new Kernel($_ENV['APP_ENV']);
-    $kernel->run(Request::createFromGlobals(), new Session());
+    $kernel->run();
 } catch (Throwable $e) {
     dd($e->getMessage());
 }

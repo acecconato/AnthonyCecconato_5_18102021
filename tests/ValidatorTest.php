@@ -4,7 +4,9 @@ namespace Tests;
 
 use Blog\Database\Adapter\AdapterInterface;
 use Blog\Database\Adapter\MySQLAdapter;
+use Blog\Entity\Post;
 use Blog\Entity\User;
+use Blog\Hydration\ObjectHydrator;
 use Blog\Kernel;
 use Blog\ORM\EntityManager;
 use Blog\ORM\Mapping\DataMapper;
@@ -17,6 +19,7 @@ use Blog\Validator\Constraint\NotNull;
 use Blog\Validator\Constraint\Slug;
 use Blog\Validator\Constraint\Unique;
 use Blog\Validator\Validator;
+use Exception;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Dotenv\Dotenv;
@@ -26,6 +29,7 @@ class ValidatorTest extends TestCase
 {
     private Validator $validator;
     private EntityManager $em;
+    private ObjectHydrator $hydrator;
 
     protected function setUp(): void
     {
@@ -52,6 +56,7 @@ class ValidatorTest extends TestCase
 
         $this->validator = $container->get(Validator::class);
         $this->em = $container->get(EntityManager::class);
+        $this->hydrator = $container->get(ObjectHydrator::class);
     }
 
     public function testEmail()
@@ -132,5 +137,23 @@ class ValidatorTest extends TestCase
 
         $this->em->delete($user);
         $this->em->flush();
+    }
+
+    public function testValidateObject()
+    {
+        $post = new Post();
+        $post
+            ->setTitle('title')
+            ->setContent('test');
+
+        $newPost = $this->hydrator->hydrateSingle([
+            'title' => 'My awesome title',
+            'content' => 'Content of the post'
+        ], new Post());
+
+        $this->assertTrue($this->validator->validateObject($newPost));
+
+        $this->expectException(Exception::class);
+        $this->validator->validateObject($post);
     }
 }

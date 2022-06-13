@@ -8,6 +8,7 @@ use Assert\InvalidArgumentException;
 use Blog\DependencyInjection\Container;
 use Blog\Validator\Constraint\Constraint;
 use Blog\Validator\Constraint\ConstraintInterface;
+use Blog\Validator\Constraint\NotNull;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -26,12 +27,17 @@ final class Validator implements ValidatorInterface
     /**
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws Exception
      */
     public function validateObject(object $object): bool
     {
         $reflObj = new \ReflectionObject($object);
 
         foreach ($reflObj->getProperties() as $property) {
+            if (!$property->isInitialized($object)) {
+                throw new Exception($property->getName() . ' is not initialized');
+            }
+
             foreach ($property->getAttributes() as $attribute) {
                 $pattern = '^' . __NAMESPACE__ . '\\Constraint\\(.*)$';
                 $pattern = '/' . str_replace('\\', '\/', $pattern) . '/';
@@ -39,6 +45,7 @@ final class Validator implements ValidatorInterface
                 if (preg_match($pattern, str_replace('\\', '/', $attribute->getName()))) {
                     /** @var Constraint $constraint */
                     $constraint = $attribute->newInstance();
+
                     $this->validate($property->getValue($object), $constraint, $property->getName());
                 }
             }

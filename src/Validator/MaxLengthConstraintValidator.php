@@ -7,16 +7,15 @@ namespace Blog\Validator;
 use Assert\Assertion;
 use Assert\AssertionFailedException;
 use Blog\Validator\Constraint\ConstraintInterface;
-use Blog\Validator\Constraint\MinLength;
+use Blog\Validator\Constraint\MaxLength;
 
-class MinLengthValidator implements ConstraintValidatorInterface
+class MaxLengthConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param MinLength $constraint
-     * @throws AssertionFailedException
+     * @param MaxLength $constraint
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
-        return Assertion::minLength($value, $constraint->minLength, $constraint->message, $propertyPath);
+        return Assertion::nullOrMaxLength($value, $constraint->maxLength, $constraint->message, $propertyPath);
     }
 }

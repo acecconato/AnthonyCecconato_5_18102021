@@ -30,30 +30,24 @@ class ObjectHydrator implements HydratorInterface
 
         return array_map(
             function ($res) use ($mapping) {
-                return $this->hydrateObject($mapping, $res);
+                $object = (new ReflectionClass($mapping->getFqcn()))->newInstance();
+                return $this->hydrateSingle($res, $object);
             },
             $results
         );
     }
 
     /**
-     * @throws ReflectionException
-     */
-    public function hydrateSingle(array $result, string $fqcnEntity): object
-    {
-        $mapping = $this->mapper->resolve($fqcnEntity);
-        return $this->hydrateObject($mapping, $result);
-    }
-
-    /**
      * @param array<string> $data
+     * @param object $object
+     * @return object
      * @throws ReflectionException
-     * @throws Exception
      */
-    protected function hydrateObject(Metadata $mapping, array $data): object
+    public function hydrateSingle(array $data, object $object): object
     {
+        $mapping = $this->mapper->resolve($object::class);
+
         $reflClass = new ReflectionClass($mapping->getFqcn());
-        $object = $reflClass->newInstance();
 
         $reflObj = new ReflectionObject($object);
         $defaultProperties = $reflObj->getDefaultProperties();

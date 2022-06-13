@@ -57,24 +57,6 @@
 {% endblock %}
 
 {% block page_content %}
-
-    <div class="container">
-        <form action="" method="post" enctype="multipart/form-data">
-            <label for="name" class="form-label">Title</label>
-            <input id="name" type="text" class="form-text" name="form[title]">
-
-            <label for="name" class="form-label">File</label>
-            <input id="name" type="file" class="form-text" name="form[file]">
-
-            <label for="name" class="form-label">Content</label>
-            <input id="name" type="text" class="form-text" name="form[content]">
-
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-            <input class="btn btn-primary" name="submit" type="submit" value="submit">
-        </form>
-    </div>
-
     <!-- Main Content-->
     <div class="container px-4 px-lg-5">
         <section class="row gx-4 gx-lg-5 justify-content-center">

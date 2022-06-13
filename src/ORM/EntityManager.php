@@ -10,6 +10,7 @@ use Blog\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\MapperInterface;
 use Blog\Validator\Validator;
 use PDO;
+use ReflectionClass;
 use ReflectionException;
 
 class EntityManager
@@ -91,7 +92,8 @@ class EntityManager
             return false;
         }
 
-        return $this->hydrator->hydrateSingle($rawResult, $entityFqcn);
+        $object = (new ReflectionClass($entityFqcn))->newInstance();
+        return $this->hydrator->hydrateSingle($rawResult, $object);
     }
 
     /**
@@ -123,7 +125,8 @@ class EntityManager
             return false;
         }
 
-        return $this->hydrator->hydrateSingle($rawResult, $entityFqcn);
+        $object = (new ReflectionClass($entityFqcn))->newInstance();
+        return $this->hydrator->hydrateSingle($rawResult, $object);
     }
 
     public function count(string $entityFqcn, string $column, string $value): int

@@ -6,16 +6,39 @@ namespace Blog\Controller;
 
 use Blog\Entity\Post;
 use Blog\Form\FormHandler;
+use Blog\ORM\EntityManager;
+use Blog\Service\FileUploader;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HomeController extends AbstractController
 {
-    public function index(FormHandler $formHandler, Request $request): Response
-    {
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    public function index(
+        FormHandler $formHandler,
+        Request $request,
+        EntityManager $em,
+        FileUploader $uploader
+    ): Response {
+        $post = new Post();
+        $form = $formHandler->loadFromRequest($request, $post);
 
-        $form = $formHandler->loadFromRequest($request, Post::class);
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($post->getFile()) {
+                $filename = $uploader->upload($post->getFile());
+                $post->setFilename($filename);
+            }
 
+            $em->add($post);
+            $em->flush();
+        }
 
         return $this->render('pages/front/home.html.twig');
     }

@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace Blog\Validator\Constraint;
 
-use Assert\InvalidArgumentException;
 use Attribute;
-use Blog\Validator\SlugConstraintValidator;
+use Blog\Validator\ImageConstraintValidator;
 
 #[Attribute(Attribute::TARGET_PROPERTY | Attribute::IS_REPEATABLE)]
-final class Slug extends Constraint
+final class Image extends Constraint
 {
     public function __construct(
-        public string $message = "La valeur '%s' n'est pas un slug valide"
+        public string $message = "%s doit être une image valide"
     ) {
     }
 
     public function getValidator(): string
     {
-        return SlugConstraintValidator::class;
+        return ImageConstraintValidator::class;
     }
 }

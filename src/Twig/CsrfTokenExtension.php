@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Blog\Twig;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
+use Exception;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class CsrfTokenExtension extends AbstractExtension
 {
+    public function __construct(
+        private SessionInterface $session
+    ) {
+    }
+
     public function getFunctions(): array
     {
         return [
@@ -18,13 +23,14 @@ class CsrfTokenExtension extends AbstractExtension
         ];
     }
 
+    /**
+     * @throws Exception
+     */
     public function generateCsrfToken(): string
     {
         $token = md5(uniqid('csrf_'));
 
-        $request = Request::createFromGlobals();
-        $request->setSession(new Session());
-        $request->getSession()->set('csrf_token', $token);
+        $this->session->set('csrf_token', $token);
 
         return $token;
     }

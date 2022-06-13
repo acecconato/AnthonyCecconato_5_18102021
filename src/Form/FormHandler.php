@@ -7,6 +7,8 @@ namespace Blog\Form;
 use Blog\Hydration\ObjectHydrator;
 use Blog\Validator\Validator;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 
@@ -31,6 +33,8 @@ class FormHandler
     }
 
     /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws Exception
      */
     public function isValid(): bool
@@ -58,7 +62,7 @@ class FormHandler
      * @throws ReflectionException
      * @throws Exception
      */
-    public function loadFromRequest(Request $request, string $fqcnClassName): self
+    public function loadFromRequest(Request $request, object $object): self
     {
         $this->request = $request;
 
@@ -74,9 +78,16 @@ class FormHandler
 
         $formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
 
-        dd($this->hydrator->hydrateSingle($formData, $fqcnClassName));
+        if ($request->files->has('form')) {
+            foreach ($request->files->all('form') as $filename => $file) {
+                if (!$_FILES['form']['error'][$filename] && $file) {
+                    $formData[$filename] = $file;
+                }
+            }
+        }
 
-        $this->formObject = $this->hydrator->hydrateSingle($formData, $fqcnClassName);
+        $this->formObject = $object;
+        $this->hydrator->hydrateSingle($formData, $object);
 
         return $this;
     }

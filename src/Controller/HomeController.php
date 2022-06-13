@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
+use Blog\Entity\Post;
+use Blog\Form\FormHandler;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class HomeController extends AbstractController
 {
-    public function index(): Response
+    public function index(FormHandler $formHandler, Request $request): Response
     {
+
+        $form = $formHandler->loadFromRequest($request, Post::class);
+
+
         return $this->render('pages/front/home.html.twig');
     }
 

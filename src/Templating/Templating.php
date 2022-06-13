@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\Templating;
 
+use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;

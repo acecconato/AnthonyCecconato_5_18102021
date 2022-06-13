@@ -120,6 +120,13 @@ final class Container implements ContainerInterface
             return $this->parameters[$id];
         }
 
+        $reflClass = new ReflectionClass($id);
+        if ($reflClass->isInterface()) {
+            if (array_key_exists($id, $this->aliases)) {
+                $id = $this->aliases[$id];
+            }
+        }
+
         if (!$this->has($id) && !isset($this->parameters[$id])) {
             if (!class_exists($id) && !interface_exists($id)) {
                 throw new NotFoundException();
@@ -159,7 +166,7 @@ final class Container implements ContainerInterface
         }
 
         if ($alias) {
-            $this->addAlias($obj::class, $alias);
+            $this->addAlias($alias, $obj::class);
         }
 
         $this->instances[$obj::class ?? $alias] = $obj;

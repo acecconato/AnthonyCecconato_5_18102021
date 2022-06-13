@@ -15,6 +15,7 @@ use Cocur\Slugify\Slugify;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[Entity(repositoryClass: PostRepository::class)]
 #[Table(tableName: 'post')]
@@ -29,13 +30,18 @@ class Post
     #[Assert\NotNull()]
     #[Assert\MinLength(minLength: 10)]
     #[Assert\MaxLength(maxLength: 255)]
-    private string $title = '';
+    private string $title;
+
+    #[Column(name: 'filename')]
+    private ?string $filename = null;
+
+    private ?UploadedFile $file = null;
 
     #[Column(name: 'content')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
     #[Assert\MaxLength(maxLength: 10000)]
-    private string $content = '';
+    private string $content;
 
     #[Column(name: 'excerpt')]
     #[Assert\NotBlank()]
@@ -47,8 +53,8 @@ class Post
     #[Assert\NotNull()]
     #[Assert\Slug()]
     #[Assert\MaxLength(maxLength: 255)]
-    #[Assert\Unique(entityFqcn: Post::class, column: 'slug', message: "Le slug '%s' existe déjà")]
-    private string $slug = '';
+//    #[Assert\Unique(entityFqcn: Post::class, column: 'slug', message: "Le slug '%s' existe déjà")]
+    private string $slug;
 
     #[Column(name: 'created_at', type: Type::DATE)]
     private DateTime $createdAt;
@@ -56,9 +62,9 @@ class Post
     #[Column(name: 'updated_at', type: Type::DATE)]
     private ?DateTime $updatedAt = null;
 
-    #[Column(name: 'user_id')]
-    #[Assert\Uuid()]
-    private ?string $userId = null;
+//    #[Column(name: 'user_id')]
+//    #[Assert\Uuid()]
+//    private ?string $userId = null;
 
     public function __construct()
     {
@@ -86,8 +92,29 @@ class Post
     public function setTitle(string $title): Post
     {
         $this->title = $title;
-
         return $this;
+    }
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(?string $filename): Post
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+    public function setFile(?UploadedFile $file): Post
+    {
+        $this->file = $file;
+        return $this;
+    }
+
+    public function getFile(): ?UploadedFile
+    {
+        return $this->file;
     }
 
     public function getContent(): string
@@ -119,9 +146,11 @@ class Post
 
     public function setSlug(?string $slug): Post
     {
-        $this->slug = $slug;
+        if ($slug) {
+            $this->slug = $slug;
+        }
 
-        if (!$slug) {
+        if (!$slug && $this->title) {
             $slugify = Slugify::create();
             $this->slug = $slugify->slugify($this->title);
         }

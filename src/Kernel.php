@@ -113,7 +113,7 @@ final class Kernel
     }
 
     /**
-     * @return void
+     * @throws ReflectionException
      * @throws DependencyInjection\Exceptions\ContainerException
      */
     public function configureContainer(): void
@@ -132,7 +132,6 @@ final class Kernel
     }
 
     /**
-     * @return void
      * @throws ContainerExceptionInterface
      * @throws DependencyInjection\Exceptions\NotFoundException
      * @throws NotFoundExceptionInterface

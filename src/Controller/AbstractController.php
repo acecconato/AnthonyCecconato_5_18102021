@@ -42,7 +42,6 @@ abstract class AbstractController
      */
     public function render(string $view, array $context = []): Response
     {
-
         return new Response($this->templating->render($view, $context));
     }
 }

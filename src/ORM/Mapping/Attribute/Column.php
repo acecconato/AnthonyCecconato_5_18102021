@@ -13,7 +13,6 @@ final class Column
     public function __construct (
         public string $name,
         public Type $type = Type::STRING,
-        public bool $timestamp = false
     ) {
     }
 }

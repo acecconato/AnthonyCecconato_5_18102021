@@ -73,6 +73,9 @@ class FormHandler
         $this->wasSubmitted = true;
 
         $formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
+
+        dd($this->hydrator->hydrateSingle($formData, $fqcnClassName));
+
         $this->formObject = $this->hydrator->hydrateSingle($formData, $fqcnClassName);
 
         return $this;

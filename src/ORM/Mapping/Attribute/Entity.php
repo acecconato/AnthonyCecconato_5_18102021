@@ -10,8 +10,7 @@ use Attribute;
 final class Entity
 {
     public function __construct(
-        public string $repositoryClass,
-        public bool $timestamps = true
+        public string $repositoryClass
     ) {
     }
 }

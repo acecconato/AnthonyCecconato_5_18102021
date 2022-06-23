@@ -17,6 +17,6 @@ class MinLengthConstraintValidator implements ConstraintValidatorInterface
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
-        return Assertion::nullOrMinLength($value, $constraint->minLength, $constraint->message, $propertyPath);
+        return Assertion::nullOrMinLength($value, $constraint->min, $constraint->message, $propertyPath);
     }
 }

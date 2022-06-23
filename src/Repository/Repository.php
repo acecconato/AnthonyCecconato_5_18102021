@@ -23,7 +23,7 @@ abstract class Repository
      * @return array<object>
      * @throws ReflectionException
      */
-    public function findAll(string $orderBy = 'id', string $orderWay = 'DESC'): array
+    public function findAll(string $orderBy = 'created_at', string $orderWay = 'DESC'): array
     {
         // Late static binding
         preg_match("/(\w+)Repository$/", static::class, $matches);

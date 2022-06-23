@@ -12,7 +12,7 @@ final class MaxLength extends Constraint
 {
     public function __construct(
         public string $message = "La valeur '%s' ne peut excéder %d caractères. Caractères actuel : %d",
-        public int $maxLength = 255
+        public int $max = 255
     ) {
     }
 

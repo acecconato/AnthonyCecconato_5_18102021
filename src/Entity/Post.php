@@ -28,8 +28,8 @@ class Post
     #[Column(name: 'title')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Assert\MinLength(minLength: 10)]
-    #[Assert\MaxLength(maxLength: 255)]
+    #[Assert\MinLength(min: 10)]
+    #[Assert\MaxLength(max: 255)]
     private string $title;
 
     #[Column(name: 'filename')]
@@ -41,18 +41,18 @@ class Post
     #[Column(name: 'content')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Assert\MaxLength(maxLength: 10000)]
+    #[Assert\MaxLength(max: 10000)]
     private string $content;
 
     #[Column(name: 'excerpt')]
-    #[Assert\MaxLength(maxLength: 300)]
+    #[Assert\MaxLength(max: 300)]
     private ?string $excerpt = null;
 
     #[Column(name: 'slug')]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
     #[Assert\Slug()]
-    #[Assert\MaxLength(maxLength: 255)]
+    #[Assert\MaxLength(max: 255)]
     #[Assert\Unique(entityFqcn: Post::class, column: 'slug', message: "Le slug '%s' existe déjà")]
     private string $slug;
 

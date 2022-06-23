@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Tests;
 
 use Blog\Controller\AbstractController;
-use Blog\Controller\HomeController;
+use Blog\Controller\FrontController;
 use Blog\DependencyInjection\Container;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
@@ -50,7 +50,7 @@ class ContainerTest extends TestCase
 
         $this->assertNotEquals(spl_object_id($foo1), spl_object_id($foo2));
 
-        $controller = $container->get(HomeController::class);
+        $controller = $container->get(FrontController::class);
 
         $this->assertInstanceOf(AbstractController::class, $controller);
     }

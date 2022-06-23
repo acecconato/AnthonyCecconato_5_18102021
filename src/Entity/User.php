@@ -26,11 +26,11 @@ class User
     #[Assert\NotNull()]
     #[Assert\MaxLength(
         message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Il en possède actuellement %d",
-        maxLength: 20)
+        max: 20)
     ]
     #[Assert\MinLength(
         message: "Le nom d'utilisateur '%s' doit faire au moins %d caractères. Il en possède actuellement %d",
-        minLength: 3)
+        min: 3)
     ]
     private string $username = '';
 

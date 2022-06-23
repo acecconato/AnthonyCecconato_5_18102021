@@ -51,14 +51,6 @@ class DataMapper implements MapperInterface
 
         $classAttributesName = array_map(fn($reflAttribute) => $reflAttribute->getName(), $reflAttribute);
 
-        if (!in_array(Entity::class, $classAttributesName)) {
-            throw new Exception('Attribute ' . Entity::class . ' is missing from ' . $fqcn);
-        }
-
-        if (!in_array(Table::class, $classAttributesName)) {
-            throw new Exception('Attribute ' . Table::class . ' is missing from ' . $fqcn);
-        }
-
         $metadatas->setFqcn($fqcn);
 
         foreach ($reflAttribute as $attribute) {

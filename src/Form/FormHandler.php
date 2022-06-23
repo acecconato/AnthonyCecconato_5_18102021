@@ -43,7 +43,7 @@ class FormHandler
         $formCsrf = $this->request->request->get('csrf_token');
 
         if (!$sessionCsrf || !$formCsrf || $sessionCsrf !== $formCsrf) {
-            throw new Exception('CSRF Token error');
+            throw new Exception('The csrf token is not valid');
         }
 
         return $this->validator->validateObject($this->formObject);
@@ -80,9 +80,7 @@ class FormHandler
 
         if ($request->files->has('form')) {
             foreach ($request->files->all('form') as $filename => $file) {
-                if (!$_FILES['form']['error'][$filename] && $file) {
-                    $formData[$filename] = $file;
-                }
+                $formData[$filename] = $file;
             }
         }
 

@@ -1,19 +1,19 @@
 <?php
 
 use Blog\Controller\DashboardController;
-use Blog\Controller\HomeController;
+use Blog\Controller\FrontController;
 use Blog\Router\Route;
 use Blog\Router\RouterInterface;
 
 return function( RouterInterface $router) {
 	$router
-        ->add(new Route('home', '/', [HomeController::class, 'index']))
-	    ->add(new Route('about', '/a-propos-de-anthony-cecconato', [HomeController::class, 'about']))
-	    ->add(new Route('contact', '/contactez-moi', [HomeController::class, 'contact']))
-        ->add(new Route('post', '/article', [HomeController::class, 'showSinglePost']))
+        ->add(new Route('home', '/', [FrontController::class, 'index']))
+	    ->add(new Route('about', '/a-propos-de-anthony-cecconato', [FrontController::class, 'about']))
+	    ->add(new Route('contact', '/contactez-moi', [FrontController::class, 'contact']))
+        ->add(new Route('post', '/article', [FrontController::class, 'showSinglePost']))
 
-	    ->add(new Route('login', '/connexion', [HomeController::class, 'login']))
-	    ->add(new Route('reset_password', '/mot-de-passe-oublie', [HomeController::class, 'resetPassword']))
+	    ->add(new Route('login', '/connexion', [FrontController::class, 'login']))
+	    ->add(new Route('reset_password', '/mot-de-passe-oublie', [FrontController::class, 'resetPassword']))
 
 	    ->add(new Route('admin_dashboard', '/dashboard', [DashboardController::class, 'index']))
 	    ->add(new Route('admin_articles', '/dashboard/articles', [DashboardController::class, 'showPosts']))

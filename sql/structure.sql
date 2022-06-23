@@ -20,12 +20,12 @@ CREATE TABLE `post`
     excerpt    TEXT                  DEFAULT NULL,
     slug       VARCHAR(255) NOT NULL,
     created_at DATETIME     NOT NULL DEFAULT NOW(),
-    updated_at DATETIME
-#     user_id    CHAR(36),
-#     FOREIGN KEY (user_id)
-#         REFERENCES user (id)
-#         ON UPDATE CASCADE
-#         ON DELETE SET NULL
+    updated_at DATETIME,
+    user_id    CHAR(36),
+    FOREIGN KEY (user_id)
+        REFERENCES user (id)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
 );
 
 COMMIT;

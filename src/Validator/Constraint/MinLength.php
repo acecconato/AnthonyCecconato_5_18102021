@@ -12,7 +12,7 @@ final class MinLength extends Constraint
 {
     public function __construct(
         public string $message = "La valeur '%s' doit faire au moins %d caractères. Caractères actuel : %d",
-        public int $minLength = 10
+        public int $min = 10
     ) {
     }
 

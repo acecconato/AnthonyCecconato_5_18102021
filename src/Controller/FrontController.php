@@ -8,6 +8,7 @@ use Blog\Entity\Contact;
 use Blog\Entity\Login;
 use Blog\Form\FormHandler;
 use Blog\Repository\PostRepository;
+use Blog\Repository\UserRepository;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -59,13 +60,19 @@ class FrontController extends AbstractController
      * @throws NotFoundExceptionInterface
      * @throws Exception
      */
-    public function login(Request $request, FormHandler $formHandler): Response
+    public function login(Request $request, FormHandler $formHandler, UserRepository $userRepository): Response
     {
         $login = new Login();
         $form = $formHandler->loadFromRequest($request, $login);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            dd($login);
+            $user = $userRepository->getUserByUsernameOrEmail($login->getUsername());
+
+            if ($user && $user->comparePassword($login->getPassword())) {
+                // Login and redirect
+            }
+
+            $form->addValidatorError("Identifiants incorrects, veuillez réessayer");
         }
 
         return $this->render('pages/front/login.html.twig', ['errors' => $form->getErrors()]);

@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class FormHandler
 {
-
     private ?object $formObject = null;
 
     private Request $request;
@@ -22,8 +21,8 @@ class FormHandler
     private bool $wasSubmitted = false;
 
     public function __construct(
-        private Validator $validator,
-        private ObjectHydrator $hydrator
+        private readonly Validator $validator,
+        private readonly ObjectHydrator $hydrator
     ) {
     }
 
@@ -93,5 +92,10 @@ class FormHandler
     public function get(string $field): string
     {
         return (string)$this->request->request->get($field);
+    }
+
+    public function addValidatorError(string $message): void
+    {
+        $this->validator->addError($message);
     }
 }

@@ -37,7 +37,7 @@ abstract class AbstractController
 
     /**
      * @param string $view
-     * @param array<string> $context
+     * @param array<mixed> $context
      * @return Response
      */
     public function render(string $view, array $context = []): Response

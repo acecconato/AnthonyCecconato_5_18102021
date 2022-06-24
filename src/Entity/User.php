@@ -26,12 +26,12 @@ class User
     #[Assert\NotNull()]
     #[Assert\MaxLength(
         message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Il en possède actuellement %d",
-        max: 20)
-    ]
+        max: 20
+    )]
     #[Assert\MinLength(
         message: "Le nom d'utilisateur '%s' doit faire au moins %d caractères. Il en possède actuellement %d",
-        min: 3)
-    ]
+        min: 3
+    )]
     private string $username = '';
 
     #[Column(name: 'email', type: Type::STRING)]
@@ -113,6 +113,11 @@ class User
     public static function encodePassword(string $plainPassword): string
     {
         return password_hash($plainPassword, PASSWORD_ARGON2I);
+    }
+
+    public function comparePassword(string $plainPassword): bool
+    {
+        return password_verify($plainPassword, $this->getPassword());
     }
 
     public function sanitize(): void

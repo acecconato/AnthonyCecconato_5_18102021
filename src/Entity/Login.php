@@ -11,14 +11,16 @@ class Login
 {
     #[NotNull()]
     #[NotBlank()]
-    #[MinLength(message: "Le nom d'utilisateur '%s' doit faire au moins %d caractères.", min: 3)]
-    #[MaxLength(message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Actuel : %d", max: 20)]
+    #[MinLength(message: "Le nom d'utilisateur doit faire au moins 3 caractères", min: 3)]
+    #[MaxLength(message: "Le nom d'utilisateur ne peut excéder 20 caractères", max: 20)]
     private string $username;
 
     #[NotNull()]
     #[NotBlank()]
     #[MaxLength(message: "Le mot de passe ne peut excéder 255 caractères", max: 255)]
     private string $password;
+
+    private bool $rememberMe = false;
 
     public function getUsername(): string
     {
@@ -39,6 +41,17 @@ class Login
     public function setPassword(string $password): Login
     {
         $this->password = $password;
+        return $this;
+    }
+
+    public function getRememberMe(): bool
+    {
+        return $this->rememberMe;
+    }
+
+    public function setRememberMe(bool $rememberMe): User
+    {
+        $this->rememberMe = $rememberMe;
         return $this;
     }
 }

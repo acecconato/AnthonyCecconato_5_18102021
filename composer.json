@@ -15,7 +15,8 @@
     "fakerphp/faker": "^1.19",
     "cocur/slugify": "^3.0",
     "beberlei/assert": "^3.3",
-    "symfony/mime": "^6.1"
+    "symfony/mime": "^6.1",
+    "psr/event-dispatcher": "^1.0"
   },
   "autoload": {
     "psr-4": {

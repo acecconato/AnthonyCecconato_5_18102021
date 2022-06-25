@@ -8,6 +8,10 @@ use Blog\Database\Adapter\AdapterInterface;
 use Blog\Database\Adapter\MySQLAdapter;
 use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
+use Blog\Event\Dispatcher\EventDispatcher;
+use Blog\Event\EventListener\ListenerProvider;
+use Blog\Event\EventListener\RequestHandlingListener;
+use Blog\Event\PreRequestHandlingEvent;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
 use Blog\Router\Router;
@@ -19,9 +23,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Throwable;
 
 final class Kernel
@@ -43,11 +45,28 @@ final class Kernel
      */
     public function __construct(
         private string $env
-
     ) {
         $this->container = new Container();
         $this->configureContainer();
         $this->configureRoutes();
+        $this->configureEvents();
+    }
+
+    /**
+     * @throws DependencyInjection\Exceptions\ContainerException
+     * @throws NotFoundExceptionInterface
+     * @throws DependencyInjection\Exceptions\NotFoundException
+     * @throws ContainerExceptionInterface
+     * @throws ReflectionException
+     */
+    private function configureEvents(): void
+    {
+        /** @var ListenerProvider $listenerProvider */
+        $listenerProvider = $this->container->get(ListenerProvider::class);
+        $listenerProvider->addListener(PreRequestHandlingEvent::class, new RequestHandlingListener());
+
+        $eventDispatcher = new EventDispatcher($listenerProvider);
+        $this->container->registerExisting($eventDispatcher);
     }
 
     /**
@@ -60,6 +79,10 @@ final class Kernel
         $request = $this->container->get(Request::class);
 
         $request->setSession(new Session());
+
+        /** @var EventDispatcher $eventDispatcher */
+        $eventDispatcher = $this->container->get(EventDispatcher::class);
+        $eventDispatcher->dispatch(new PreRequestHandlingEvent($request));
 
         $route = $this->router->match($request->getRequestUri());
         $routeArgs = $route->getArgs($request);

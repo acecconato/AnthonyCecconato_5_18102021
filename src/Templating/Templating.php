@@ -4,11 +4,8 @@ declare(strict_types=1);
 
 namespace Blog\Templating;
 
-use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
-use Blog\Router\RouterInterface;
-use Blog\Router\UrlGeneratorInterface;
 use Blog\Twig\CsrfTokenExtension;
 use Blog\Twig\PathExtension;
 use Lcharette\WebpackEncoreTwig\EntrypointsTwigExtension;
@@ -16,6 +13,7 @@ use Lcharette\WebpackEncoreTwig\TagRenderer;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\WebpackEncoreBundle\Asset\EntrypointLookup;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -42,13 +40,16 @@ class Templating implements TemplatingInterface
     ) {
         $loader = new FilesystemLoader($this->templatesDirs);
 
+        /** @var Session $session */
+        $session = $this->request->getSession();
+
         $this->isDevMode = $_ENV['APP_ENV'] === 'development';
 
         $this->twig = new Environment($loader, [
             'cache' => sprintf('%s/twig', $this->cacheDir),
             'debug' => $this->isDevMode,
             'auto_reload' => $this->isDevMode,
-            'strict_variables' => $this->isDevMode
+            'strict_variables' => $this->isDevMode,
         ]);
 
         $this->twig->addExtension($this->getWebpackEncoreExtension());
@@ -69,8 +70,21 @@ class Templating implements TemplatingInterface
     public function render(string $view, array $context = []): string
     {
         if ($this->isDevMode) {
-            $context = [...$context, 'isDevMode' => true, 'backtrace' => debug_backtrace()];
+            $context = [
+                ...$context,
+                'isDevMode' => true,
+                'backtrace' => debug_backtrace()
+            ];
         }
+
+        /** @var Session $session */
+        $session = $this->request->getSession();
+        $context = [
+            ...$context,
+            'app' => [
+                'flashes' => $session->getFlashBag()->all()
+            ]
+        ];
 
         return $this->twig->render($view, $context);
     }

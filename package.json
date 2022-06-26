@@ -2,7 +2,10 @@
   "dependencies": {
     "@ckeditor/ckeditor5-build-classic": "^34.0.0",
     "@symfony/webpack-encore": "^1.8.1",
-    "sass": "^1.49.7"
+    "core-js": "^3.23.3",
+    "noty": "^3.2.0-beta-deprecated",
+    "sass": "^1.49.7",
+    "toastify-js": "^1.11.2"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.2",

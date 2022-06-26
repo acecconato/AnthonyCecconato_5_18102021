@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
+use Blog\Router\Router;
 use Blog\Templating\TemplatingInterface;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,6 +13,7 @@ abstract class AbstractController
 {
     public function __construct(
         protected TemplatingInterface $templating,
+        protected Router $router
     ) {
     }
 

@@ -29,7 +29,7 @@ abstract class AbstractController
     /**
      * @param string $to
      * @param int $status
-     * @param array<string> $headers
+     * @param array<mixed> $headers
      * @return RedirectResponse
      */
     public function redirect(string $to, int $status = 302, array $headers = []): RedirectResponse

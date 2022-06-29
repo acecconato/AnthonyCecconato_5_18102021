@@ -65,7 +65,7 @@ final class Kernel
         $listenerProvider = $this->container->get(ListenerProvider::class);
         $listenerProvider->addListener(PreRequestHandlingEvent::class, new RequestHandlingListener());
 
-        $eventDispatcher = new EventDispatcher($listenerProvider);
+        $eventDispatcher = new EventDispatcher($listenerProvider, $this->container);
         $this->container->registerExisting($eventDispatcher);
     }
 

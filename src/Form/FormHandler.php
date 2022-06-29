@@ -20,6 +20,8 @@ class FormHandler
 
     private bool $wasSubmitted = false;
 
+    private array $formData = [];
+
     public function __construct(
         private readonly Validator $validator,
         private readonly ObjectHydrator $hydrator
@@ -38,7 +40,7 @@ class FormHandler
      */
     public function isValid(): bool
     {
-        $sessionCsrf = $this->request->getSession()->get('csrf_token');
+        $sessionCsrf = $this->request->get('csrf_token');
         $formCsrf = $this->request->request->get('csrf_token');
 
         if (!$sessionCsrf || !$formCsrf || $sessionCsrf !== $formCsrf) {
@@ -75,23 +77,27 @@ class FormHandler
 
         $this->wasSubmitted = true;
 
-        $formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
+        $this->formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
 
         if ($request->files->has('form')) {
             foreach ($request->files->all('form') as $filename => $file) {
-                $formData[$filename] = $file;
+                $this->formData[$filename] = $file;
             }
         }
 
         $this->formObject = $object;
-        $this->hydrator->hydrateSingle($formData, $object);
+        $this->hydrator->hydrateSingle($this->formData, $object);
 
         return $this;
     }
 
     public function get(string $field): string
     {
-        return (string)$this->request->request->get($field);
+        if (array_key_exists($field, $this->formData)) {
+            return (string)$this->formData[$field];
+        }
+
+        return '';
     }
 
     public function addValidatorError(string $message): void

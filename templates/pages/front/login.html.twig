@@ -20,7 +20,7 @@
                     <h1>Connexion</h1>
                     <div class="my-5">
 
-                        {% if errors is iterable %}
+                        {% if errors is defined and errors is iterable %}
                             {% for error in errors %}
                                 <p class="alert alert-danger">{{ error['message'] }}</p>
                             {% endfor %}
@@ -36,6 +36,7 @@
                                         name="form[username]"
                                         id="username"
                                         type="text"
+                                        value="{{ username|default('') }}"
                                         placeholder="John Doe"
                                         required
                                 />
@@ -55,7 +56,8 @@
                             </div>
 
                             <div class="form-check">
-                                <input class="form-check-input" name="form[rememberMe]" type="checkbox" id="flexCheckDefault">
+                                <input class="form-check-input" name="form[rememberMe]" type="checkbox"
+                                       id="flexCheckDefault">
                                 <label class="form-check-label" for="flexCheckDefault">
                                     Rester connecté
                                 </label>

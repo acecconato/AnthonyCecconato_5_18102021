@@ -71,7 +71,11 @@
                     <ul class="list-group list-group-horizontal justify-content-center align-items-center">
                         <li class="list-group-item border-0"><a href="#">Mentions légales</a></li>
                         <li class="list-group-item border-0"><a href="#">Politique de confidentialité</a></li>
-                        <li class="list-group-item border-0"><a href="{{ path('login') }}">Connexion</a></li>
+                        {% if auth.isLoggedIn %}
+                            <li class="list-group-item border-0"><a href="{{ path('logout') }}">Déconnexion</a></li>
+                        {% else %}
+                            <li class="list-group-item border-0"><a href="{{ path('login') }}">Connexion</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

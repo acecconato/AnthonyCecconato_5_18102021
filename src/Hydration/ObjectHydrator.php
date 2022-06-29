@@ -52,16 +52,27 @@ class ObjectHydrator implements HydratorInterface
         $reflObj = new ReflectionObject($object);
         $defaultProperties = $reflObj->getDefaultProperties();
 
+        $columns = [];
+        foreach ($mapping->getColumns() as $column) {
+            // @phpstan-ignore-next-line
+            $columns[$column->propertyName] = $column->name;
+        }
+
         foreach ($reflClass->getProperties() as $prop) {
             if (array_key_exists($prop->getName(), $data)) {
                 $prop->setValue($object, $data[$prop->getName()]);
-                continue;
+            }
+
+            if (array_key_exists($prop->getName(), $columns)) {
+                if (array_key_exists($columns[$prop->getName()], $data)) {
+                    $prop->setValue($object, $data[$columns[$prop->getName()]]);
+                }
             }
 
             $setter = 'set' . ucfirst($prop->getName());
 
             // Handle "property must not be accessed before initialization" case
-            if (!array_key_exists($prop->getName(), $defaultProperties)) {
+            if (!array_key_exists($prop->getName(), $defaultProperties) && !$prop->isInitialized($object)) {
                 $nbParams = $reflClass->getMethod($setter)->getNumberOfParameters();
                 $hasParameter = (bool)$reflClass->getMethod($setter)->getNumberOfParameters();
 

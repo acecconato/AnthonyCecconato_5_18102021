@@ -5,17 +5,21 @@ declare(strict_types=1);
 namespace Blog\Security;
 
 use Blog\Entity\User;
+use Blog\ORM\EntityManager;
+use Blog\Repository\UserRepository;
+use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
 
 class Authenticator
 {
     public function __construct(
-        private readonly Request $request
+        private readonly Request $request,
+        private readonly EntityManager $entityManager
     ) {
     }
 
-    public function authenticate(User $user): void
+    public function authenticate(User $user, bool $remember = false): void
     {
         $session = $this->request->getSession();
 
@@ -29,6 +33,20 @@ class Authenticator
             'username' => $user->getUsername(),
             'email' => $user->getEmail()
         ]);
+
+        if ($remember) {
+            $now = new DateTimeImmutable();
+            $expires = $now->modify('+1 month')->getTimestamp();
+
+            $rememberMeToken = md5(uniqid());
+
+            setcookie('username', $user->getUsername(), $expires);
+            setcookie('remember_token', $rememberMeToken, $expires);
+
+            $user->setRememberToken($rememberMeToken);
+            $this->entityManager->update($user);
+            $this->entityManager->flush();
+        }
     }
 
     public function isValid(): bool
@@ -36,17 +54,14 @@ class Authenticator
         $session = $this->request->getSession();
 
         if ($session->get('clientIp') !== $this->getAnonymizedClientIp()) {
-            $this->logout();
             return false;
         }
 
         if ($session->get('userAgent') !== $this->getUserAgent()) {
-            $this->logout();
             return false;
         }
 
         if (time() < $session->get('lastAccess') + 3600) {
-            $this->logout();
             return false;
         }
 
@@ -66,11 +81,18 @@ class Authenticator
 
     public function refresh(): bool
     {
-        return $this->request->getSession()->migrate();
+        dump($this->request->getSession()->getId());
+        $is = $this->request->getSession()->migrate();
+        dump($this->request->getSession()->getId());
+        return $is;
     }
 
-    public function logout(): bool
+    public function logout(): void
     {
-        return $this->request->getSession()->invalidate();
+        $this->request->getSession()->clear();
+
+        $now = (new DateTimeImmutable())->getTimestamp();
+        setcookie('username', '', $now);
+        setcookie('remember_token', '', $now);
     }
 }

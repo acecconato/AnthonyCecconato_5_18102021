@@ -45,6 +45,9 @@ class User
 
     private ?string $plainPassword;
 
+    #[Column(name: 'remember_token', type: Type::STRING)]
+    private ?string $rememberToken;
+
     public function __construct()
     {
         if (!isset($this->id)) {
@@ -107,6 +110,17 @@ class User
     public function setPlainPassword(string $plainPassword): User
     {
         $this->plainPassword = $plainPassword;
+        return $this;
+    }
+
+    public function getRememberToken(): ?string
+    {
+        return $this->rememberToken;
+    }
+
+    public function setRememberToken(?string $rememberToken): User
+    {
+        $this->rememberToken = $rememberToken;
         return $this;
     }
 

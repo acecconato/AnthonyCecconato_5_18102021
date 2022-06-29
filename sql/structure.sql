@@ -5,10 +5,11 @@ DROP TABLE IF EXISTS `user`;
 
 CREATE TABLE `user`
 (
-    id       CHAR(36)     NOT NULL PRIMARY KEY,
-    username VARCHAR(20)  NOT NULL,
-    email    VARCHAR(50)  NOT NULL,
-    password VARCHAR(255) NOT NULL
+    id             CHAR(36)     NOT NULL PRIMARY KEY,
+    username       VARCHAR(20)  NOT NULL,
+    email          VARCHAR(50)  NOT NULL,
+    password       VARCHAR(255) NOT NULL,
+    remember_token VARCHAR(255)
 );
 
 CREATE TABLE `post`

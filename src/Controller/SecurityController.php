@@ -39,7 +39,7 @@ class SecurityController extends AbstractController
             $user = $userRepository->getUserByUsernameOrEmail($login->getUsername());
 
             if ($user && $user->comparePassword($login->getPassword())) {
-                $authenticator->authenticate($user);
+                $authenticator->authenticate($user, (bool)$form->get('rememberMe'));
 
                 /** @var Session $session */
                 $session = $request->getSession();
@@ -50,7 +50,12 @@ class SecurityController extends AbstractController
             $form->addValidatorError("Identifiants incorrects, veuillez réessayer");
         }
 
-        return $this->render('pages/front/login.html.twig', ['errors' => $form->getErrors()]);
+        return $this->render(
+            'pages/front/login.html.twig',
+            [
+                'errors' => $form->getErrors()
+            ]
+        );
     }
 
     public function resetPassword(): Response
@@ -61,8 +66,14 @@ class SecurityController extends AbstractController
     /**
      * @throws RouteNotFoundException
      */
-    public function logout(): RedirectResponse
+    public function logout(Authenticator $authenticator, Request $request): RedirectResponse
     {
+        $authenticator->logout();
+
+        /** @var Session $session */
+        $session = $request->getSession();
+        $session->getFlashBag()->add('success', 'Vous êtes désormais déconnecté');
+
         return $this->redirect($this->router->generateUri('home'));
     }
 }

@@ -23,13 +23,11 @@ class RepositoryTest extends TestCase
 {
     public function loadContainer(): Container
     {
-        // TODO Q/A Best way pour charger un environnement de test avec phpunit ?
         $container = new Container();
         $container
             ->addAlias(AdapterInterface::class, MySQLAdapter::class)
             ->addAlias(MapperInterface::class, DataMapper::class);
 
-        // TODO:: These parameters should be into the .env file
         return $container
             ->addParameter('host', 'localhost')
             ->addParameter('dbName', 'anthonyc5')

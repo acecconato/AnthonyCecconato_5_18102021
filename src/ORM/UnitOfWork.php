@@ -10,6 +10,7 @@ use Blog\ORM\Mapping\MapperInterface;
 use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use ReflectionObject;
 
 class UnitOfWork
 {
@@ -42,8 +43,22 @@ class UnitOfWork
 
             $mapping = $this->mapper->resolve($object::class);
             $tableName = $mapping->getTable()->tableName;
+            $reflObj = new ReflectionObject($object);
 
-            $prepValues = implode(', ', array_map(fn($column) => ':' . $column->name, $mapping->getColumns()));
+            $prepValues = array_map(function ($prop) use ($object, $mapping) {
+                if ($prop->isInitialized($object)) {
+                    if ($column = $mapping->getColumn($prop->getName())) {
+                        return ':' . $column->name;
+                    }
+                }
+
+                return null;
+            }, $reflObj->getProperties());
+
+            // Remove null values
+            $prepValues = array_filter($prepValues, fn($value) => ($value));
+
+            $prepValues = implode(', ', $prepValues);
 
             $query = "
                 INSERT INTO $tableName ( " . $mapping->getId() . ", " . str_replace(':', '', $prepValues) . " )
@@ -56,22 +71,28 @@ class UnitOfWork
             $bind[':' . $mapping->getId()] = $object->getId();
 
             foreach ($mapping->getColumns() as $column) {
-                // DateTime to string conversion
-                if ($column->type === Type::DATE) {
-                    /** @var ?DateTime $datetime */
-                    $datetime = $object->{'get' . ucfirst($column->propertyName)}();
+                foreach ($reflObj->getProperties() as $prop) {
+                    // @phpstan-ignore-next-line
+                    if ($prop->getName() === $column->propertyName) {
+                        if ($prop->isInitialized($object)) {
+                            // DateTime to string conversion
+                            if ($column->type === Type::DATE) {
+                                /** @var ?DateTime $datetime */
+                                $datetime = $prop->getValue($object);
 
-                    $bind[':' . $column->name] = null;
+                                $bind[':' . $column->name] = null;
 
-                    if ($datetime) {
-                        $bind[':' . $column->name] = $datetime->format(Kernel::DATE_FORMAT);
+                                if ($datetime) {
+                                    $bind[':' . $column->name] = $datetime->format(Kernel::DATE_FORMAT);
+                                }
+
+                                continue;
+                            }
+
+                            $bind[':' . $column->name] = $prop->getValue($object);
+                        }
                     }
-
-                    continue;
                 }
-
-                // @phpstan-ignore-next-line
-                $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
 
             $adapter->addToTransaction($query, $bind);

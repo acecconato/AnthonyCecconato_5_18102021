@@ -36,7 +36,7 @@ class Authenticator
 
         if ($remember) {
             $now = new DateTimeImmutable();
-            $expires = $now->modify('+1 month')->getTimestamp();
+            $expires = $now->modify('+3 month')->getTimestamp();
 
             $rememberMeToken = md5(uniqid());
 

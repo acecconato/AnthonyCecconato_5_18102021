@@ -62,9 +62,9 @@ class Post
     #[Column(name: 'updated_at', type: Type::DATE)]
     private ?DateTime $updatedAt = null;
 
-//    #[Column(name: 'user_id')]
-//    #[Assert\Uuid()]
-//    private ?string $userId = null;
+    #[Column(name: 'user_id')]
+    #[Assert\Uuid()]
+    private ?string $userId = null;
 
     public function __construct()
     {

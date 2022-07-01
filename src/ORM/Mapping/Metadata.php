@@ -73,6 +73,22 @@ class Metadata
         return $this->columns;
     }
 
+    public function getColumn(string $name): ?Column
+    {
+        foreach ($this->columns as $column) {
+            // @phpstan-ignore-next-line
+            if ($column->propertyName === $name) {
+                return $column;
+            }
+
+            if ($column->name === $name) {
+                return $column;
+            }
+        }
+
+        return null;
+    }
+
     public function addColumns(Column $column): Metadata
     {
         $this->columns[] = $column;

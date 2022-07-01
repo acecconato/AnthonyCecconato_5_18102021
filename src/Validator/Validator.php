@@ -15,7 +15,6 @@ use Psr\Container\NotFoundExceptionInterface;
 
 final class Validator implements ValidatorInterface
 {
-    // TODO Q/A Ici lorsque je passe l'interface au lieu du container, j'ai une erreur dans l'injection de dépendnace
     public function __construct(
         private Container $container
     ) {

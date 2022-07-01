@@ -42,6 +42,7 @@ class ObjectHydrator implements HydratorInterface
      * @param object $object
      * @return object
      * @throws ReflectionException
+     * @throws Exception
      */
     public function hydrateSingle(array $data, object $object): object
     {
@@ -64,7 +65,16 @@ class ObjectHydrator implements HydratorInterface
             }
 
             if (array_key_exists($prop->getName(), $columns)) {
-                if (array_key_exists($columns[$prop->getName()], $data)) {
+                if (array_key_exists($column = $columns[$prop->getName()], $data)) {
+                    $column = $mapping->getColumn($column);
+
+                    if ($column->type === Type::DATE) {
+                        if (array_key_exists($column->name, $data) && $data[$column->name]) {
+                            $prop->setValue($object, new DateTime($data[$column->name]));
+                            continue;
+                        }
+                    }
+
                     $prop->setValue($object, $data[$columns[$prop->getName()]]);
                 }
             }

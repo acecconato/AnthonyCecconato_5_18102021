@@ -8,10 +8,11 @@ use Blog\Database\Adapter\AdapterInterface;
 use Blog\Hydration\HydratorInterface;
 use Blog\Hydration\ObjectHydrator;
 use Blog\ORM\Mapping\MapperInterface;
-use Blog\Validator\Validator;
 use PDO;
 use ReflectionClass;
 use ReflectionException;
+
+use function _PHPStan_1d2f63169\React\Promise\resolve;
 
 class EntityManager
 {
@@ -62,13 +63,16 @@ class EntityManager
      * @return array<object>
      * @throws ReflectionException
      */
-    public function findAll(string $entityFqcn, string $orderBy, string $orderWay): array
+    public function findAll(string $entityFqcn, int $offset, int $limit, string $orderBy, string $orderWay): array
     {
         $mapping = $this->mapper->resolve($entityFqcn);
 
         $tableName = $mapping->getTable()->tableName;
 
         $query = "SELECT * FROM  $tableName ORDER BY $orderBy $orderWay";
+        $query .= ((bool)$limit) ? " LIMIT $limit" : null;
+        $query .= ((bool)$offset) ? " OFFSET $offset" : null;
+
         $rawResults = $this->adapter->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
         return $this->hydrator->hydrateResultSet($rawResults, $entityFqcn);
@@ -141,6 +145,19 @@ class EntityManager
         $result = $this->adapter->query($query, [':value' => $value]);
 
         return $result->fetch(PDO::FETCH_COLUMN);
+    }
+
+    public function countAll(string $entityFqcn): int
+    {
+        $mapping = $this->mapper->resolve($entityFqcn);
+
+        $tableName = $mapping->getTable()->tableName;
+
+        $query = "SELECT COUNT(*) FROM $tableName";
+
+        $result = $this->adapter->query($query);
+
+        return (int)$result->fetch(PDO::FETCH_COLUMN);
     }
 
     /**

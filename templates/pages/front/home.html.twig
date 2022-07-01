@@ -61,75 +61,47 @@
     <div class="container px-4 px-lg-5">
         <section class="row gx-4 gx-lg-5 justify-content-center">
             <div class="col-md-10 col-xl-8 my-5">
-                <h2>Articles récents</h2>
+                <h2>Mes dernières publications</h2>
                 <hr>
             </div>
             <div class="col-md-10 col-xl-8">
-                <!-- Post preview-->
-                <div class="post-preview">
-                    <a href="post.html">
-                        <h3 class="">Man must explore, and this is exploration at its greatest</h3>
-                        <p class="post-subtitle">Problems look mighty small from 150 miles up</p>
-                    </a>
-                    <p class="post-meta">
-                        Posted by
-                        <a href="#!">Start Bootstrap</a>
-                        on September 24, 2022
-                    </p>
-                </div>
-                <!-- Divider-->
-                <hr class="my-4"/>
-                <!-- Post preview-->
-                <div class="post-preview">
-                    <a href="post.html"><h3 class="">I believe every human has a finite number of heartbeats.
-                            I don't intend to waste any of mine.</h3></a>
-                    <p class="post-meta">
-                        Posted by
-                        <a href="#">Start Bootstrap</a>
-                        on September 18, 2022
-                    </p>
-                </div>
-                <!-- Divider-->
-                <hr class="my-4"/>
-                <!-- Post preview-->
-                <div class="post-preview">
-                    <a href="post.html">
-                        <h3 class="">Science has not yet mastered prophecy</h3>
-                        <p class="post-subtitle">We predict too much for the next year and yet far too little for the
-                            next ten.</p>
-                    </a>
-                    <p class="post-meta">
-                        Posted by
-                        <a href="#!">Start Bootstrap</a>
-                        on August 24, 2022
-                    </p>
-                </div>
-                <!-- Divider-->
-                <hr class="my-4"/>
-                <!-- Post preview-->
-                <div class="post-preview">
-                    <a href="post.html">
-                        <h2 class="">Failure is not an option</h2>
-                        <p class="post-subtitle">Many say exploration is part of our destiny, but it’s actually our
-                            duty to future generations.</p>
-                    </a>
-                    <p class="post-meta">
-                        Posted by
-                        <a href="#!">Start Bootstrap</a>
-                        on July 8, 2022
-                    </p>
-                </div>
-                <!-- Divider-->
-                <hr class="my-4"/>
-                <!-- Pager-->
-                <div class="d-flex justify-content-end mb-4"><a class="btn btn-primary text-uppercase" href="#!">Older
-                        Posts →</a></div>
+
+                {% if posts is iterable and posts is not empty %}
+                    {% for post in posts %}
+
+                        <div class="post-preview">
+                            <a href="post.html">
+                                <h3 class="">{{ post.title }}</h3>
+                                <p class="post-subtitle">{{ post.excerpt ?? post.content|slice(0, 300) ~ '...' }}</p>
+                            </a>
+                            <p class="post-meta">
+
+                            </p>
+                        </div>
+                        <!-- Divider-->
+                        <hr class="my-4"/>
+                    {% endfor %}
+
+                    <nav aria-label="Page navigation example">
+                        <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                            <li class="page-item"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                    </nav>
+
+                {% else %}
+                    <p class="alert alert-info">Il n y a pas encore de publications à afficher</p>
+                {% endif %}
             </div>
         </section>
     </div>
 
-    <div class="container px-4 px-lg-5 mt-5 pt-5 mb-5">
+    <div class="container-fluid px-4 px-lg-5 mt-5 pt-5 mb-5">
         <div class="row gx-4 gx-lg-5 justify-content-center">
+
             <div class="col-md-10 col-xl-8">
                 <h2>Contactez-moi !</h2>
             </div>

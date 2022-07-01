@@ -23,13 +23,27 @@ abstract class Repository
      * @return array<object>
      * @throws ReflectionException
      */
-    public function findAll(string $orderBy = 'created_at', string $orderWay = 'DESC'): array
+    public function findAll(
+        int $offset = 0,
+        int $limit = 0,
+        string $orderBy = 'created_at',
+        string $orderWay = 'DESC'
+    ): array {
+        // Late static binding
+        preg_match("/(\w+)Repository$/", static::class, $matches);
+        $entityFqcn = 'Blog\\Entity\\' . $matches[1];
+
+        return $this->entityManager->findAll($entityFqcn, $offset, $limit, $orderBy, $orderWay);
+    }
+
+
+    public function countAll(): int
     {
         // Late static binding
         preg_match("/(\w+)Repository$/", static::class, $matches);
         $entityFqcn = 'Blog\\Entity\\' . $matches[1];
 
-        return $this->entityManager->findAll($entityFqcn, $orderBy, $orderWay);
+        return $this->entityManager->countAll($entityFqcn);
     }
 
     /**

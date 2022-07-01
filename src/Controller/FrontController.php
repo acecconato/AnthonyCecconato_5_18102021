@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Blog\Controller;
 
 use Blog\Entity\Contact;
+use Blog\Entity\Post;
 use Blog\Form\FormHandler;
 use Blog\Repository\PostRepository;
 use Psr\Container\ContainerExceptionInterface;
@@ -22,8 +23,12 @@ class FrontController extends AbstractController
      */
     public function index(FormHandler $formHandler, Request $request, PostRepository $postRepository): Response
     {
-        // todo pagination
-        $posts = $postRepository->findAll();
+        $page = (int)$request->query->get('page', 0);
+        $nbPerPage = 6;
+        $totalPage = (int)ceil($postRepository->countAll() / $nbPerPage);
+        $offset = $page * $nbPerPage;
+
+        $posts = $postRepository->getPostsWithUsers($offset, $nbPerPage);
 
         $contact = new Contact();
 
@@ -33,7 +38,11 @@ class FrontController extends AbstractController
             // todo send mail and display a flash message
         }
 
-        return $this->render('pages/front/home.html.twig', ['posts' => $posts]);
+        return $this->render('pages/front/home.html.twig', [
+            'posts' => $posts,
+            'totalPage' => $totalPage,
+            'page' => $page
+        ]);
     }
 
     public function about(): Response

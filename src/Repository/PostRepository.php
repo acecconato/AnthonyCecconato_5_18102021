@@ -4,35 +4,37 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
-use Blog\Database\Adapter\MySQLAdapter;
+use Blog\Entity\Post;
+use PDO;
 
 class PostRepository extends Repository
 {
-//    /** Create a new user
-//     * @param string $username
-//     * @param string $email
-//     * @return false|string lastInsertId
-//     */
-//    public function create(string $username, string $email): false|string
-//    {
-//        /** @var MySQLAdapter $adapter */
-//        $adapter = $this->getAdapter();
-//
-//        $uuid = $this->generateId();
-//
-//        $statement = $adapter->query(
-//            "INSERT INTO `user` VALUES (:id, :username, :email)",
-//            [
-//                ':id' => $uuid,
-//                ':username' => strip_tags($username),
-//                ':email' => strip_tags($email)
-//            ]
-//        );
-//
-//        if ($statement->rowCount()) {
-//            return $uuid;
-//        }
-//
-//        return false;
-//    }
+    /**
+     * @return Post[]
+     */
+    public function getPostsWithUsers(
+        int $offset = 0,
+        int $limit = 0,
+        string $orderBy = 'created_at',
+        string $orderWay = 'DESC'
+    ): array {
+        $entityManager = $this->getEntityManager();
+
+        $adapter = $entityManager->getAdapter();
+        $hydrator = $entityManager->getHydrator();
+
+        $query = "
+            SELECT * 
+            FROM post p
+            INNER JOIN user u ON u.id = p.user_id
+            ORDER BY $orderBy $orderWay
+            ";
+
+        $query .= ((bool)$limit) ? " LIMIT $limit" : null;
+        $query .= ((bool)$offset) ? " OFFSET $offset" : null;
+
+        $results = $adapter->query($query)->fetchAll(PDO::FETCH_ASSOC);
+
+        return $hydrator->hydrateResultSet($results, Post::class);
+    }
 }

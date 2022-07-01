@@ -53,7 +53,7 @@ for ($i = 0; $i < 20; $i++) {
     $post = new Post();
     $post
         ->setTitle($faker->sentence)
-        ->setContent($faker->realText)
+        ->setContent($faker->realTextBetween(300, 600))
         ->setSlug(null)
         ->setUserId($demoUser->getId())
         ->setCreatedAt((new DateTime())->modify("+$i minutes"));

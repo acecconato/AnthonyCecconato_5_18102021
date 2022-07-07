@@ -102,15 +102,18 @@ final class Route implements RouteInterface
         // Add ^ and $ delimiters
         $pattern = sprintf('/^%s$/', $pattern);
 
+        // Remove ?queries from incoming request uri
+        $path = preg_replace('/(\?.*)/', '', $path);
+
         return (bool)preg_match($pattern, $path);
     }
 
     /**
-     * @return array
+     * @return array<callable>
      */
     public function getCallable(): array
     {
-       return [$this->callable[0], $this->callable[1]];
+        return [$this->callable[0], $this->callable[1]];
     }
 
     /**

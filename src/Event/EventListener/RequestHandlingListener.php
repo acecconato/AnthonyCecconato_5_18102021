@@ -4,21 +4,19 @@ declare(strict_types=1);
 
 namespace Blog\Event\EventListener;
 
-use Blog\DependencyInjection\ContainerInterface;
-use Blog\Event\PreRequestHandlingEvent;
 use Blog\Repository\UserRepository;
 use Blog\Security\Authenticator;
-use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
 use Symfony\Component\HttpFoundation\Request;
 
-class RequestHandlingListener
+class RequestHandlingListener implements EventListenerInterface
 {
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     */
-    public function __invoke(PreRequestHandlingEvent $event, ContainerInterface $container): void
+    public function __construct(
+        private readonly Authenticator $authenticator,
+        private readonly UserRepository $userRepository
+    ) {
+    }
+
+    public function execute(mixed $event): void
     {
         $object = $event->getObject();
 
@@ -28,20 +26,15 @@ class RequestHandlingListener
 
         $request = $object;
 
-        /** @var Authenticator $authenticator */
-        $authenticator = $container->get(Authenticator::class);
-
         $username = $request->cookies->get('username');
         $rememberToken = $request->cookies->get('remember_token');
 
         /** Login automatically if is remembered */
-        if (!$authenticator->isValid() && $username && $rememberToken) {
-            /** @var UserRepository $userRepository */
-            $userRepository = $container->get(UserRepository::class);
-            $user = $userRepository->getUserByUsernameOrEmail($username);
+        if (!$this->authenticator->isValid() && $username && $rememberToken) {
+            $user = $this->userRepository->getUserByUsernameOrEmail($username);
 
             if ($user && $user->getRememberToken() === $rememberToken) {
-                $authenticator->authenticate($user);
+                $this->authenticator->authenticate($user);
             }
         }
     }

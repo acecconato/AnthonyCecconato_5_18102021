@@ -61,10 +61,13 @@ final class Kernel
      */
     private function configureEvents(): void
     {
+        $registerEvents = require dirname(__DIR__) . '/config/registerEvents.php';
+
         /** @var ListenerProvider $listenerProvider */
         $listenerProvider = $this->container->get(ListenerProvider::class);
-        $listenerProvider->addListener(PreRequestHandlingEvent::class, new RequestHandlingListener());
 
+        $registerEvents($listenerProvider);
+        
         $eventDispatcher = new EventDispatcher($listenerProvider, $this->container);
         $this->container->registerExisting($eventDispatcher);
     }
@@ -76,6 +79,7 @@ final class Kernel
      */
     public function run(): void
     {
+        /** @var Request $request */
         $request = $this->container->get(Request::class);
 
         $request->setSession(new Session());

@@ -7,7 +7,7 @@ namespace Blog\Event;
 class PreRequestHandlingEvent extends Event
 {
     public function __construct(
-        private object $object
+        private readonly object $object
     ) {
     }
 

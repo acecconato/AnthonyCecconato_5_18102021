@@ -18,11 +18,6 @@ class PostRepository extends Repository
         string $orderBy = 'created_at',
         string $orderWay = 'DESC'
     ): array {
-        $entityManager = $this->getEntityManager();
-
-        $adapter = $entityManager->getAdapter();
-        $hydrator = $entityManager->getHydrator();
-
         $query = "
             SELECT * 
             FROM post p
@@ -33,8 +28,8 @@ class PostRepository extends Repository
         $query .= ((bool)$limit) ? " LIMIT $limit" : null;
         $query .= ((bool)$offset) ? " OFFSET $offset" : null;
 
-        $results = $adapter->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        $results = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
 
-        return $hydrator->hydrateResultSet($results, Post::class);
+        return $this->getHydrator()->hydrateResultSet($results, Post::class);
     }
 }

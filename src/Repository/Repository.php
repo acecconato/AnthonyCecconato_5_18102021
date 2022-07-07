@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
+use Blog\Database\Adapter\AdapterInterface;
+use Blog\Hydration\HydratorInterface;
 use Blog\ORM\EntityManager;
+use PDOStatement;
 use ReflectionException;
 
 abstract class Repository
@@ -17,6 +20,21 @@ abstract class Repository
     public function getEntityManager(): EntityManager
     {
         return $this->entityManager;
+    }
+
+    protected function getHydrator(): HydratorInterface
+    {
+        return $this->entityManager->getHydrator();
+    }
+
+    protected function getAdapter(): AdapterInterface
+    {
+        return $this->entityManager->getAdapter();
+    }
+
+    protected function query(string $query): bool|PDOStatement
+    {
+        return $this->entityManager->getAdapter()->query($query);
     }
 
     /**

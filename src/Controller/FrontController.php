@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Blog\Controller;
 
 use Blog\Entity\Contact;
-use Blog\Entity\Post;
 use Blog\Form\FormHandler;
 use Blog\Repository\PostRepository;
+use Blog\Router\Exceptions\RouteNotFoundException;
+use Blog\Router\Router;
+use Blog\Service\Paginator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -20,15 +22,25 @@ class FrontController extends AbstractController
      * @throws ReflectionException
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
+     * @throws RouteNotFoundException
      */
-    public function index(FormHandler $formHandler, Request $request, PostRepository $postRepository): Response
-    {
+    public function index(
+        FormHandler $formHandler,
+        Request $request,
+        PostRepository $postRepository,
+        Paginator $paginator,
+        Router $router
+    ): Response {
+        // Pagination
         $page = (int)$request->query->get('page', 0);
-        $nbPerPage = 6;
-        $totalPage = (int)ceil($postRepository->countAll() / $nbPerPage);
-        $offset = $page * $nbPerPage;
+        $nbItem = $postRepository->countAll();
+        $pDatas = $paginator->getPaginatingDatas($page, $nbItem, 6);
 
-        $posts = $postRepository->getPostsWithUsers($offset, $nbPerPage);
+        if ($page > $pDatas['pagesCount']) {
+            return $this->redirect($router->generateUri('home'));
+        }
+
+        $posts = $postRepository->getPostsWithUsers($pDatas['offset'], $pDatas['maxPerPage']);
 
         $contact = new Contact();
 
@@ -40,8 +52,9 @@ class FrontController extends AbstractController
 
         return $this->render('pages/front/home.html.twig', [
             'posts' => $posts,
-            'totalPage' => $totalPage,
-            'page' => $page
+            'pages' => $pDatas['pagesCount'],
+            'page' => $page,
+            'pagination_range' => $pDatas['range']
         ]);
     }
 
@@ -59,6 +72,4 @@ class FrontController extends AbstractController
     {
         return $this->render('pages/front/post.html.twig');
     }
-
-
 }

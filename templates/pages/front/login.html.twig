@@ -20,14 +20,23 @@
                     <h1>Connexion</h1>
                     <div class="my-5">
 
-                        <form method="post" id="comments-form">
+                        {% if errors is defined and errors is iterable %}
+                            {% for error in errors %}
+                                <p class="alert alert-danger">{{ error['message'] }}</p>
+                            {% endfor %}
+                        {% endif %}
+
+                        <form action="" method="post" id="comments-form">
+
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                             <div class="form-floating mb-4">
                                 <input
                                         class="form-control"
-                                        name="user[username]"
+                                        name="form[username]"
                                         id="username"
                                         type="text"
+                                        value="{{ username|default('') }}"
                                         placeholder="John Doe"
                                         required
                                 />
@@ -37,7 +46,7 @@
                             <div class="form-floating mb-4">
                                 <input
                                         class="form-control"
-                                        name="user[password]"
+                                        name="form[password]"
                                         id="password"
                                         type="password"
                                         placeholder="*****"
@@ -46,9 +55,17 @@
                                 <label for="password">Mot de passe</label>
                             </div>
 
+                            <div class="form-check">
+                                <input class="form-check-input" name="form[rememberMe]" type="checkbox"
+                                       id="flexCheckDefault">
+                                <label class="form-check-label" for="flexCheckDefault">
+                                    Rester connecté
+                                </label>
+                            </div>
 
                             <div class="d-md-flex gap-3">
-                                <button class="btn btn-primary mt-3" id="submitButton" type="submit">
+                                <button class="btn btn-primary mt-3" id="submitButton" type="submit" name="submit"
+                                        value="submit">
                                     Connexion
                                 </button>
 

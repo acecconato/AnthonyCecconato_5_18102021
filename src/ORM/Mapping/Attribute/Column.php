@@ -10,12 +10,9 @@ use Blog\ORM\Mapping\Attribute\Enum\Type;
 #[Attribute]
 final class Column
 {
-    public function __construct(
+    public function __construct (
         public string $name,
         public Type $type = Type::STRING,
-        public bool $nullable = false,
-        public bool $unique = false,
-        public bool $timestamp = false
     ) {
     }
 }

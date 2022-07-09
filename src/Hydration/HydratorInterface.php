@@ -12,11 +12,11 @@ interface HydratorInterface
     public function hydrateResultSet(array $results, string $fqcnEntity): array;
 
     /** Hydrate a single object from an array
-     * @param array<string> $result
-     * @param string $fqcnEntity
+     * @param array<string> $data
+     * @param object $object
      * @return object
      */
-    public function hydrateSingle(array $result, string $fqcnEntity): object;
+    public function hydrateSingle(array $data, object $object): object;
 
     /** Extract object(s) to array
      * @param object|array<object> $entry

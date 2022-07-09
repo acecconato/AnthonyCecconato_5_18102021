@@ -18,57 +18,36 @@ class Metadata
 
     private string $id;
 
-    /** @var array<Column> */
+    /** @var Column[] */
     private array $columns = [];
 
-    /**
-     * @return string
-     */
     public function getFqcn(): string
     {
         return $this->fqcn;
     }
 
-    /**
-     * @param string $fqcn
-     * @return Metadata
-     */
     public function setFqcn(string $fqcn): Metadata
     {
         $this->fqcn = $fqcn;
         return $this;
     }
 
-    /**
-     * @return Entity
-     */
     public function getEntity(): Entity
     {
         return $this->entity;
     }
 
-    /**
-     * @param \Blog\ORM\Mapping\Attribute\Entity $entity
-     * @return Metadata
-     */
     public function setEntity(Entity $entity): Metadata
     {
         $this->entity = $entity;
         return $this;
     }
 
-    /**
-     * @return Table
-     */
     public function getTable(): Table
     {
         return $this->table;
     }
 
-    /**
-     * @param \Blog\ORM\Mapping\Attribute\Table $table
-     * @return Metadata
-     */
     public function setTable(Table $table): Metadata
     {
         $this->table = $table;
@@ -87,17 +66,29 @@ class Metadata
     }
 
     /**
-     * @return array<Column>
+     * @return Column[]
      */
     public function getColumns(): array
     {
         return $this->columns;
     }
 
-    /**
-     * @param Column $column
-     * @return Metadata
-     */
+    public function getColumn(string $name): ?Column
+    {
+        foreach ($this->columns as $column) {
+            // @phpstan-ignore-next-line
+            if ($column->propertyName === $name) {
+                return $column;
+            }
+
+            if ($column->name === $name) {
+                return $column;
+            }
+        }
+
+        return null;
+    }
+
     public function addColumns(Column $column): Metadata
     {
         $this->columns[] = $column;

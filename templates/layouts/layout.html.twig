@@ -25,7 +25,7 @@
                                 À propos de moi</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('single-post') }}">
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('post') }}">
                                 Single post
                             </a>
                         </li>
@@ -71,7 +71,11 @@
                     <ul class="list-group list-group-horizontal justify-content-center align-items-center">
                         <li class="list-group-item border-0"><a href="#">Mentions légales</a></li>
                         <li class="list-group-item border-0"><a href="#">Politique de confidentialité</a></li>
-                        <li class="list-group-item border-0"><a href="{{ path('login') }}">Connexion</a></li>
+                        {% if auth.isLoggedIn %}
+                            <li class="list-group-item border-0"><a href="{{ path('logout') }}">Déconnexion</a></li>
+                        {% else %}
+                            <li class="list-group-item border-0"><a href="{{ path('login') }}">Connexion</a></li>
+                        {% endif %}
                     </ul>
                 </div>
             </div>

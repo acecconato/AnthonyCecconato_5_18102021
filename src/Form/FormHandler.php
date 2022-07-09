@@ -7,21 +7,24 @@ namespace Blog\Form;
 use Blog\Hydration\ObjectHydrator;
 use Blog\Validator\Validator;
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 
 class FormHandler
 {
-
-    private object|null $formObject = null;
+    private ?object $formObject = null;
 
     private Request $request;
 
     private bool $wasSubmitted = false;
 
+    private array $formData = [];
+
     public function __construct(
-        private Validator $validator,
-        private ObjectHydrator $hydrator
+        private readonly Validator $validator,
+        private readonly ObjectHydrator $hydrator
     ) {
     }
 
@@ -31,15 +34,17 @@ class FormHandler
     }
 
     /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws Exception
      */
     public function isValid(): bool
     {
-        $sessionCsrf = $this->request->getSession()->get('csrf_token');
+        $sessionCsrf = $this->request->get('csrf_token');
         $formCsrf = $this->request->request->get('csrf_token');
 
         if (!$sessionCsrf || !$formCsrf || $sessionCsrf !== $formCsrf) {
-            throw new Exception('CSRF Token error');
+            throw new Exception('The csrf token is not valid');
         }
 
         return $this->validator->validateObject($this->formObject);
@@ -58,7 +63,7 @@ class FormHandler
      * @throws ReflectionException
      * @throws Exception
      */
-    public function loadFromRequest(Request $request, string $fqcnClassName): self
+    public function loadFromRequest(Request $request, object $object): self
     {
         $this->request = $request;
 
@@ -72,19 +77,31 @@ class FormHandler
 
         $this->wasSubmitted = true;
 
-        $formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
-        $this->formObject = $this->hydrator->hydrateSingle($formData, $fqcnClassName);
+        $this->formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
+
+        if ($request->files->has('form')) {
+            foreach ($request->files->all('form') as $filename => $file) {
+                $this->formData[$filename] = $file;
+            }
+        }
+
+        $this->formObject = $object;
+        $this->hydrator->hydrateSingle($this->formData, $object);
 
         return $this;
     }
 
     public function get(string $field): string
     {
-        return (string)$this->request->request->get($field);
+        if (array_key_exists($field, $this->formData)) {
+            return (string)$this->formData[$field];
+        }
+
+        return '';
     }
 
-    public function getCsrfToken()
+    public function addValidatorError(string $message): void
     {
-        return false;
+        $this->validator->addError($message);
     }
 }

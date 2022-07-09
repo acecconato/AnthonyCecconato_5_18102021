@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Blog\ORM;
 
-use Blog\ORM\Exception\NullableConstraintException;
-use Blog\ORM\Exception\UniqueConstraintException;
-use Blog\ORM\Mapping\Attribute\Column;
+use Blog\Kernel;
+use Blog\ORM\Mapping\Attribute\Enum\Type;
 use Blog\ORM\Mapping\MapperInterface;
+use DateTime;
 use Exception;
 use Ramsey\Uuid\Uuid;
+use ReflectionObject;
 
 class UnitOfWork
 {
@@ -29,8 +30,6 @@ class UnitOfWork
     }
 
     /**
-     * @throws UniqueConstraintException
-     * @throws NullableConstraintException
      * @throws Exception
      */
     private function executeInserts(): int
@@ -44,22 +43,26 @@ class UnitOfWork
 
             $mapping = $this->mapper->resolve($object::class);
             $tableName = $mapping->getTable()->tableName;
+            $reflObj = new ReflectionObject($object);
 
-            $prepValues = array_map(fn($column) => ':' . $column->name, $mapping->getColumns());
-
-            foreach ($mapping->getColumns() as $column) {
-                if ($column->unique) {
-                    $this->checkUniqueConstraint($tableName, $column, $object);
+            $prepValues = array_map(function ($prop) use ($object, $mapping) {
+                if ($prop->isInitialized($object)) {
+                    if ($column = $mapping->getColumn($prop->getName())) {
+                        return ':' . $column->name;
+                    }
                 }
 
-                if (!$column->nullable) {
-                    $this->checkNullableConstraint($tableName, $column, $object);
-                }
-            }
+                return null;
+            }, $reflObj->getProperties());
+
+            // Remove null values
+            $prepValues = array_filter($prepValues, fn($value) => ($value));
+
+            $prepValues = implode(', ', $prepValues);
 
             $query = "
-                INSERT INTO $tableName 
-                VALUES ( :" . $mapping->getId() . ", " . implode(', ', $prepValues) . " )
+                INSERT INTO $tableName ( " . $mapping->getId() . ", " . str_replace(':', '', $prepValues) . " )
+                VALUES( :" . $mapping->getId() . ", " . $prepValues . " )
             ";
 
             $bind = [];
@@ -67,28 +70,31 @@ class UnitOfWork
             ($object->getId()) ?: $object->setId((string)Uuid::uuid4());
             $bind[':' . $mapping->getId()] = $object->getId();
 
-//            $object->setCreatedAt('KDUAZHDKAZUH');
-
             foreach ($mapping->getColumns() as $column) {
-                // Handle created_at
-//                if ($column->timestamp && !$object->{'get' . ucfirst($column->propertyName)}()) {
-//                    dump($object->getCreatedAt());
-//                    $bind[':' . $column->name] = 'NOW()';
-//                    continue;
-//                }
-//
-//                // Handle updated_at
-//                if ($column->timestamp) {
-//                    $bind[':' . $column->name] = 'NOW()';
-//                    continue;
-//                }
+                foreach ($reflObj->getProperties() as $prop) {
+                    // @phpstan-ignore-next-line
+                    if ($prop->getName() === $column->propertyName) {
+                        if ($prop->isInitialized($object)) {
+                            // DateTime to string conversion
+                            if ($column->type === Type::DATE) {
+                                /** @var ?DateTime $datetime */
+                                $datetime = $prop->getValue($object);
 
-                // @phpstan-ignore-next-line
-                $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
+                                $bind[':' . $column->name] = null;
+
+                                if ($datetime) {
+                                    $bind[':' . $column->name] = $datetime->format(Kernel::DATE_FORMAT);
+                                }
+
+                                continue;
+                            }
+
+                            $bind[':' . $column->name] = $prop->getValue($object);
+                        }
+                    }
+                }
             }
 
-
-            dd($bind);
             $adapter->addToTransaction($query, $bind);
         }
 
@@ -97,45 +103,6 @@ class UnitOfWork
     }
 
     /**
-     * @param string $tableName
-     * @param Column $column
-     * @param object $object
-     * @throws NullableConstraintException
-     */
-    private function checkNullableConstraint(string $tableName, Column $column, object $object): void
-    {
-        // @phpstan-ignore-next-line
-        if (null === $object->{'get' . ucfirst($column->propertyName)}()) {
-            throw new NullableConstraintException("'" . $column->name . "' cannot be nullable");
-        }
-    }
-
-    /**
-     * @param string $tableName
-     * @param Column $column
-     * @param object $object
-     * @return void
-     * @throws UniqueConstraintException
-     */
-    private function checkUniqueConstraint(string $tableName, Column $column, object $object): void
-    {
-        $adapter = $this->entityManager->getAdapter();
-
-        // @phpstan-ignore-next-line
-        $value = $object->{'get' . ucfirst($column->propertyName)}();
-
-        $query = "SELECT COUNT(*) FROM $tableName WHERE " . $column->name . "=:columnValue";
-        $bind = [':columnValue' => $value];
-
-        $statement = $adapter->query($query, $bind);
-
-        if ($statement->fetchColumn() > 0) {
-            throw new UniqueConstraintException("'$value' already exists in the database");
-        }
-    }
-
-    /**
-     * @return int
      * @throws Exception
      */
     private function executeUpdates(): int
@@ -153,22 +120,22 @@ class UnitOfWork
 
             $prepValues = array_map(fn($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
 
-            foreach ($mapping->getColumns() as $column) {
-                if ($column->unique) {
-                    $this->checkUniqueConstraint($tableName, $column, $object);
-                }
-
-                if (!$column->nullable) {
-                    $this->checkNullableConstraint($tableName, $column, $object);
-                }
-            }
-
             $query = "UPDATE $tableName SET " . implode(', ', $prepValues) . " WHERE " . $mapping->getId() . " = :id";
 
             $bind = [];
             $bind[':' . $mapping->getId()] = $object->getId();
 
             foreach ($mapping->getColumns() as $column) {
+                // DateTime to string conversion
+                if ($column->type === Type::DATE) {
+                    /** @var ?DateTime $datetime */
+                    $datetime = $object->{'get' . ucfirst($column->propertyName)}() ?? new DateTime();
+
+                    $bind[':' . $column->name] = $datetime?->format(Kernel::DATE_FORMAT);
+
+                    continue;
+                }
+
                 // @phpstan-ignore-next-line
                 $bind[':' . $column->name] = $object->{'get' . ucfirst($column->propertyName)}();
             }
@@ -181,7 +148,6 @@ class UnitOfWork
     }
 
     /**
-     * @return int
      * @throws Exception
      */
     private function executeDeletions(): int
@@ -207,37 +173,24 @@ class UnitOfWork
         return $adapter->transactionQuery();
     }
 
-    /**
-     * @param object $entity
-     * @return void
-     */
     public function add(object $entity): void
     {
         $oid = spl_object_id($entity);
         $this->entityInsertions[$oid] = $entity;
     }
 
-    /**
-     * @param object $entity
-     * @return void
-     */
     public function update(object $entity): void
     {
         $oid = spl_object_id($entity);
         $this->entityUpdates[$oid] = $entity;
     }
 
-    /**
-     * @param object $entity
-     * @return void
-     */
     public function delete(object $entity): void
     {
         $this->entityDeletions[] = $entity;
     }
 
     /**
-     * @return int
      * @throws Exception
      */
     public function commit(): int

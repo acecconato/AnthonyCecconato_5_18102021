@@ -18,31 +18,43 @@ use Ramsey\Uuid\Uuid;
 class User
 {
     #[Id()]
+    #[Assert\Uuid()]
     protected string $id;
 
-    #[Column(name: 'username', type: Type::STRING, nullable: false, unique: true)]
+    #[Column(name: 'username', type: Type::STRING)]
     #[Assert\NotBlank()]
+    #[Assert\NotNull()]
     #[Assert\MaxLength(
         message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Il en possède actuellement %d",
-        maxLen: 20)
-    ]
-    private string $username;
+        max: 20
+    )]
+    #[Assert\MinLength(
+        message: "Le nom d'utilisateur '%s' doit faire au moins %d caractères. Il en possède actuellement %d",
+        min: 3
+    )]
+    private string $username = '';
 
-    #[Column(name: 'email', type: Type::STRING, nullable: false, unique: true)]
+    #[Column(name: 'email', type: Type::STRING)]
     #[Assert\NotBlank()]
+    #[Assert\NotNull()]
     #[Assert\Email()]
-    private string $email;
+    private string $email = '';
 
-    #[Column(name: 'password', type: Type::STRING, nullable: false)]
-    private string $password;
+    #[Column(name: 'password', type: Type::STRING)]
+    private string $password = '';
 
-    private string|null $plainPassword;
+    private ?string $plainPassword;
+
+    #[Column(name: 'remember_token', type: Type::STRING)]
+    private ?string $rememberToken;
 
     public function __construct()
     {
         if (!isset($this->id)) {
             $this->id = (string)Uuid::uuid4();
         }
+
+        $this->sanitize();
     }
 
     public function getId(): string|false
@@ -86,6 +98,7 @@ class User
     public function setPassword(string $password): User
     {
         $this->password = $password;
+        $this->sanitize();
         return $this;
     }
 
@@ -100,8 +113,29 @@ class User
         return $this;
     }
 
+    public function getRememberToken(): ?string
+    {
+        return $this->rememberToken;
+    }
+
+    public function setRememberToken(?string $rememberToken): User
+    {
+        $this->rememberToken = $rememberToken;
+        return $this;
+    }
+
     public static function encodePassword(string $plainPassword): string
     {
         return password_hash($plainPassword, PASSWORD_ARGON2I);
+    }
+
+    public function comparePassword(string $plainPassword): bool
+    {
+        return password_verify($plainPassword, $this->getPassword());
+    }
+
+    public function sanitize(): void
+    {
+        $this->plainPassword = '';
     }
 }

@@ -30,7 +30,7 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param  Request $request
+     * @param Request $request
      * @return Route|null
      * @throws RouteNotFoundException
      */
@@ -53,7 +53,7 @@ final class Router implements RouterInterface
             }
         }
 
-        throw new RouteNotFoundException();
+        throw new RouteNotFoundException("Route $path not found");
     }
 
     /**
@@ -65,7 +65,7 @@ final class Router implements RouterInterface
     public function add(Route $route): self
     {
         if ($this->has($route->getName())) {
-            throw new RouteAlreadyExistsException();
+            throw new RouteAlreadyExistsException(sprintf("Route %s already exists", $route->getName()));
         }
 
         $this->routes[$route->getName()] = $route;
@@ -86,8 +86,8 @@ final class Router implements RouterInterface
     /**
      * Generate a route from route name and parameters
      *
-     * @param  string       $name
-     * @param  array<mixed> $parameters
+     * @param string $name
+     * @param array<mixed> $parameters
      * @return string
      * @throws RouteNotFoundException
      */
@@ -152,7 +152,7 @@ final class Router implements RouterInterface
     public function get(string $name): Route
     {
         if (!$this->has($name)) {
-            throw new RouteNotFoundException();
+            throw new RouteNotFoundException("Route $name not found");
         }
 
         return $this->routes[$name];

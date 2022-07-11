@@ -72,10 +72,10 @@
                             <a href="post.html">
                                 <h3 class="">{{ post.title }}</h3>
                                 <p class="post-subtitle">{{ post.excerpt ?? post.content|slice(0, 300) ~ '...' }}</p>
+                                <p class="opacity-50 small">
+                                    Publié par {{ post.user.username }}, le {{ post.createdAt|date('d M y') }}
+                                </p>
                             </a>
-                            <p class="post-meta">
-                                Publié par Anthony C, le 8 janv. 2022
-                            </p>
                         </div>
 
                         <hr class="my-4"/>

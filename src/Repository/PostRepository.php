@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Blog\Repository;
 
 use Blog\Entity\Post;
-use PDO;
+use Blog\Entity\User;
 
 class PostRepository extends Repository
 {
     /**
      * @return Post[]
+     * @throws \ReflectionException
      */
     public function getPostsWithUsers(
         int $offset = 0,
@@ -18,18 +19,14 @@ class PostRepository extends Repository
         string $orderBy = 'created_at',
         string $orderWay = 'DESC'
     ): array {
-        $query = "
-            SELECT * 
-            FROM post p
-            INNER JOIN user u ON u.id = p.user_id
-            ORDER BY $orderBy $orderWay
-            ";
+        /** @var Post[] $posts */
+        $posts = $this->findAll($offset, $limit, $orderBy, $orderWay);
+        foreach ($posts as $post) {
+            /** @var User $user */
+            $user = $this->getEntityManager()->find(User::class, $post->getUserId());
+            $post->setUser($user);
+        }
 
-        $query .= ((bool)$limit) ? " LIMIT $limit" : null;
-        $query .= ((bool)$offset) ? " OFFSET $offset" : null;
-
-        $results = $this->query($query)->fetchAll(PDO::FETCH_ASSOC);
-
-        return $this->getHydrator()->hydrateResultSet($results, Post::class);
+        return $posts;
     }
 }

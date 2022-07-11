@@ -15,6 +15,9 @@ use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Email;
 
 class FrontController extends AbstractController
 {
@@ -23,6 +26,7 @@ class FrontController extends AbstractController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws RouteNotFoundException
+     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
      */
     public function index(
         FormHandler $formHandler,
@@ -46,16 +50,39 @@ class FrontController extends AbstractController
 
         $form = $formHandler->loadFromRequest($request, $contact);
 
+        // @todo autowiring
+        $transport = Transport::fromDsn('smtp://localhost:1025');
+        $mailer = new Mailer($transport);
+
+        $email = (new Email())
+            ->from('hello@example.com')
+            ->to('you@example.com')
+            //->cc('cc@example.com')
+            //->bcc('bcc@example.com')
+            //->replyTo('fabien@example.com')
+            //->priority(Email::PRIORITY_HIGH)
+            ->subject('Time for Symfony Mailer!')
+            ->text('Sending emails is fun again!')
+            ->html('<p>See Twig integration for better HTML integration!</p>');
+
+        $mailer->send($email);
+
+        die("ok");
+
+
         if ($form->isSubmitted() && $form->isValid()) {
             // todo send mail and display a flash message
         }
 
-        return $this->render('pages/front/home.html.twig', [
-            'posts' => $posts,
-            'pages' => $pDatas['pagesCount'],
-            'page' => $page,
-            'pagination_range' => $pDatas['range']
-        ]);
+        return $this->render(
+            'pages/front/home.html.twig',
+            [
+                'posts' => $posts,
+                'pages' => $pDatas['pagesCount'],
+                'page' => $page,
+                'pagination_range' => $pDatas['range']
+            ]
+        );
     }
 
     public function about(): Response

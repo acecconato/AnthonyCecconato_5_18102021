@@ -94,10 +94,23 @@ class FormHandler
     public function get(string $field): string
     {
         if (array_key_exists($field, $this->formData)) {
-            return (string)$this->formData[$field];
+            return trim($this->formData[$field]);
         }
 
         return '';
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getAllValues(): array
+    {
+        return $this->formData;
+    }
+
+    public function clear(): void
+    {
+        $this->formData = [];
     }
 
     public function addValidatorError(string $message): void

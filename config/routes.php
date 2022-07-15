@@ -11,7 +11,7 @@ return function (RouterInterface $router) {
         ->add(new Route('home', '/', [FrontController::class, 'index']))
         ->add(new Route('about', '/a-propos-de-anthony-cecconato', [FrontController::class, 'about']))
         ->add(new Route('contact', '/contactez-moi', [FrontController::class, 'contact']))
-        ->add(new Route('post', '/article', [FrontController::class, 'showSinglePost']))
+        ->add(new Route('post', '/articles/{slug:[a-zA-Z0-9-_]+}', [FrontController::class, 'showSinglePost']))
 
         ->add(new Route('login', '/connexion', [SecurityController::class, 'login']))
         ->add(new Route('reset_password', '/mot-de-passe-oublie', [SecurityController::class, 'resetPassword']))

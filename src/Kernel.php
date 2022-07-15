@@ -10,7 +10,6 @@ use Blog\DependencyInjection\Container;
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Event\Dispatcher\EventDispatcher;
 use Blog\Event\EventListener\ListenerProvider;
-use Blog\Event\EventListener\RequestHandlingListener;
 use Blog\Event\PreRequestHandlingEvent;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
@@ -24,6 +23,10 @@ use ReflectionException;
 use ReflectionMethod;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Transport\TransportInterface;
 use Throwable;
 
 final class Kernel
@@ -67,7 +70,7 @@ final class Kernel
         $listenerProvider = $this->container->get(ListenerProvider::class);
 
         $registerEvents($listenerProvider);
-        
+
         $eventDispatcher = new EventDispatcher($listenerProvider, $this->container);
         $this->container->registerExisting($eventDispatcher);
     }
@@ -167,6 +170,12 @@ final class Kernel
             ->addParameter('publicDir', dirname(__DIR__) . '/public')
             ->addParameter('uploadDir', dirname(__DIR__) . '/public/uploads');
 
+        // Register Symfony Mailer
+        $transport = Transport::fromDsn($_ENV['MAILER_DSN']);
+        $mailer = new Mailer($transport);
+
+        $this->container->registerExisting($mailer, MailerInterface::class);
+
         if ($this->env !== 'test') {
             $this->container
                 ->addParameter('host', $_ENV['DB_HOST'])
@@ -175,8 +184,11 @@ final class Kernel
                 ->addParameter('dbPassword', $_ENV['DB_PASSWORD']);
         }
 
+        // Register the request so we can retrieve the same instance everywhere through the container
         $request = Request::createFromGlobals();
         $this->container->registerExisting($request, Request::class);
+
+        // Same as the request
         $this->container->registerExisting($this->container, ContainerInterface::class);
     }
 

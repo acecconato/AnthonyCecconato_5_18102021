@@ -13,7 +13,7 @@ use ReflectionException;
 abstract class Repository
 {
     public function __construct(
-        private EntityManager $entityManager,
+        private readonly EntityManager $entityManager,
     ) {
     }
 

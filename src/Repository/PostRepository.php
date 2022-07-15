@@ -6,12 +6,13 @@ namespace Blog\Repository;
 
 use Blog\Entity\Post;
 use Blog\Entity\User;
+use ReflectionException;
 
 class PostRepository extends Repository
 {
     /**
      * @return Post[]
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function getPostsWithUsers(
         int $offset = 0,
@@ -28,5 +29,17 @@ class PostRepository extends Repository
         }
 
         return $posts;
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function loadUser(Post $post): void
+    {
+        $userId = $post->getUserId();
+
+        /** @var User $user */
+        $user = $this->getEntityManager()->find(User::class, $userId);
+        $post->setUser($user);
     }
 }

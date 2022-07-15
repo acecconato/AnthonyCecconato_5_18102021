@@ -5,19 +5,24 @@ declare(strict_types=1);
 namespace Blog\Controller;
 
 use Blog\Entity\Contact;
+use Blog\Entity\Post;
 use Blog\Form\FormHandler;
 use Blog\Repository\PostRepository;
+use Blog\Router\Exceptions\ResourceNotFound;
 use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Router;
 use Blog\Service\Paginator;
+use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Mailer\Mailer;
-use Symfony\Component\Mailer\Transport;
+use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
+use Throwable;
 
 class FrontController extends AbstractController
 {
@@ -26,16 +31,16 @@ class FrontController extends AbstractController
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      * @throws RouteNotFoundException
-     * @throws \Symfony\Component\Mailer\Exception\TransportExceptionInterface
+     * @throws Exception
      */
     public function index(
         FormHandler $formHandler,
         Request $request,
         PostRepository $postRepository,
         Paginator $paginator,
-        Router $router
+        Router $router,
+        MailerInterface $mailer
     ): Response {
-        // Pagination
         $page = (int)$request->query->get('page', 0);
         $nbItem = $postRepository->countAll();
         $pDatas = $paginator->getPaginatingDatas($page, $nbItem, 6);
@@ -50,28 +55,29 @@ class FrontController extends AbstractController
 
         $form = $formHandler->loadFromRequest($request, $contact);
 
-        // @todo autowiring
-        $transport = Transport::fromDsn('smtp://localhost:1025');
-        $mailer = new Mailer($transport);
-
-        $email = (new Email())
-            ->from('hello@example.com')
-            ->to('you@example.com')
-            //->cc('cc@example.com')
-            //->bcc('bcc@example.com')
-            //->replyTo('fabien@example.com')
-            //->priority(Email::PRIORITY_HIGH)
-            ->subject('Time for Symfony Mailer!')
-            ->text('Sending emails is fun again!')
-            ->html('<p>See Twig integration for better HTML integration!</p>');
-
-        $mailer->send($email);
-
-        die("ok");
-
+        $username = $form->get('name');
+        $userEmail = $form->get('email');
+        $message = $form->get('message');
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // todo send mail and display a flash message
+            $email = (new Email())
+                ->from($_ENV['MAILER_SENDER'])
+                ->to($userEmail)
+                ->priority(Email::PRIORITY_NORMAL)
+                ->subject('Vous avez un nouveau message!')
+                ->text(strip_tags($message))
+                ->html(nl2br($message));
+
+            /** @var Session $session */
+            $session = $request->getSession();
+
+            try {
+                $mailer->send($email);
+                $session->getFlashBag()->add('success', "Message envoyé ! Nous reviendrons vers vous au plus vite");
+                $form->clear();
+            } catch (Throwable $exception) {
+                $session->getFlashBag()->add('danger', "Impossible d'envoyer le message");
+            }
         }
 
         return $this->render(
@@ -80,7 +86,12 @@ class FrontController extends AbstractController
                 'posts' => $posts,
                 'pages' => $pDatas['pagesCount'],
                 'page' => $page,
-                'pagination_range' => $pDatas['range']
+                'pagination_range' => $pDatas['range'],
+                'errors' => $form->getErrors(),
+                'username' => $username,
+                'email' => $userEmail,
+                'message' => $message,
+                'form' => $form
             ]
         );
     }
@@ -95,8 +106,21 @@ class FrontController extends AbstractController
         return $this->render('pages/front/contact.html.twig');
     }
 
-    public function showSinglePost(): Response
+    /**
+     * @throws ReflectionException
+     * @throws ResourceNotFound
+     */
+    public function showSinglePost(string $slug, PostRepository $postRepository): Response
     {
-        return $this->render('pages/front/post.html.twig');
+        /** @var ?Post $post */
+        $post = $postRepository->findOneBy(['slug' => $slug]);
+
+        if (!$post) {
+            throw new ResourceNotFound("Publication '$slug' introuvable");
+        }
+
+        $postRepository->loadUser($post);
+
+        return $this->render('pages/front/post.html.twig', ['post' => $post]);
     }
 }

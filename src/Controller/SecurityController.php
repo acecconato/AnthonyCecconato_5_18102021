@@ -53,7 +53,8 @@ class SecurityController extends AbstractController
         return $this->render(
             'pages/front/login.html.twig',
             [
-                'errors' => $form->getErrors()
+                'errors' => $form->getErrors(),
+                'username' => $form->get('username')
             ]
         );
     }

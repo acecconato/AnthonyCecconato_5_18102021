@@ -17,7 +17,8 @@
     "beberlei/assert": "^3.3",
     "symfony/mime": "^6.1",
     "psr/event-dispatcher": "^1.0",
-    "symfony/mailer": "^6.1"
+    "symfony/mailer": "^6.1",
+    "twig/intl-extra": "^3.4"
   },
   "autoload": {
     "psr-4": {

@@ -20,7 +20,7 @@
                     <div class="site-heading">
                         {% block page_title %}
                             <h1>{{ post.title }}</h1>
-                            <span class="subheading mt-5">{{ post.excerpt ?? post.content|slice(0, 250) ~ '...' }}</span>
+                            <span class="subheading mt-5">{{ post.excerpt ?? post.content|slice(0, 300)|secure|striptags ~ '...' }}</span>
                         {% endblock %}
                     </div>
                 </div>
@@ -34,7 +34,7 @@
     <div class="container">
         <div class="row gx-4 gx-lg-5 justify-content-center">
             <div class="m-0 col-md-10 col-xl-8 d-flex justify-content-between align-items-center">
-                <p class="m-0">Crée le 2 Mai 2021</p>
+                <p class="m-0">Publié le {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM yy à HH:mm') }}</p>
                 <p class="m-0">par {{ post.user.username|capitalize }}</p>
             </div>
         </div>
@@ -46,7 +46,7 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-xl-8 mt-5">
                     {% autoescape %}
-                        {{ post.content }}
+                        {{ post.content|secure|raw }}
                     {% endautoescape %}
                 </div>
             </div>

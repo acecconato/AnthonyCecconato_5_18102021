@@ -72,7 +72,7 @@
                         <div class="post-preview">
                             <a href="{{ path('post', {slug: post.slug}) }}">
                                 <h3 class="">{{ post.title }}</h3>
-                                <p class="post-subtitle">{{ post.excerpt ?? post.content|slice(0, 300) ~ '...' }}</p>
+                                <p class="post-subtitle">{{ post.excerpt ?? post.content|slice(0, 300)|secure|striptags ~ '...' }}</p>
                                 <p class="opacity-50 small">
                                     Publié par {{ post.user.username }}, le {{ post.createdAt|date('d M y') }}
                                 </p>

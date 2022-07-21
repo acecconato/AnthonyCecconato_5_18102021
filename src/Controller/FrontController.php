@@ -19,7 +19,6 @@ use ReflectionException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
 use Throwable;
@@ -88,9 +87,6 @@ class FrontController extends AbstractController
                 'page' => $page,
                 'pagination_range' => $pDatas['range'],
                 'errors' => $form->getErrors(),
-                'username' => $username,
-                'email' => $userEmail,
-                'message' => $message,
                 'form' => $form
             ]
         );

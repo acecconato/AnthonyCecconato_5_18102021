@@ -8,6 +8,7 @@ use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
 use Blog\Twig\CsrfTokenExtension;
 use Blog\Twig\PathExtension;
+use Blog\Twig\SecureFilter;
 use Lcharette\WebpackEncoreTwig\EntrypointsTwigExtension;
 use Lcharette\WebpackEncoreTwig\TagRenderer;
 use Psr\Container\ContainerExceptionInterface;
@@ -20,6 +21,7 @@ use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 use Twig\Extension\DebugExtension;
+use Twig\Extra\Intl\IntlExtension;
 use Twig\Loader\FilesystemLoader;
 
 class Templating implements TemplatingInterface
@@ -40,9 +42,6 @@ class Templating implements TemplatingInterface
     ) {
         $loader = new FilesystemLoader($this->templatesDirs);
 
-        /** @var Session $session */
-        $session = $this->request->getSession();
-
         $this->isDevMode = $_ENV['APP_ENV'] === 'development';
 
         $this->twig = new Environment($loader, [
@@ -56,6 +55,9 @@ class Templating implements TemplatingInterface
         $this->twig->addExtension(new DebugExtension());
         $this->twig->addExtension(new CsrfTokenExtension($this->request->getSession()));
         $this->twig->addExtension(new PathExtension($this->container->get(Router::class)));
+        $this->twig->addExtension(new IntlExtension());
+
+        $this->twig->addExtension(new SecureFilter());
     }
 
     /**

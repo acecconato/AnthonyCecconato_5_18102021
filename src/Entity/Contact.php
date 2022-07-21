@@ -13,18 +13,20 @@ use Blog\Validator\Constraint\NotNull;
 class Contact
 {
     #[NotNull]
-    #[NotBlank]
-    #[MaxLength(max: 30)]
-    #[MinLength(min: 3)]
+    #[NotBlank("Le nom ne doit pas être vide")]
+    #[MaxLength(message: "Le nom ne doit pas excéder 30 caractères", max: 30)]
+    #[MinLength(message: "Le nom doit faire au moins 3 caractères", min: 3)]
     private string $name;
 
     #[NotNull]
-    #[NotBlank]
-    #[Email()]
+    #[NotBlank("L'adresse email ne doit pas être vide")]
+    #[Email("L'adresse email n'est pas valide")]
     private string $email;
 
     #[NotNull]
-    #[NotBlank]
+    #[NotBlank("Le message ne doit pas être vide")]
+    #[MinLength("Le message doit faire au moins 10 caractères")]
+    #[MaxLength(message: "Le message ne peut excéder 1000 caractères", max: 1000)]
     private string $message;
 
     public function getName(): string

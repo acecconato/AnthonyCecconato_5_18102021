@@ -5,8 +5,6 @@ declare(strict_types=1);
 use Blog\Kernel;
 use Symfony\Component\Dotenv\Dotenv;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 require_once '../vendor/autoload.php';
 

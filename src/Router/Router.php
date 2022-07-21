@@ -117,6 +117,7 @@ final class Router implements RouterInterface
             $expectedVars[1]
         );
 
+
         // Check that the parameters sent are expected by the route
         foreach ($parameters as $paramName => $paramValue) {
             if (!in_array($paramName, $expectedKeys)) {
@@ -128,13 +129,17 @@ final class Router implements RouterInterface
 
         return (string)preg_replace_callback(
             '/{([^}]*)}/',
-            function ($matches) use ($parameters) {
+            function ($matches) use ($parameters, $name) {
                 $routeVar = $matches[1]; // e.g: name:[a-zA-Z-_ ]+
                 $routeVarName = $routeVar;
 
                 // If the param contains a regex, remove it and keep only the parameter's name
                 if (str_contains($routeVar, ':')) {
                     $routeVarName = substr($routeVar, 0, (int)strpos($routeVar, ':'));
+                }
+
+                if (!array_key_exists($routeVarName, $parameters)) {
+                    throw new InvalidArgumentException("Error generating route $name, $routeVarName missing");
                 }
 
                 return $parameters[$routeVarName];

@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         Toastify({
             text: message,
-            duration: 2500,
+            duration: 4000,
             gravity: "top",
             position: 'right',
             close: true,

@@ -66,6 +66,8 @@ class Post
     #[Assert\Uuid()]
     private ?string $userId = null;
 
+    private User $user;
+
     public function __construct()
     {
         if (!isset($this->id)) {
@@ -214,5 +216,16 @@ class Post
     {
         $this->excerpt = $excerpt;
         return $this;
+    }
+
+    public function setUser(User $user): Post
+    {
+        $this->user = $user;
+        return $this;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
     }
 }

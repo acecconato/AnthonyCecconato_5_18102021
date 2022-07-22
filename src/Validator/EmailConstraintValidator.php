@@ -9,7 +9,7 @@ use Assert\AssertionFailedException;
 use Blog\Validator\Constraint\ConstraintInterface;
 use Blog\Validator\Constraint\Email;
 
-class EmailValidator implements ConstraintValidatorInterface
+class EmailConstraintValidator implements ConstraintValidatorInterface
 {
     /**
      * @param Email $constraint

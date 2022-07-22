@@ -48,6 +48,9 @@ class User
     #[Column(name: 'remember_token', type: Type::STRING)]
     private ?string $rememberToken;
 
+    #[Column(name: 'enabled')]
+    private int $enabled = 0;
+
     public function __construct()
     {
         if (!isset($this->id)) {
@@ -137,5 +140,16 @@ class User
     public function sanitize(): void
     {
         $this->plainPassword = '';
+    }
+
+    public function getEnabled(): int
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(int $enabled): User
+    {
+        $this->enabled = $enabled;
+        return $this;
     }
 }

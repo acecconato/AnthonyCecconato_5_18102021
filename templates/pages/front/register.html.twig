@@ -17,8 +17,12 @@
         <div class="container px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-8 pb-3 pt-5 shadow">
-                    <h1>Connexion</h1>
+                    <h1>Inscription</h1>
                     <div class="my-5">
+
+                        <p class="alert alert-info">
+                            Après l'envoi du formulaire, votre compte sera soumis à une validation manuelle.
+                        </p>
 
                         {% if errors is defined and errors is iterable %}
                             {% for error in errors %}
@@ -36,11 +40,24 @@
                                         name="form[username]"
                                         id="username"
                                         type="text"
-                                        value="{{ username|default('') }}"
+                                        value="{{ form.get('username')|default('') }}"
                                         placeholder="John Doe"
                                         required
                                 />
                                 <label for="username">Identifiant</label>
+                            </div>
+
+                            <div class="form-floating mb-4">
+                                <input
+                                        class="form-control"
+                                        name="form[email]"
+                                        id="username"
+                                        type="email"
+                                        value="{{ form.get('email')|default('') }}"
+                                        placeholder="Adresse email"
+                                        required
+                                />
+                                <label for="username">Adresse mail</label>
                             </div>
 
                             <div class="form-floating mb-4">
@@ -55,30 +72,24 @@
                                 <label for="password">Mot de passe</label>
                             </div>
 
-                            <div class="form-check">
-                                <input class="form-check-input" name="form[rememberMe]" type="checkbox"
-                                       id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    Rester connecté
-                                </label>
+                            <div class="form-floating mb-4">
+                                <input
+                                        class="form-control"
+                                        name="password_verify"
+                                        id="password"
+                                        type="password"
+                                        placeholder="*****"
+                                        required
+                                />
+                                <label for="password">Retaper le mot de passe</label>
                             </div>
 
                             <div class="d-md-flex gap-3">
                                 <button class="btn btn-primary mt-3" id="submitButton" type="submit" name="submit"
                                         value="submit">
-                                    Connexion
+                                    S'inscrire
                                 </button>
-
-                                <a href="{{ path('reset_password') }}" class="btn btn-outline-primary mt-3">
-                                    J'ai oublié mon mot de passe
-                                </a>
                             </div>
-
-                            <p class="mb-0">Pas encore de compte ?</p>
-
-                            <a href="{{ path('register') }}" class="btn btn-outline-dark mt-3">
-                               S'inscrire
-                            </a>
                         </form>
                     </div>
                 </div>
@@ -88,8 +99,9 @@
         <div class="container px-4 px-lg-5 mt-4">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-8 p-0">
-                    <a href="{{ path('home') }}" class="btn btn-outline-dark"><i class="fa-solid fa-circle-left"></i>
-                        Revenir sur la page d'accueil
+                    <p>Vous avez déjà un compte ?</p>
+                    <a href="{{ path('login') }}" class="btn btn-outline-dark"><i class="fa-solid fa-circle-left"></i>
+                        Connexion
                     </a>
                 </div>
             </div>

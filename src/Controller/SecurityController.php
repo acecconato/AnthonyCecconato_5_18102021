@@ -40,8 +40,14 @@ class SecurityController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $userRepository->getUserByUsernameOrEmail($login->getUsername());
+            
+            if (!$user || !$user->comparePassword($login->getPassword())) {
+                $form->addValidatorError('Identifiants incorrects, veuillez réessayer');
+            } elseif (!$user->getEnabled()) {
+                $form->addValidatorError("Votre compte n'est pas activé");
+            }
 
-            if ($user && $user->comparePassword($login->getPassword())) {
+            if (!$form->hasErrors()) {
                 $authenticator->authenticate($user, (bool)$form->get('rememberMe'));
 
                 /** @var Session $session */
@@ -49,8 +55,6 @@ class SecurityController extends AbstractController
                 $session->getFlashBag()->add('success', 'Bonjour, ' . ucfirst($user->getUsername()) . ' !');
                 return $this->redirect($this->router->generateUri('home'));
             }
-
-            $form->addValidatorError("Identifiants incorrects, veuillez réessayer");
         }
 
         return $this->render(

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Blog\Controller;
 
 use Blog\Entity\Login;
-use Blog\Entity\Register;
 use Blog\Entity\User;
 use Blog\Form\FormHandler;
 use Blog\ORM\EntityManager;
@@ -40,7 +39,7 @@ class SecurityController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $userRepository->getUserByUsernameOrEmail($login->getUsername());
-            
+
             if (!$user || !$user->comparePassword($login->getPassword())) {
                 $form->addValidatorError('Identifiants incorrects, veuillez réessayer');
             } elseif (!$user->getEnabled()) {
@@ -74,21 +73,19 @@ class SecurityController extends AbstractController
      */
     public function register(FormHandler $formHandler, Request $request, EntityManager $entityManager): Response
     {
-        $register = new Register();
-        $form = $formHandler->loadFromRequest($request, $register);
+        $user = new User();
+        $form = $formHandler->loadFromRequest($request, $user);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('password') !== $request->request->get('password_verify')) {
+            if ($form->get('plainPassword') !== $request->request->get('password_verify')) {
                 $form->addValidatorError("Les mots de passe ne correspondent pas");
             }
 
             if (!$form->hasErrors()) {
-                $user = new User();
                 $user
-                    ->setEmail($form->get('email'))
-                    ->setUsername($form->get('username'))
-                    ->setPassword(User::encodePassword($form->get('password')))
-                    ->setEnabled(0);
+                    ->setPassword(User::encodePassword($form->get('plainPassword')))
+                    ->setEnabled(0)
+                    ->sanitize();
 
                 $entityManager->add($user);
                 $entityManager->flush();
@@ -97,8 +94,7 @@ class SecurityController extends AbstractController
                 $session = $request->getSession();
                 $session->getFlashBag()->add(
                     'success',
-                    "Votre demande de création de compte a été prise en compte, vous recevrez un mail lorsque 
-                    celle-ci sera validée"
+                    "Votre demande de création de compte a été prise en compte, vous recevrez un mail lorsque celle-ci sera validée"
                 );
 
                 return $this->redirect('/');

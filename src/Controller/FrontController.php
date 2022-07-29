@@ -63,7 +63,7 @@ class FrontController extends AbstractController
                 ->from($_ENV['MAILER_SENDER'])
                 ->to($userEmail)
                 ->priority(Email::PRIORITY_NORMAL)
-                ->subject('Vous avez un nouveau message!')
+                ->subject("Vous avez un nouveau message de la part de $username")
                 ->text(strip_tags($message))
                 ->html(nl2br($message));
 
@@ -95,11 +95,6 @@ class FrontController extends AbstractController
     public function about(): Response
     {
         return $this->render('pages/front/about.html.twig');
-    }
-
-    public function contact(): Response
-    {
-        return $this->render('pages/front/contact.html.twig');
     }
 
     /**

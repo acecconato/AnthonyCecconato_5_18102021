@@ -117,4 +117,9 @@ class FormHandler
     {
         $this->validator->addError($message);
     }
+
+    public function hasErrors(): bool
+    {
+        return $this->validator->hasErrors();
+    }
 }

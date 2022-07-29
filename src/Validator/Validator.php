@@ -96,4 +96,9 @@ final class Validator implements ValidatorInterface
         $this->errors[] = ['propertyPath' => $propertyPath, 'message' => $message];
         return $this;
     }
+
+    public function hasErrors(): bool
+    {
+        return (bool)$this->errors;
+    }
 }

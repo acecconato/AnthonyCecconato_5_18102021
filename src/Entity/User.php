@@ -22,31 +22,35 @@ class User
     protected string $id;
 
     #[Column(name: 'username', type: Type::STRING)]
-    #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Assert\MaxLength(
-        message: "Le nom d'utilisateur '%s' ne peut excéder %d caractères. Il en possède actuellement %d",
-        max: 20
-    )]
-    #[Assert\MinLength(
-        message: "Le nom d'utilisateur '%s' doit faire au moins %d caractères. Il en possède actuellement %d",
-        min: 3
-    )]
+    #[Assert\NotBlank()]
+    #[Assert\MinLength(message: "Le nom d'utilisateur doit faire au moins 3 caractères", min: 3)]
+    #[Assert\MaxLength(message: "Le nom d'utilisateur ne peut excéder 20 caractères", max: 20)]
+    #[Assert\Unique(User::class, 'username', "Un utilisateur existe déjà avec cet username")]
+    #[Assert\Username()]
     private string $username = '';
 
     #[Column(name: 'email', type: Type::STRING)]
     #[Assert\NotBlank()]
     #[Assert\NotNull()]
-    #[Assert\Email()]
+    #[Assert\Email("L'adresse email n'est pas valide")]
+    #[Assert\Unique(User::class, 'email', "L'adresse email est déjà utilisée")]
     private string $email = '';
 
     #[Column(name: 'password', type: Type::STRING)]
     private string $password = '';
 
+    #[Assert\MaxLength(message: "Le mot de passe ne peut excéder 255 caractères", max: 255)]
+    #[Assert\MinLength(message: "Le mot de passe doit faire au moins 8 caractères", min: 8)]
+    #[Assert\StrongPassword()]
+    #[Assert\HIBP()]
     private ?string $plainPassword;
 
     #[Column(name: 'remember_token', type: Type::STRING)]
     private ?string $rememberToken;
+
+    #[Column(name: 'enabled')]
+    private int $enabled = 0;
 
     public function __construct()
     {
@@ -137,5 +141,16 @@ class User
     public function sanitize(): void
     {
         $this->plainPassword = '';
+    }
+
+    public function getEnabled(): int
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(int $enabled): User
+    {
+        $this->enabled = $enabled;
+        return $this;
     }
 }

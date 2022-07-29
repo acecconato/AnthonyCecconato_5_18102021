@@ -9,14 +9,15 @@ CREATE TABLE `user`
     username       VARCHAR(20)  NOT NULL,
     email          VARCHAR(50)  NOT NULL,
     password       VARCHAR(255) NOT NULL,
-    remember_token VARCHAR(255)
+    remember_token VARCHAR(255),
+    enabled        INT          NOT NULL DEFAULT 0
 );
 
 CREATE TABLE `post`
 (
     id         CHAR(36)     NOT NULL PRIMARY KEY,
     title      VARCHAR(255) NOT NULL,
-    filename   VARCHAR(255),
+    filename    VARCHAR(255),
     content    TEXT         NOT NULL,
     excerpt    TEXT                  DEFAULT NULL,
     slug       VARCHAR(255) NOT NULL,

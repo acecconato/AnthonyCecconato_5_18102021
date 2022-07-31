@@ -52,6 +52,9 @@ class User
     #[Column(name: 'enabled')]
     private int $enabled = 0;
 
+    #[Column(name: 'is_admin')]
+    private int $isAdmin = 0;
+
     public function __construct()
     {
         if (!isset($this->id)) {
@@ -152,5 +155,16 @@ class User
     {
         $this->enabled = $enabled;
         return $this;
+    }
+
+    public function setIsAdmin(int $isAdmin): User
+    {
+        $this->isAdmin = $isAdmin;
+        return $this;
+    }
+
+    public function getIsAdmin(): int
+    {
+        return $this->isAdmin;
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
+use Blog\Entity\Comment;
 use Blog\Entity\Post;
 use Blog\Entity\User;
 use ReflectionException;
@@ -41,5 +42,20 @@ class PostRepository extends Repository
         /** @var User $user */
         $user = $this->getEntityManager()->find(User::class, $userId);
         $post->setUser($user);
+    }
+
+    /**
+     * @throws ReflectionException
+     */
+    public function loadComments(Post $post): void
+    {
+        /** @var Comment[] $comments */
+        $comments = $this->getEntityManager()->findAllBy(
+            Comment::class,
+            ['post_id' => $post->getId(), 'enabled' => '1'],
+            'created_at'
+        );
+
+        $post->setComments($comments);
     }
 }

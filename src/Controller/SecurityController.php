@@ -52,7 +52,9 @@ class SecurityController extends AbstractController
                 /** @var Session $session */
                 $session = $request->getSession();
                 $session->getFlashBag()->add('success', 'Bonjour, ' . ucfirst($user->getUsername()) . ' !');
-                return $this->redirect($this->router->generateUri('home'));
+
+                $redirectTo = $request->query->get('redirect') ?? $this->router->generateUri('home');
+                return $this->redirect($redirectTo);
             }
         }
 

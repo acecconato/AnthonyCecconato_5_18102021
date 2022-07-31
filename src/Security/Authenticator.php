@@ -6,7 +6,6 @@ namespace Blog\Security;
 
 use Blog\Entity\User;
 use Blog\ORM\EntityManager;
-use Blog\Repository\UserRepository;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,6 +29,7 @@ class Authenticator
         $session->set('userAgent', $userAgent);
         $session->set('clientIp', $clientIp);
         $session->set('user', [
+            'userId' => $user->getId(),
             'username' => $user->getUsername(),
             'email' => $user->getEmail()
         ]);
@@ -81,10 +81,7 @@ class Authenticator
 
     public function refresh(): bool
     {
-        dump($this->request->getSession()->getId());
-        $is = $this->request->getSession()->migrate();
-        dump($this->request->getSession()->getId());
-        return $is;
+        return $this->request->getSession()->migrate();
     }
 
     public function logout(): void
@@ -94,5 +91,19 @@ class Authenticator
         $now = (new DateTimeImmutable())->getTimestamp();
         setcookie('username', '', $now);
         setcookie('remember_token', '', $now);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getUser(): array
+    {
+        return $this->request->getSession()->get('user');
+    }
+
+    public function getUserId(): string
+    {
+        $user = $this->request->getSession()->get('user');
+        return $user['userId'] ?? '';
     }
 }

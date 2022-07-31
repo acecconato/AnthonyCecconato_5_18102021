@@ -111,7 +111,6 @@ class EntityManager
         $mapping = $this->mapper->resolve($entityFqcn);
 
         $tableName = $mapping->getTable()->tableName;
-        array_walk($criteria, fn(&$criterion) => $criterion = $criterion);
 
         $query = "SELECT * FROM $tableName";
 
@@ -131,6 +130,42 @@ class EntityManager
 
         $object = (new ReflectionClass($entityFqcn))->newInstance();
         return $this->hydrator->hydrateSingle($rawResult, $object);
+    }
+
+    /**
+     * @param array<mixed> $criteria
+     * @return object[]
+     * @throws ReflectionException
+     */
+    public function findAllBy(
+        string $entityFqcn,
+        array $criteria = [],
+        ?string $orderBy = null,
+        ?string $orderWay = null
+    ): array {
+        $mapping = $this->mapper->resolve($entityFqcn);
+
+        $tableName = $mapping->getTable()->tableName;
+
+        $query = "SELECT * FROM $tableName";
+
+        foreach ($criteria as $key => $criterion) {
+            if ($key === array_key_first($criteria)) {
+                $query .= " WHERE $key='" . $criterion . "'";
+            } else {
+                $query .= " AND $key='" . $criterion . "'";
+            }
+        }
+
+        ($orderBy) ? $query .= " ORDER BY $orderBy " . ($orderWay ?? 'DESC') : null;
+
+        $rawResult = $this->adapter->query($query)->fetchAll(PDO::FETCH_ASSOC);
+
+        if (!$rawResult) {
+            return [];
+        }
+
+        return $this->hydrator->hydrateResultSet($rawResult, $entityFqcn);
     }
 
     public function count(string $entityFqcn, string $column, string $value): int

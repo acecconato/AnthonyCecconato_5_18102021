@@ -84,12 +84,13 @@ class Templating implements TemplatingInterface
         $context = [
             ...$context,
             'app' => [
-                'flashes' => $session->getFlashBag()->all()
+                'flashes' => $session->getFlashBag()->all(),
+                'request_uri' => $this->request->getRequestUri()
             ],
 
             'auth' => [
                 'isLoggedIn' => $session->get('isLoggedIn'),
-                'user' => $session->get('user'),
+                'user' => $session->get('user')
             ]
         ];
 

@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
+use Blog\Entity\Comment;
 use Blog\Entity\Contact;
 use Blog\Entity\Post;
 use Blog\Form\FormHandler;
+use Blog\Repository\CommentRepository;
 use Blog\Repository\PostRepository;
 use Blog\Router\Exceptions\ResourceNotFound;
 use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Router;
+use Blog\Security\Authenticator;
 use Blog\Service\Paginator;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
@@ -98,11 +101,19 @@ class FrontController extends AbstractController
     }
 
     /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws ResourceNotFound
      */
-    public function showSinglePost(string $slug, PostRepository $postRepository): Response
-    {
+    public function showSinglePost(
+        string $slug,
+        PostRepository $postRepository,
+        CommentRepository $commentRepository,
+        FormHandler $formHandler,
+        Request $request,
+        Authenticator $auth
+    ): Response {
         /** @var ?Post $post */
         $post = $postRepository->findOneBy(['slug' => $slug]);
 
@@ -111,6 +122,26 @@ class FrontController extends AbstractController
         }
 
         $postRepository->loadUser($post);
+        $postRepository->loadComments($post);
+
+        foreach ($post->getComments() as $comment) {
+            $commentRepository->loadUser($comment);
+        }
+
+        $comment = new Comment();
+        $form = $formHandler->loadFromRequest($request, $comment);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $postRepository->getEntityManager();
+            $em->add($comment);
+            $em->flush();
+
+            /** @var Session $session */
+            $session = $request->getSession();
+            $session->getFlashBag()->add('success', "Votre commentaire est en attente de validation");
+
+            return $this->redirect($request->getRequestUri());
+        }
 
         return $this->render('pages/front/post.html.twig', ['post' => $post]);
     }

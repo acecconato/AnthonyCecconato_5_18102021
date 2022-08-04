@@ -31,7 +31,8 @@ class Authenticator
         $session->set('user', [
             'userId' => $user->getId(),
             'username' => $user->getUsername(),
-            'email' => $user->getEmail()
+            'email' => $user->getEmail(),
+            'isAdmin' => $user->getIsAdmin()
         ]);
 
         if ($remember) {
@@ -96,14 +97,25 @@ class Authenticator
     /**
      * @return array<mixed>
      */
-    public function getUser(): array
+    public function getUserDatas(): array
     {
-        return $this->request->getSession()->get('user');
+        return $this->request->getSession()->get('user') ?? [
+                'userId' => '',
+                'username' => '',
+                'email' => '',
+                'isAdmin' => false
+            ];
     }
 
-    public function getUserId(): string
+    public function currentUserId(): string
     {
-        $user = $this->request->getSession()->get('user');
-        return $user['userId'] ?? '';
+        $user = $this->getUserDatas();
+        return $user['userId'];
+    }
+
+    public function isAdmin(): bool
+    {
+        $user = $this->getUserDatas();
+        return (bool)$user['isAdmin'];
     }
 }

@@ -31,31 +31,4 @@ class PostRepository extends Repository
 
         return $posts;
     }
-
-    /**
-     * @throws ReflectionException
-     */
-    public function loadUser(Post $post): void
-    {
-        $userId = $post->getUserId();
-
-        /** @var User $user */
-        $user = $this->getEntityManager()->find(User::class, $userId);
-        $post->setUser($user);
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    public function loadComments(Post $post): void
-    {
-        /** @var Comment[] $comments */
-        $comments = $this->getEntityManager()->findAllBy(
-            Comment::class,
-            ['post_id' => $post->getId(), 'enabled' => '1'],
-            'created_at'
-        );
-
-        $post->setComments($comments);
-    }
 }

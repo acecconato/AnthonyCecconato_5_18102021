@@ -40,6 +40,7 @@ class Comment
     #[Assert\Uuid()]
     private string $postId;
 
+    #[Column(name: 'enabled')]
     private int $enabled = 0;
 
     private User $user;

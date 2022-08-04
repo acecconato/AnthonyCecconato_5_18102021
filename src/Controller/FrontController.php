@@ -7,9 +7,11 @@ namespace Blog\Controller;
 use Blog\Entity\Comment;
 use Blog\Entity\Contact;
 use Blog\Entity\Post;
+use Blog\Entity\User;
 use Blog\Form\FormHandler;
 use Blog\Repository\CommentRepository;
 use Blog\Repository\PostRepository;
+use Blog\Repository\UserRepository;
 use Blog\Router\Exceptions\ResourceNotFound;
 use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Router;
@@ -110,6 +112,7 @@ class FrontController extends AbstractController
         string $slug,
         PostRepository $postRepository,
         CommentRepository $commentRepository,
+        UserRepository $userRepository,
         FormHandler $formHandler,
         Request $request,
         Authenticator $auth
@@ -121,11 +124,18 @@ class FrontController extends AbstractController
             throw new ResourceNotFound("Publication '$slug' introuvable");
         }
 
-        $postRepository->loadUser($post);
-        $postRepository->loadComments($post);
+        /** @var User $user */
+        $user = $userRepository->find($post->getUserId());
+        $post->setUser($user);
 
-        foreach ($post->getComments() as $comment) {
-            $commentRepository->loadUser($comment);
+        /** @var Comment[] $comments */
+        $comments = $commentRepository->findAllBy(['post_id' => $post->getId(), 'enabled' => 1]);
+        $post->setComments($comments);
+
+        foreach ($comments as $comment) {
+            /** @var User $commentAuthor */
+            $commentAuthor = $userRepository->find($comment->getUserId());
+            $comment->setUser($commentAuthor);
         }
 
         $comment = new Comment();

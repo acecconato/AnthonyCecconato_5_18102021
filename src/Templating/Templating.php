@@ -6,6 +6,7 @@ namespace Blog\Templating;
 
 use Blog\DependencyInjection\ContainerInterface;
 use Blog\Router\Router;
+use Blog\Security\Authenticator;
 use Blog\Twig\CsrfTokenExtension;
 use Blog\Twig\PathExtension;
 use Blog\Twig\SecureFilter;
@@ -35,10 +36,11 @@ class Templating implements TemplatingInterface
      * @throws NotFoundExceptionInterface
      */
     public function __construct(
-        private string $cacheDir,
-        private string $templatesDirs,
-        private ContainerInterface $container,
-        private Request $request
+        private readonly string $cacheDir,
+        private readonly string $templatesDirs,
+        private readonly ContainerInterface $container,
+        private readonly Request $request,
+        private readonly Authenticator $auth
     ) {
         $loader = new FilesystemLoader($this->templatesDirs);
 
@@ -81,6 +83,7 @@ class Templating implements TemplatingInterface
 
         /** @var Session $session */
         $session = $this->request->getSession();
+
         $context = [
             ...$context,
             'app' => [
@@ -90,7 +93,7 @@ class Templating implements TemplatingInterface
 
             'auth' => [
                 'isLoggedIn' => $session->get('isLoggedIn'),
-                'user' => $session->get('user')
+                'user' => $this->auth->getUserDatas()
             ]
         ];
 

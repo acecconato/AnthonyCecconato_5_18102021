@@ -38,7 +38,7 @@ abstract class Repository
     }
 
     /**
-     * @return array<object>
+     * @return object[]
      * @throws ReflectionException
      */
     public function findAll(
@@ -52,6 +52,23 @@ abstract class Repository
         $entityFqcn = 'Blog\\Entity\\' . $matches[1];
 
         return $this->entityManager->findAll($entityFqcn, $offset, $limit, $orderBy, $orderWay);
+    }
+
+    /**
+     * @param array<mixed> $criteria
+     * @return object[]
+     * @throws ReflectionException
+     */
+    public function findAllBy(
+        array $criteria,
+        string $orderBy = 'created_at',
+        string $orderWay = 'DESC'
+    ): array {
+        // Late static binding
+        preg_match("/(\w+)Repository$/", static::class, $matches);
+        $entityFqcn = 'Blog\\Entity\\' . $matches[1];
+
+        return $this->entityManager->findAllBy($entityFqcn, $criteria, $orderBy, $orderWay);
     }
 
 

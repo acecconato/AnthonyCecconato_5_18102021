@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
-use Blog\Entity\Post;
 use Blog\Entity\User;
 use PDO;
 

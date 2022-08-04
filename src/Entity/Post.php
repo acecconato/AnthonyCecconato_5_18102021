@@ -35,7 +35,7 @@ class Post
     #[Column(name: 'filename')]
     private ?string $filename = null;
 
-//    #[Assert\Image()]
+    #[Assert\Image()]
     private ?UploadedFile $file = null;
 
     #[Column(name: 'content')]
@@ -67,6 +67,9 @@ class Post
     private ?string $userId = null;
 
     private User $user;
+
+    /** @var Comment[] */
+    private array $comments = [];
 
     public function __construct()
     {
@@ -227,5 +230,22 @@ class Post
     public function getUser(): User
     {
         return $this->user;
+    }
+
+    /**
+     * @param Comment[] $comments
+     */
+    public function setComments(array $comments): Post
+    {
+        $this->comments = $comments;
+        return $this;
+    }
+
+    /**
+     * @return Comment[]
+     */
+    public function getComments(): array
+    {
+        return $this->comments;
     }
 }

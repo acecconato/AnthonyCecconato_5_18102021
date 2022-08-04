@@ -6,7 +6,6 @@ namespace Blog\Security;
 
 use Blog\Entity\User;
 use Blog\ORM\EntityManager;
-use Blog\Repository\UserRepository;
 use DateTimeImmutable;
 use Symfony\Component\HttpFoundation\IpUtils;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,8 +29,10 @@ class Authenticator
         $session->set('userAgent', $userAgent);
         $session->set('clientIp', $clientIp);
         $session->set('user', [
+            'userId' => $user->getId(),
             'username' => $user->getUsername(),
-            'email' => $user->getEmail()
+            'email' => $user->getEmail(),
+            'isAdmin' => $user->getIsAdmin()
         ]);
 
         if ($remember) {
@@ -81,10 +82,7 @@ class Authenticator
 
     public function refresh(): bool
     {
-        dump($this->request->getSession()->getId());
-        $is = $this->request->getSession()->migrate();
-        dump($this->request->getSession()->getId());
-        return $is;
+        return $this->request->getSession()->migrate();
     }
 
     public function logout(): void
@@ -94,5 +92,30 @@ class Authenticator
         $now = (new DateTimeImmutable())->getTimestamp();
         setcookie('username', '', $now);
         setcookie('remember_token', '', $now);
+    }
+
+    /**
+     * @return array<mixed>
+     */
+    public function getUserDatas(): array
+    {
+        return $this->request->getSession()->get('user') ?? [
+                'userId' => '',
+                'username' => '',
+                'email' => '',
+                'isAdmin' => false
+            ];
+    }
+
+    public function currentUserId(): string
+    {
+        $user = $this->getUserDatas();
+        return $user['userId'];
+    }
+
+    public function isAdmin(): bool
+    {
+        $user = $this->getUserDatas();
+        return (bool)$user['isAdmin'];
     }
 }

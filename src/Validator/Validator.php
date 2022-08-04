@@ -34,7 +34,7 @@ final class Validator implements ValidatorInterface
 
         foreach ($reflObj->getProperties() as $property) {
             if (!$property->isInitialized($object)) {
-                throw new Exception($property->getName() . ' is not initialized');
+                continue;
             }
 
             foreach ($property->getAttributes() as $attribute) {

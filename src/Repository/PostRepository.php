@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
+use Blog\Entity\Comment;
 use Blog\Entity\Post;
 use Blog\Entity\User;
 use ReflectionException;
@@ -29,17 +30,5 @@ class PostRepository extends Repository
         }
 
         return $posts;
-    }
-
-    /**
-     * @throws ReflectionException
-     */
-    public function loadUser(Post $post): void
-    {
-        $userId = $post->getUserId();
-
-        /** @var User $user */
-        $user = $this->getEntityManager()->find(User::class, $userId);
-        $post->setUser($user);
     }
 }

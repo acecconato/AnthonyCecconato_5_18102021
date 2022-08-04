@@ -36,7 +36,9 @@ for ($i = 0; $i < 5; $i++) {
     $user
         ->setEmail($faker->email)
         ->setUsername($faker->userName)
-        ->setPassword($faker->password);
+        ->setPassword($faker->password)
+        ->setEnabled(0)
+        ->setIsAdmin(0);
 
     $em->add($user);
 }
@@ -45,6 +47,8 @@ $demoUser = new User();
 $demoUser
     ->setUsername('demo')
     ->setEmail('demo@demo.fr')
+    ->setIsAdmin(1)
+    ->setEnabled(1)
     ->setPassword(User::encodePassword('demo_password'));
 
 $em->add($demoUser);
@@ -53,12 +57,23 @@ for ($i = 0; $i < 20; $i++) {
     $post = new Post();
     $post
         ->setTitle($faker->sentence)
-        ->setContent($faker->randomHtml())
+        ->setContent($faker->paragraph(10))
         ->setSlug(null)
         ->setUserId($demoUser->getId())
         ->setCreatedAt((new DateTime())->modify("+$i minutes"));
 
     $em->add($post);
+
+    for ($y = 0; $y < rand(0, 8); $y++) {
+        $comment = new \Blog\Entity\Comment();
+        $comment
+            ->setContent($faker->realText(500))
+            ->setPostId($post->getId())
+            ->setUserId($demoUser->getId())
+            ->setCreatedAt((new DateTime())->modify("+$y minutes"));
+
+        $em->add($comment);
+    }
 }
 
 $em->flush();

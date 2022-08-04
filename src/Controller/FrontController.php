@@ -4,13 +4,18 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
+use Blog\Entity\Comment;
 use Blog\Entity\Contact;
 use Blog\Entity\Post;
+use Blog\Entity\User;
 use Blog\Form\FormHandler;
+use Blog\Repository\CommentRepository;
 use Blog\Repository\PostRepository;
+use Blog\Repository\UserRepository;
 use Blog\Router\Exceptions\ResourceNotFound;
 use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Router;
+use Blog\Security\Authenticator;
 use Blog\Service\Paginator;
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
@@ -98,11 +103,20 @@ class FrontController extends AbstractController
     }
 
     /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws ResourceNotFound
      */
-    public function showSinglePost(string $slug, PostRepository $postRepository): Response
-    {
+    public function showSinglePost(
+        string $slug,
+        PostRepository $postRepository,
+        CommentRepository $commentRepository,
+        UserRepository $userRepository,
+        FormHandler $formHandler,
+        Request $request,
+        Authenticator $auth
+    ): Response {
         /** @var ?Post $post */
         $post = $postRepository->findOneBy(['slug' => $slug]);
 
@@ -110,7 +124,34 @@ class FrontController extends AbstractController
             throw new ResourceNotFound("Publication '$slug' introuvable");
         }
 
-        $postRepository->loadUser($post);
+        /** @var User $user */
+        $user = $userRepository->find($post->getUserId());
+        $post->setUser($user);
+
+        /** @var Comment[] $comments */
+        $comments = $commentRepository->findAllBy(['post_id' => $post->getId(), 'enabled' => 1]);
+        $post->setComments($comments);
+
+        foreach ($comments as $comment) {
+            /** @var User $commentAuthor */
+            $commentAuthor = $userRepository->find($comment->getUserId());
+            $comment->setUser($commentAuthor);
+        }
+
+        $comment = new Comment();
+        $form = $formHandler->loadFromRequest($request, $comment);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em = $postRepository->getEntityManager();
+            $em->add($comment);
+            $em->flush();
+
+            /** @var Session $session */
+            $session = $request->getSession();
+            $session->getFlashBag()->add('success', "Votre commentaire est en attente de validation");
+
+            return $this->redirect($request->getRequestUri());
+        }
 
         return $this->render('pages/front/post.html.twig', ['post' => $post]);
     }

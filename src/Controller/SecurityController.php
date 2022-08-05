@@ -137,7 +137,7 @@ class SecurityController extends AbstractController
             }
 
             if (!$form->hasErrors()) {
-                $token = uniqid();
+                $token = md5(uniqid());
 
                 $user->setResetToken($token);
 

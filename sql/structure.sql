@@ -11,7 +11,8 @@ CREATE TABLE `user`
     password       VARCHAR(255) NOT NULL,
     remember_token VARCHAR(255),
     is_admin       INT          NOT NULL DEFAULT 0,
-    enabled        INT          NOT NULL DEFAULT 0
+    enabled        INT          NOT NULL DEFAULT 0,
+    reset_token    VARCHAR(255)
 );
 
 CREATE TABLE `post`

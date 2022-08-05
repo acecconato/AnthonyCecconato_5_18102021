@@ -55,6 +55,9 @@ class User
     #[Column(name: 'is_admin')]
     private int $isAdmin = 0;
 
+    #[Column(name: 'reset_token', type: Type::STRING)]
+    private ?string $resetToken = null;
+
     public function __construct()
     {
         if (!isset($this->id)) {
@@ -166,5 +169,16 @@ class User
     public function getIsAdmin(): int
     {
         return $this->isAdmin;
+    }
+
+    public function setResetToken(?string $token = null): User
+    {
+        $this->resetToken = $token;
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
     }
 }

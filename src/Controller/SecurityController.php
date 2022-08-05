@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Blog\Controller;
 
+use Blog\Entity\HandleResetPassword;
 use Blog\Entity\Login;
+use Blog\Entity\ResetPassword;
 use Blog\Entity\User;
 use Blog\Form\FormHandler;
 use Blog\ORM\EntityManager;
@@ -19,6 +21,9 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
+use Throwable;
 
 class SecurityController extends AbstractController
 {
@@ -109,9 +114,115 @@ class SecurityController extends AbstractController
         ]);
     }
 
-    public function resetPassword(): Response
-    {
-        return $this->render('pages/front/reset_password.html.twig');
+    /**
+     * @throws ReflectionException
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws Exception
+     */
+    public function resetPassword(
+        FormHandler $formHandler,
+        Request $request,
+        UserRepository $userRepository,
+        MailerInterface $mailer
+    ): Response {
+        $resetPassword = new ResetPassword();
+        $form = $formHandler->loadFromRequest($request, $resetPassword);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var User|false $user */
+            $user = $userRepository->getUserByUsernameOrEmail($resetPassword->getUsername());
+
+            /** @var Session $session */
+            $session = $request->getSession();
+            $session->getFlashBag()->add('success', "Un mail vous a été envoyé à l'adresse associée au compte");
+
+            if (!$user) {
+                // Shadow error, redirect but do nothing
+                return $this->redirect($request->getRequestUri());
+            }
+
+            if (!$form->hasErrors()) {
+                $token = uniqid();
+
+                $user->setResetToken($token);
+
+                $entityManager = $userRepository->getEntityManager();
+                $entityManager->update($user);
+                $entityManager->flush();
+
+                // @phpstan-ignore-next-line
+                $resetUrl = _ROOT_ . $this->router->generateUri('handle_reset_password');
+                $resetUrl .= "?reset_token=$token";
+
+                $messageHtml = sprintf(file_get_contents(__DIR__ . '/../../mails/reset_password.html'), $resetUrl);
+                $messageTxt = sprintf(file_get_contents(__DIR__ . '/../../mails/reset_password.txt'), $resetUrl);
+
+                $email = (new Email())
+                    ->from($_ENV['MAILER_SENDER'])
+                    ->to($user->getEmail())
+                    ->priority(Email::PRIORITY_NORMAL)
+                    ->subject("Réinitialisation de votre mot de passe")
+                    ->text(strip_tags($messageTxt))
+                    ->html(nl2br($messageHtml));
+
+                try {
+                    $mailer->send($email);
+                    return $this->redirect($this->router->generateUri('login'));
+                } catch (Throwable $exception) {
+                    $session->getFlashBag()->add('danger', "Une erreur inconnue est survenue");
+                }
+            }
+        }
+
+        return $this->render('pages/front/reset_password.html.twig', ['errors' => $form->getErrors()]);
+    }
+
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws RouteNotFoundException
+     * @throws Exception
+     */
+    public function handleResetPassword(
+        FormHandler $formHandler,
+        Request $request,
+        UserRepository $userRepository,
+    ): Response {
+        $token = (string)$request->query->get('reset_token');
+
+        /** @var User|false $user */
+        $user = $userRepository->findOneBy(['reset_token' => $token]);
+
+        if (!$token || !$user) {
+            throw new RouteNotFoundException();
+        }
+
+        $handleResetPassword = new HandleResetPassword();
+        $form = $formHandler->loadFromRequest($request, $handleResetPassword);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $newPassword = User::encodePassword($form->get('plainPassword'));
+
+            $user->setPassword($newPassword);
+            $user->setResetToken();
+
+            $entityManager = $userRepository->getEntityManager();
+            $entityManager->update($user);
+            $entityManager->flush();
+
+            /** @var Session $session */
+            $session = $request->getSession();
+            $session->getFlashBag()->add(
+                'success',
+                "Mot de passe modifié avec succès, vous pouvez désormais vous connecter"
+            );
+
+            return $this->redirect($this->router->generateUri('login'));
+        }
+
+        return $this->render('pages/front/handle_reset_password.html.twig', ['errors' => $form->getErrors()]);
     }
 
     /**

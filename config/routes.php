@@ -15,6 +15,7 @@ return function (RouterInterface $router) {
         ->add(new Route('login', '/connexion', [SecurityController::class, 'login']))
         ->add(new Route('register', '/inscription', [SecurityController::class, 'register']))
         ->add(new Route('reset_password', '/mot-de-passe-oublie', [SecurityController::class, 'resetPassword']))
+        ->add(new Route('handle_reset_password', '/reinitialisation', [SecurityController::class, 'handleResetPassword']))
         ->add(new Route('logout', '/deconnexion', [SecurityController::class, 'logout']))
 
         ->add(new Route('admin_dashboard', '/dashboard', [DashboardController::class, 'index']))

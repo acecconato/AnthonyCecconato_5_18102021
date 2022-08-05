@@ -84,28 +84,22 @@ class SecurityController extends AbstractController
         $form = $formHandler->loadFromRequest($request, $user);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('plainPassword') !== $request->request->get('password_verify')) {
-                $form->addValidatorError("Les mots de passe ne correspondent pas");
-            }
+            $user
+                ->setPassword(User::encodePassword($form->get('plainPassword')))
+                ->setEnabled(0)
+                ->sanitize();
 
-            if (!$form->hasErrors()) {
-                $user
-                    ->setPassword(User::encodePassword($form->get('plainPassword')))
-                    ->setEnabled(0)
-                    ->sanitize();
+            $entityManager->add($user);
+            $entityManager->flush();
 
-                $entityManager->add($user);
-                $entityManager->flush();
+            /** @var Session $session */
+            $session = $request->getSession();
+            $session->getFlashBag()->add(
+                'success',
+                "Votre demande de création de compte a été prise en compte, vous recevrez un mail lorsque celle-ci sera validée"
+            );
 
-                /** @var Session $session */
-                $session = $request->getSession();
-                $session->getFlashBag()->add(
-                    'success',
-                    "Votre demande de création de compte a été prise en compte, vous recevrez un mail lorsque celle-ci sera validée"
-                );
-
-                return $this->redirect('/');
-            }
+            return $this->redirect('/');
         }
 
         return $this->render('pages/front/register.html.twig', [

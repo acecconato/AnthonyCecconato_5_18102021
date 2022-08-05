@@ -37,8 +37,12 @@ class SecurityController extends AbstractController
         Request $request,
         FormHandler $formHandler,
         UserRepository $userRepository,
-        Authenticator $authenticator
+        Authenticator $auth
     ): Response {
+        if ($auth->isLoggedIn()) {
+            return $this->redirect('/');
+        }
+
         $login = new Login();
         $form = $formHandler->loadFromRequest($request, $login);
 
@@ -52,7 +56,7 @@ class SecurityController extends AbstractController
             }
 
             if (!$form->hasErrors()) {
-                $authenticator->authenticate($user, (bool)$form->get('rememberMe'));
+                $auth->authenticate($user, (bool)$form->get('rememberMe'));
 
                 /** @var Session $session */
                 $session = $request->getSession();
@@ -78,8 +82,16 @@ class SecurityController extends AbstractController
      * @throws ReflectionException
      * @throws Exception
      */
-    public function register(FormHandler $formHandler, Request $request, EntityManager $entityManager): Response
-    {
+    public function register(
+        FormHandler $formHandler,
+        Request $request,
+        EntityManager $entityManager,
+        Authenticator $auth
+    ): Response {
+        if ($auth->isLoggedIn()) {
+            return $this->redirect('/');
+        }
+
         $user = new User();
         $form = $formHandler->loadFromRequest($request, $user);
 
@@ -118,8 +130,13 @@ class SecurityController extends AbstractController
         FormHandler $formHandler,
         Request $request,
         UserRepository $userRepository,
-        MailerInterface $mailer
+        MailerInterface $mailer,
+        Authenticator $auth
     ): Response {
+        if ($auth->isLoggedIn()) {
+            return $this->redirect('/');
+        }
+
         $resetPassword = new ResetPassword();
         $form = $formHandler->loadFromRequest($request, $resetPassword);
 
@@ -183,7 +200,12 @@ class SecurityController extends AbstractController
         FormHandler $formHandler,
         Request $request,
         UserRepository $userRepository,
+        Authenticator $auth
     ): Response {
+        if ($auth->isLoggedIn()) {
+            return $this->redirect('/');
+        }
+
         $token = (string)$request->query->get('reset_token');
 
         /** @var User|false $user */
@@ -222,9 +244,9 @@ class SecurityController extends AbstractController
     /**
      * @throws RouteNotFoundException
      */
-    public function logout(Authenticator $authenticator, Request $request): RedirectResponse
+    public function logout(Authenticator $auth, Request $request): RedirectResponse
     {
-        $authenticator->logout();
+        $auth->logout();
 
         /** @var Session $session */
         $session = $request->getSession();

@@ -16,16 +16,32 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
                     <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('home') }}">
-                                Retour sur le site
+                        <li class="nav-item">
+                            <a class="nav-link px-lg-3 py-3 mx-5 py-lg-4 btn btn-outline-dark"
+                               title="Revenir sur le site"
+                               href="{{ path('home') }}">
+                                <i class="fa fa-angle-left mx-2"></i>
                             </a>
                         </li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('about') }}">
+
+                        <li class="nav-item">
+                            <a class="nav-link px-lg-3 py-3 py-lg-4 btn btn-dark" href="{{ path('admin_dashboard') }}">
+                                <i class="fa fa-home mx-2"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('admin_articles') }}">
                                 Articles
                             </a>
                         </li>
-                        <li class="nav-item"><a class="nav-link px-lg-3 py-3 py-lg-4" href="#">
+                        <li class="nav-item">
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('admin_comments') }}">
                                 Commentaires
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('admin_users') }}">
+                                Utilisateurs
                             </a>
                         </li>
                     </ul>
@@ -49,9 +65,11 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-xl-8">
                     <ul class="list-group list-group-horizontal justify-content-center align-items-center">
-                        <li class="list-group-item border-0"><a href="#">Mentions légales</a></li>
-                        <li class="list-group-item border-0"><a href="#">Politique de confidentialité</a></li>
-                        <li class="list-group-item border-0"><a href="{{ path('login') }}">Connexion</a></li>
+                        <li class="list-group-item border-0">
+                            <a href="{{ path('logout') }}" class="btn btn-danger">
+                                Déconnexion
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>

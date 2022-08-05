@@ -39,4 +39,10 @@ class UserRepository extends Repository
 
         return $hydrator->hydrateSingle($result, new User());
     }
+
+    public function countUserAwaitingValidation(): int
+    {
+        $query = "SELECT COUNT(*) FROM user WHERE enabled='0'";
+        return (int)$this->getAdapter()->query($query)->fetchColumn();
+    }
 }

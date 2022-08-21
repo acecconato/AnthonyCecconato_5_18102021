@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Blog;
 
+use Blog\Controller\Exception\UnauthorizedException;
+use Blog\Controller\ErrorController;
 use Blog\Database\Adapter\AdapterInterface;
 use Blog\Database\Adapter\MySQLAdapter;
 use Blog\DependencyInjection\Container;
@@ -31,7 +33,7 @@ use Throwable;
 
 final class Kernel
 {
-    const DATE_FORMAT = 'Y-m-d H:i:s';
+    public const DATE_FORMAT = 'Y-m-d H:i:s';
 
     /** @var RouterInterface */
     private RouterInterface $router;
@@ -95,14 +97,14 @@ final class Kernel
         $routeArgs = $route->getArgs($request);
 
         $callable = $route->getCallable();
-        $class = $this->container->get($callable[0]);
-        $method = $callable[1];
+        $class    = $this->container->get($callable[0]);
+        $method   = $callable[1];
 
         $reflectionMethod = new ReflectionMethod($class::class, $method);
 
         $expectedFromMethod = array_filter(
             $reflectionMethod->getParameters(),
-            fn($param) => !array_key_exists($param->getName(), $routeArgs)
+            fn($param) => ! array_key_exists($param->getName(), $routeArgs)
         );
 
         $methodArgs = [];
@@ -117,11 +119,12 @@ final class Kernel
                 // @phpstan-ignore-next-line
                 if ($this->container->has($param->getName())) {
                     $methodArgs[$param->getName()] = $this->container->get($param->getName());
+                    $methodArgs[$param->getName()] = $this->container->get($param->getName());
                 }
 
                 // Use the container to instantiate the required class
                 // @phpstan-ignore-next-line
-                if (!$param->getType()?->isBuiltin()) {
+                if (! $param->getType()?->isBuiltin()) {
                     // @phpstan-ignore-next-line
                     $methodArgs[$param->getName()] = $this->container->get($param->getType()->getName());
                 }
@@ -143,10 +146,18 @@ final class Kernel
         } catch (Throwable $e) {
             if ($this->env === 'development') {
                 dd($e);
-                // Todo call a 500 controller
             }
 
-            exit('Internal server error: 500');
+            $errorController = $this->container->get(ErrorController::class);
+
+            if ($e::class === UnauthorizedException::class) {
+                $response = call_user_func([$errorController, 'redirect'], $this->router->generateUri('login'));
+                $response->send();
+                return;
+            }
+
+            $response = call_user_func([$errorController, 'displayError']);
+            $response->send();
         }
     }
 
@@ -172,7 +183,7 @@ final class Kernel
 
         // Register Symfony Mailer
         $transport = Transport::fromDsn($_ENV['MAILER_DSN']);
-        $mailer = new Mailer($transport);
+        $mailer    = new Mailer($transport);
 
         $this->container->registerExisting($mailer, MailerInterface::class);
 

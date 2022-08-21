@@ -8,8 +8,6 @@ use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 
 require_once '../vendor/autoload.php';
 
-require __DIR__ . '/../config/defines.php';
-
 $dotenv = new Dotenv();
 
 if (!file_exists(dirname(__DIR__) . '/.env')) {

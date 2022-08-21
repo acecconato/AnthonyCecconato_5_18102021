@@ -24,6 +24,7 @@ Encore
 
     .addEntry('home', './assets/pages/home.js')
     .addEntry("single", "./assets/pages/single.js")
+    .addEntry("error500", "./assets/pages/error500.js")
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     // .enableStimulusBridge('./assets/controllers.json')

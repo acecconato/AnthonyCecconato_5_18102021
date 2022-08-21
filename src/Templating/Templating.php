@@ -63,15 +63,12 @@ class Templating implements TemplatingInterface
     }
 
     /**
-     * @param string $view
      * @param array<mixed> $context
-     *
-     * @return string
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function render(string $view, array $context = []): string
+    public function render(string $view, array $context = [], bool $mainRequest = true): string
     {
         if ($this->isDevMode) {
             $context = [
@@ -87,7 +84,7 @@ class Templating implements TemplatingInterface
         $context = [
             ...$context,
             'app' => [
-                'flashes' => $session->getFlashBag()->all(),
+                'flashes' => ($mainRequest) ? $session->getFlashBag()->all() : $session->getFlashBag()->peekAll(),
                 'request_uri' => $this->request->getRequestUri()
             ],
 

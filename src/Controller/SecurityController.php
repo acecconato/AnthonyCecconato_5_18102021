@@ -17,6 +17,7 @@ use Exception;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
+use Soundasleep\Html2Text;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,23 +40,21 @@ class SecurityController extends AbstractController
         UserRepository $userRepository,
         Authenticator $auth
     ): Response {
-        if ($auth->isLoggedIn()) {
-            return $this->redirect('/');
-        }
+        $this->denyAccessUnlessNotLoggedIn();
 
         $login = new Login();
-        $form = $formHandler->loadFromRequest($request, $login);
+        $form  = $formHandler->loadFromRequest($request, $login);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $userRepository->getUserByUsernameOrEmail($login->getUsername());
 
-            if (!$user || !$user->comparePassword($login->getPassword())) {
+            if (! $user || ! $user->comparePassword($login->getPassword())) {
                 $form->addValidatorError('Identifiants incorrects, veuillez réessayer');
-            } elseif (!$user->getEnabled()) {
+            } elseif (! $user->getEnabled()) {
                 $form->addValidatorError("Votre compte n'est pas activé");
             }
 
-            if (!$form->hasErrors()) {
+            if (! $form->hasErrors()) {
                 $auth->authenticate($user, (bool)$form->get('rememberMe'));
 
                 /** @var Session $session */
@@ -63,6 +62,7 @@ class SecurityController extends AbstractController
                 $session->getFlashBag()->add('success', 'Bonjour, ' . ucfirst($user->getUsername()) . ' !');
 
                 $redirectTo = $request->query->get('redirect') ?? $this->router->generateUri('home');
+
                 return $this->redirect($redirectTo);
             }
         }
@@ -86,11 +86,8 @@ class SecurityController extends AbstractController
         FormHandler $formHandler,
         Request $request,
         EntityManager $entityManager,
-        Authenticator $auth
     ): Response {
-        if ($auth->isLoggedIn()) {
-            return $this->redirect('/');
-        }
+        $this->denyAccessUnlessNotLoggedIn();
 
         $user = new User();
         $form = $formHandler->loadFromRequest($request, $user);
@@ -116,7 +113,7 @@ class SecurityController extends AbstractController
 
         return $this->render('pages/front/register.html.twig', [
             'errors' => $form->getErrors(),
-            'form' => $form
+            'form'   => $form
         ]);
     }
 
@@ -131,14 +128,11 @@ class SecurityController extends AbstractController
         Request $request,
         UserRepository $userRepository,
         MailerInterface $mailer,
-        Authenticator $auth
     ): Response {
-        if ($auth->isLoggedIn()) {
-            return $this->redirect('/');
-        }
+        $this->denyAccessUnlessNotLoggedIn();
 
         $resetPassword = new ResetPassword();
-        $form = $formHandler->loadFromRequest($request, $resetPassword);
+        $form          = $formHandler->loadFromRequest($request, $resetPassword);
 
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User|false $user */
@@ -148,12 +142,12 @@ class SecurityController extends AbstractController
             $session = $request->getSession();
             $session->getFlashBag()->add('success', "Un mail vous a été envoyé à l'adresse associée au compte");
 
-            if (!$user) {
+            if (! $user) {
                 // Shadow error, redirect but do nothing
-                return $this->redirect($request->getRequestUri());
+                return $this->redirect($this->router->generateUri('login'));
             }
 
-            if (!$form->hasErrors()) {
+            if (! $form->hasErrors()) {
                 $token = md5(uniqid());
 
                 $user->setResetToken($token);
@@ -162,20 +156,18 @@ class SecurityController extends AbstractController
                 $entityManager->update($user);
                 $entityManager->flush();
 
-                // @phpstan-ignore-next-line
-                $resetUrl = _ROOT_ . $this->router->generateUri('handle_reset_password');
+                $resetUrl = $request->getSchemeAndHttpHost() . $this->router->generateUri('handle_reset_password');
                 $resetUrl .= "?reset_token=$token";
 
-                $messageHtml = sprintf(file_get_contents(__DIR__ . '/../../mails/reset_password.html'), $resetUrl);
-                $messageTxt = sprintf(file_get_contents(__DIR__ . '/../../mails/reset_password.txt'), $resetUrl);
+                $emailContent = $this->renderView('mails/reset_password.html.twig', ['url' => $resetUrl], false);
 
                 $email = (new Email())
                     ->from($_ENV['MAILER_SENDER'])
                     ->to($user->getEmail())
                     ->priority(Email::PRIORITY_NORMAL)
                     ->subject("Réinitialisation de votre mot de passe")
-                    ->text(strip_tags($messageTxt))
-                    ->html(nl2br($messageHtml));
+                    ->text(strip_tags(Html2Text::convert($emailContent)))
+                    ->html(nl2br($emailContent));
 
                 try {
                     $mailer->send($email);
@@ -200,23 +192,20 @@ class SecurityController extends AbstractController
         FormHandler $formHandler,
         Request $request,
         UserRepository $userRepository,
-        Authenticator $auth
     ): Response {
-        if ($auth->isLoggedIn()) {
-            return $this->redirect('/');
-        }
+        $this->denyAccessUnlessNotLoggedIn();
 
         $token = (string)$request->query->get('reset_token');
 
         /** @var User|false $user */
         $user = $userRepository->findOneBy(['reset_token' => $token]);
 
-        if (!$token || !$user) {
+        if (! $token || ! $user) {
             throw new RouteNotFoundException();
         }
 
         $handleResetPassword = new HandleResetPassword();
-        $form = $formHandler->loadFromRequest($request, $handleResetPassword);
+        $form                = $formHandler->loadFromRequest($request, $handleResetPassword);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $newPassword = User::encodePassword($form->get('plainPassword'));

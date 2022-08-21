@@ -10,8 +10,9 @@ interface TemplatingInterface
      *
      * @param string $view
      * @param array<string> $context
+     * @param bool $mainRequest
      *
      * @return string
      */
-    public function render(string $view, array $context = []): string;
+    public function render(string $view, array $context = [], bool $mainRequest = true): string;
 }

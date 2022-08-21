@@ -24,8 +24,8 @@
                             Après l'envoi du formulaire, votre compte sera soumis à une validation manuelle.
                         </p>
 
-                        {% if errors is defined and errors is iterable %}
-                            {% for error in errors %}
+                        {% if form is defined and form.hasErrors %}
+                            {% for error in form.errors %}
                                 <p class="alert alert-danger">{{ error['message'] }}</p>
                             {% endfor %}
                         {% endif %}

@@ -84,6 +84,8 @@ class FrontController extends AbstractController
             }
         }
 
+        dump($form);
+
         return $this->render(
             'pages/front/home.html.twig',
             [
@@ -91,7 +93,6 @@ class FrontController extends AbstractController
                 'pages' => $pDatas['pagesCount'],
                 'page' => $page,
                 'pagination_range' => $pDatas['range'],
-                'errors' => $form->getErrors(),
                 'form' => $form
             ]
         );

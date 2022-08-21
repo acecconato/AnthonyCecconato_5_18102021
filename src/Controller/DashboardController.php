@@ -59,7 +59,7 @@ class DashboardController extends AbstractController
             dd($post);
         }
 
-        return $this->render('pages/back/form_post.html.twig', ['form' => $form, 'errors' => $form->getErrors()]);
+        return $this->render('pages/back/form_post.html.twig', ['form' => $form]);
     }
 
     /**

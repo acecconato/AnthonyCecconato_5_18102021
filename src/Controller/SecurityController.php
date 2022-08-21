@@ -111,10 +111,7 @@ class SecurityController extends AbstractController
             return $this->redirect('/');
         }
 
-        return $this->render('pages/front/register.html.twig', [
-            'errors' => $form->getErrors(),
-            'form'   => $form
-        ]);
+        return $this->render('pages/front/register.html.twig', ['form' => $form]);
     }
 
     /**
@@ -171,6 +168,7 @@ class SecurityController extends AbstractController
 
                 try {
                     $mailer->send($email);
+
                     return $this->redirect($this->router->generateUri('login'));
                 } catch (Throwable $exception) {
                     $session->getFlashBag()->add('danger', "Une erreur inconnue est survenue");

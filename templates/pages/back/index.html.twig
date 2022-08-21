@@ -3,59 +3,48 @@
 {% block page_content %}
     <main id="dashboard" class="mt-5 pt-md-5 mb-5">
         <div class="container mt-5 pt-5 px-4 px-lg-5">
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="row col-10">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">First</th>
-                            <th scope="col">Last</th>
-                            <th scope="col">Handle</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td colspan="2">Larry the Bird</td>
-                            <td>@twitter</td>
-                        </tr>
-                        </tbody>
-                    </table>
 
-                    <div class="col-md-10 col-xl-8 mt-5">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
+            <h1 class="mb-5">Tableau de bord</h1>
+
+            <section class="mb-5">
+                <h2>Statistiques</h2>
+                <ul class="list-group">
+                    <li class="list-inline-item">Il y a <b>{{ nbUsers }}</b> utilisateurs enregistrés, dont
+                        <b>{{ nbDisabledUsers }}</b> en
+                        attente d'acceptation
+                    </li>
+                    <li class="list-inline-item">Il y a <b>{{ nbPosts }}</b> articles publiés</li>
+                    <li class="list-inline-item">Il y a <b>{{ nbComments }}</b> commentaires en attente d'acceptation
+                    </li>
+                </ul>
+            </section>
+
+            <section class="mb-5">
+                <h2>Accès rapide</h2>
+                <ul class="list-group mt-4 d-flex flex-row">
+                    <li class="list-inline-item">
+                        <a href="{{ path('admin_articles') }}" class="btn btn-outline-primary">
+                            Articles
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="{{ path('admin_comments') }}" class="btn btn-outline-primary">
+                            Commentaires
+                            {% if nbComments > 0 %}
+                                <span class="badge bg-danger">{{ nbComments }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="{{ path('admin_users') }}" class="btn btn-outline-primary">
+                            Utilisateurs
+                            {% if nbDisabledUsers > 0 %}
+                                <span class="badge bg-danger">{{ nbDisabledUsers }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+            </section>
         </div>
     </main>
 {% endblock %}

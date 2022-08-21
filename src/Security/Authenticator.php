@@ -103,7 +103,7 @@ class Authenticator
                 'userId' => '',
                 'username' => '',
                 'email' => '',
-                'isAdmin' => false
+                'isAdmin' => false,
             ];
     }
 
@@ -117,5 +117,10 @@ class Authenticator
     {
         $user = $this->getUserDatas();
         return (bool)$user['isAdmin'];
+    }
+
+    public function isLoggedIn(): bool
+    {
+        return (bool)$this->request->getSession()->get('isLoggedIn');
     }
 }

@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('error500') }}
+{% endblock %}
+
+{% block body %}
+    <div class="page-404">
+        <div class="outer">
+            <div class="middle">
+                <div class="inner">
+                    <div class="inner-circle"><span>500</span></div>
+                    <span class="inner-status">INTERNAL SERVER ERROR</span>
+                    <span class="inner-detail">Malheureusement, nous avons des difficultés à charger la page que vous recherchez. Veuillez revenir dans quelque temps.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

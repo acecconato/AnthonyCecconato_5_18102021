@@ -41,7 +41,6 @@ class User
     private string $password = '';
 
     #[Assert\MaxLength(message: "Le mot de passe ne peut excéder 255 caractères", max: 255)]
-    #[Assert\MinLength(message: "Le mot de passe doit faire au moins 8 caractères", min: 8)]
     #[Assert\StrongPassword()]
     #[Assert\HIBP()]
     private ?string $plainPassword;
@@ -54,6 +53,9 @@ class User
 
     #[Column(name: 'is_admin')]
     private int $isAdmin = 0;
+
+    #[Column(name: 'reset_token', type: Type::STRING)]
+    private ?string $resetToken = null;
 
     public function __construct()
     {
@@ -166,5 +168,16 @@ class User
     public function getIsAdmin(): int
     {
         return $this->isAdmin;
+    }
+
+    public function setResetToken(?string $token = null): User
+    {
+        $this->resetToken = $token;
+        return $this;
+    }
+
+    public function getResetToken(): ?string
+    {
+        return $this->resetToken;
     }
 }

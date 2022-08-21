@@ -91,7 +91,6 @@ class FrontController extends AbstractController
                 'pages' => $pDatas['pagesCount'],
                 'page' => $page,
                 'pagination_range' => $pDatas['range'],
-                'errors' => $form->getErrors(),
                 'form' => $form
             ]
         );

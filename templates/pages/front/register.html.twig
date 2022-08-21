@@ -24,8 +24,8 @@
                             Après l'envoi du formulaire, votre compte sera soumis à une validation manuelle.
                         </p>
 
-                        {% if errors is defined and errors is iterable %}
-                            {% for error in errors %}
+                        {% if form is defined and form.hasErrors %}
+                            {% for error in form.errors %}
                                 <p class="alert alert-danger">{{ error['message'] }}</p>
                             {% endfor %}
                         {% endif %}
@@ -70,18 +70,6 @@
                                         required
                                 />
                                 <label for="password">Mot de passe</label>
-                            </div>
-
-                            <div class="form-floating mb-4">
-                                <input
-                                        class="form-control"
-                                        name="password_verify"
-                                        id="password"
-                                        type="password"
-                                        placeholder="*****"
-                                        required
-                                />
-                                <label for="password">Retaper le mot de passe</label>
                             </div>
 
                             <div class="d-md-flex gap-3">

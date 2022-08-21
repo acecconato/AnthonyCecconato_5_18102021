@@ -20,16 +20,36 @@ class StrongPasswordConstraintValidator implements ConstraintValidatorInterface
 
     /**
      * @param StrongPassword $constraint
+     *
      * @throws AssertionFailedException
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
-        $checker = new Zxcvbn();
-        $strength = $checker->passwordStrength($value);
+        $error = false;
 
-        if ($strength['score'] < self::MEDIUM) {
+        if (strlen($value) < 8) {
+            $error = 'Le mot de passe doit au moins contenir 8 caractères';
+        }
+
+        if (! preg_match('/[^\da-zA-Z]/', $value)) {
+            $error = 'Le mot de passe doit au moins contenir un caractère spécial';
+        }
+
+        if (! preg_match('/(?=.*[a-z])/', $value)) {
+            $error = 'Le mot de passe doit au moins contenir une lettre minuscule';
+        }
+
+        if (! preg_match('/(?=.*[A-Z])/', $value)) {
+            $error = 'Le mot de passe doit au moins contenir une lettre majuscule';
+        }
+
+        if (! preg_match('/(?=.*\d)/', $value)) {
+            $error = 'Le mot de passe doit au moins contenir un chiffre';
+        }
+
+        if ($error) {
             throw new InvalidArgumentException(
-                $constraint->message ?? "Le mot de passe n'est pas sécurisé",
+                $error,
                 0,
                 $propertyPath
             );

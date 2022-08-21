@@ -124,8 +124,8 @@
                     me faire un petit coucou ? Envoyez-moi un message, j'y répondrai avec plaisir !
                 </p>
 
-                {% if errors is defined and errors is iterable %}
-                    {% for error in errors %}
+                {% if form is defined and form.hasErrors %}
+                    {% for error in form.errors %}
                         <p class="alert alert-danger">{{ error['message'] }}</p>
                     {% endfor %}
                 {% endif %}

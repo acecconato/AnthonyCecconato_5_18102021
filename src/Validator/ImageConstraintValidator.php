@@ -22,6 +22,10 @@ class ImageConstraintValidator implements ConstraintValidatorInterface
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
+        if (!$value) {
+            return true;
+        }
+
         // @phpstan-ignore-next-line
         if (!is_object($value) || $value::class !== File::class && $value::class !== UploadedFile::class) {
             throw new InvalidArgumentException($value . ' is not a file', 0, $propertyPath);

@@ -23,12 +23,18 @@
                 <h2>Accès rapide</h2>
                 <ul class="list-group mt-4 d-flex flex-row">
                     <li class="list-inline-item">
-                        <a href="{{ path('admin_articles') }}" class="btn btn-outline-primary">
+                        <a href="{{ path('admin_create_post') }}" class="btn btn-primary" title="Écrire un article">
+                            <i class="fa fa-lg fa-add"></i> Écrire un article
+                        </a>
+                    </li>
+                    <li class="list-inline-item">
+                        <a href="{{ path('admin_articles') }}" class="btn btn-outline-primary" title="Voir les articles">
                             Articles
                         </a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="{{ path('admin_comments') }}" class="btn btn-outline-primary">
+                        <a href="{{ path('admin_comments') }}" class="btn btn-outline-primary"
+                           title="Voir les commentaires">
                             Commentaires
                             {% if nbComments > 0 %}
                                 <span class="badge bg-danger">{{ nbComments }}</span>
@@ -36,7 +42,8 @@
                         </a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="{{ path('admin_users') }}" class="btn btn-outline-primary">
+                        <a href="{{ path('admin_users') }}" class="btn btn-outline-primary"
+                           title="Voir les utilisateurs">
                             Utilisateurs
                             {% if nbDisabledUsers > 0 %}
                                 <span class="badge bg-danger">{{ nbDisabledUsers }}</span>

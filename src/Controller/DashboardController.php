@@ -9,6 +9,7 @@ use Blog\Form\FormHandler;
 use Blog\Repository\CommentRepository;
 use Blog\Repository\PostRepository;
 use Blog\Repository\UserRepository;
+use Blog\Security\Authenticator;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -48,11 +49,15 @@ class DashboardController extends AbstractController
      */
     public function createPost(
         Request $request,
-        FormHandler $formHandler
+        FormHandler $formHandler,
+        Authenticator $auth
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
         $post = new Post();
+
+        $post->setUserId($auth->currentUserId());
+
         $form = $formHandler->loadFromRequest($request, $post);
 
         if ($form->isSubmitted() && $form->isValid()) {

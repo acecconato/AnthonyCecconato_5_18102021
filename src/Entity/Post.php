@@ -26,33 +26,33 @@ class Post
     protected string $id;
 
     #[Column(name: 'title')]
-    #[Assert\NotBlank()]
-    #[Assert\NotNull()]
-    #[Assert\MinLength(min: 10)]
-    #[Assert\MaxLength(max: 255)]
+    #[Assert\NotBlank('Le titre ne doit pas être vide')]
+    #[Assert\NotNull('Le titre ne doit pas être vide')]
+    #[Assert\MinLength(message: 'Le titre doit contenir au moins 10 caractères', min: 10)]
+    #[Assert\MaxLength(message: 'Le titre ne peut excéder 255 caractères', max: 255)]
     private string $title;
 
     #[Column(name: 'filename')]
     private ?string $filename = null;
 
-    #[Assert\Image()]
+    #[Assert\Image("L'image n'est pas valide")]
     private ?UploadedFile $file = null;
 
     #[Column(name: 'content')]
-    #[Assert\NotBlank()]
-    #[Assert\NotNull()]
+    #[Assert\NotBlank('Le contenu ne doit pas être vide')]
+    #[Assert\NotNull('Le contenu ne doit pas être vide')]
     #[Assert\MaxLength(max: 10000)]
     private string $content;
 
     #[Column(name: 'excerpt')]
-    #[Assert\MaxLength(max: 300)]
+    #[Assert\MaxLength(message: 'Le résumé ne peut excéder 300 caractères', max: 300)]
     private ?string $excerpt = null;
 
     #[Column(name: 'slug')]
-    #[Assert\NotBlank()]
-    #[Assert\NotNull()]
-    #[Assert\Slug()]
-    #[Assert\MaxLength(max: 255)]
+    #[Assert\NotBlank('Le slug ne doit pas être vide')]
+    #[Assert\NotNull('Le slug ne doit pas être vide')]
+    #[Assert\Slug('Le slug est invalide')]
+    #[Assert\MaxLength(message: 'Le slug ne peut excéder 255 caractères', max: 255)]
     #[Assert\Unique(entityFqcn: Post::class, column: 'slug', message: "Le slug '%s' existe déjà")]
     private string $slug;
 

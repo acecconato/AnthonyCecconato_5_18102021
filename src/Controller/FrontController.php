@@ -18,6 +18,7 @@ use Blog\Router\Router;
 use Blog\Security\Authenticator;
 use Blog\Service\Paginator;
 use Exception;
+use Blog\Controller\Exception\UnauthorizedException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -106,6 +107,7 @@ class FrontController extends AbstractController
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws ResourceNotFound
+     * @throws UnauthorizedException
      */
     public function showSinglePost(
         string $slug,
@@ -141,6 +143,7 @@ class FrontController extends AbstractController
         $form = $formHandler->loadFromRequest($request, $comment);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessLoggedIn();
             $em = $postRepository->getEntityManager();
             $em->add($comment);
             $em->flush();

@@ -10,6 +10,7 @@ use Blog\Security\Authenticator;
 use Blog\Twig\CsrfTokenExtension;
 use Blog\Twig\PathExtension;
 use Blog\Twig\SecureFilter;
+use Blog\Twig\StripTagsFilter;
 use Lcharette\WebpackEncoreTwig\EntrypointsTwigExtension;
 use Lcharette\WebpackEncoreTwig\TagRenderer;
 use Psr\Container\ContainerExceptionInterface;
@@ -60,6 +61,7 @@ class Templating implements TemplatingInterface
         $this->twig->addExtension(new IntlExtension());
 
         $this->twig->addExtension(new SecureFilter());
+        $this->twig->addExtension(new StripTagsFilter());
     }
 
     /**

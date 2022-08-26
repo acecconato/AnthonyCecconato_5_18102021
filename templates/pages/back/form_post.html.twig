@@ -2,7 +2,9 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.25.2/ui/trumbowyg.min.css"
+          integrity="sha512-K87nr2SCEng5Nrdwkb6d6crKqDAl4tJn/BD17YCXH0hu2swuNMqSV6S8hTBZ/39h+0pDpW/tbQKq9zua8WiZTA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"/>
 {% endblock %}
 
 {% block page_content %}
@@ -17,7 +19,7 @@
                         {% endfor %}
                     {% endif %}
 
-                    <form method="post" id="comments-form">
+                    <form enctype="multipart/form-data" method="post" id="comments-form">
 
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
@@ -27,31 +29,32 @@
                                    name="form[title]"
                                    type="text"
                                    placeholder="Titre"
+                                   value="{{ form.get('title')|default('') }}"
                                    required
                             />
-                            <label for="title">Titre</label>
+                            <label for="title" class="mb-2 mt-3">Titre</label>
                         </div>
 
                         <div class="form-floating mb-4">
                             <input class="form-control" id="excerpt" name="form[excerpt]" type="text"
-                                   placeholder="Résumé"/>
-                            <label for="excerpt">Résumé</label>
+                                   placeholder="Résumé" value="{{ form.get('excerpt')|default('') }}"/>
+                            <label for="excerpt" class="mb-2 mt-3">Résumé</label>
                         </div>
 
                         <div class="mb-4">
-                            <label for="name" class="text-muted">Image mise en avant (optionnel)</label>
-                            <input class="form-control" id="image" type="file" name="form[file]"/>
+                            <label for="name" class="text-muted mb-2 mt-3">Image mise en avant (optionnel)</label>
+                            <input class="form-control" id="image" type="file" name="form[file]" value="{{ form.get('slug')|default('') }}"/>
                         </div>
 
                         <div class="form-floating mb-4">
                             <input class="form-control" id="slug" name="form[slug]" type="text"
                                    placeholder="slug"/>
-                            <label for="slug">Slug (optionnel)</label>
+                            <label for="slug" class="mb-2 mt-3">Slug (optionnel)</label>
                         </div>
 
-                        <label for="form[content]" class="text-muted">Contenu</label>
+                        <label for="editor" class="text-muted mb-2 mt-3">Contenu</label>
 
-                        <textarea class="form-control editor" id="form[content]" required></textarea>
+                        <textarea class="form-control editor" id="editor" name="form[content]" required>{{ form.get('content')|default('') }}</textarea>
 
                         <button class="btn btn-primary mt-5" id="submitButton" name="submit"
                                 type="submit" value="submit">
@@ -67,11 +70,16 @@
 {% block javascripts %}
     {{ parent() }}
     {{ encore_entry_script_tags('add_post', {defer: true}) }}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"
+            integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Trumbowyg/2.25.2/trumbowyg.min.js"
+            integrity="sha512-mBsoM2hTemSjQ1ETLDLBYvw6WP9QV8giiD33UeL2Fzk/baq/AibWjI75B36emDB6Td6AAHlysP4S/XbMdN+kSA=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script defer>
         document.addEventListener('DOMContentLoaded', () => {
-            const quill = new Quill('#editor', {theme: 'snow'})
-        })
+            $('#editor').trumbowyg();
+        });
     </script>
 {% endblock %}

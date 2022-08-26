@@ -70,19 +70,35 @@
                 {% if posts is iterable and posts is not empty %}
                     {% for post in posts %}
                         <div class="post-preview">
-                            <a href="{{ path('post', {slug: post.slug}) }}">
-                                <h3 class="">{{ post.title }}</h3>
-                                <p class="post-subtitle">{{ post.excerpt ?? post.content|slice(0, 300)|secure|striptags ~ '...' }}</p>
-                                <p class="opacity-50 small">
-                                    Publié par {{ post.user.username }}, le {{ post.createdAt|date('d M y') }}
-                                </p>
+                            <a href="{{ path('post', {slug: post.slug}) }}"
+                               class="d-flex justify-content-between align-items-center">
+
+                                {% if post.filename is not empty %}
+                                    <img src="{{ 'uploads/thumbs/' ~ post.filename }}" alt=""
+                                         class="post-thumb img img-thumbnail img-fluid col-4">
+                                {% endif %}
+
+                                <div class="{% if post.filename is not empty %}col-7{% endif %}">
+                                    <h3 class="">{{ post.title }}</h3>
+                                    <p class="post-subtitle">
+                                        {% if post.excerpt is not empty %}
+                                            {{ post.excerpt|secure|striptags }}
+                                        {% else %}
+                                            {{ post.content|secure|striptags|slice(0, 300) ~ '...' }}
+                                        {% endif %}
+                                    </p>
+                                    <p class="opacity-50 small">
+                                        Publié par {{ post.user.username }},
+                                        le {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM yy') }}
+                                    </p>
+                                </div>
                             </a>
                         </div>
 
                         <hr class="my-4"/>
                     {% endfor %}
                 {% else %}
-                    <p class="alert alert-info">Il n'y a pas de publications à afficher sur cette page</p>
+                    <p class="alert alert-info mb-4">Il n'y a pas d'articles à afficher sur cette page</p>
                 {% endif %}
 
                 <div aria-label="Pagination">
@@ -96,7 +112,7 @@
                         {% for range in pagination_range %}
                             <li class="page-item {% if range == page %}active{% endif %}">
                                 <a class="page-link " href="{{ path('home') }}?page={{ range }}#posts">
-                                    {{ range }}
+                                    {{ range + 1 }}
                                 </a>
                             </li>
                         {% endfor %}

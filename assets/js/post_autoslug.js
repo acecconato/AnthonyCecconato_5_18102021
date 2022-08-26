@@ -5,6 +5,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const slugElt = document.getElementById('slug');
 
     titleElt.addEventListener('change', (e) => {
-        slugElt.value = slugify(e.target.value).toLowerCase();
+        slugElt.value = slugify(e.target.value, {remove: /[*+~.()'"!:@]/g}).trim().toLowerCase();
     })
 })

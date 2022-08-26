@@ -26,6 +26,7 @@ Encore
     .addEntry("single", "./assets/pages/single.js")
     .addEntry("error500", "./assets/pages/error500.js")
     .addEntry("add_post", "./assets/pages/add_post.js")
+    .addEntry("dashboard_layout", "./assets/layouts/dashboard_layout.js")
 
     // enables the Symfony UX Stimulus bridge (used in assets/bootstrap.js)
     // .enableStimulusBridge('./assets/controllers.json')

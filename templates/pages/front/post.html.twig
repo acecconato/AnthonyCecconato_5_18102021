@@ -11,16 +11,21 @@
 {% endblock %}
 
 {% block header_content %}
-    <!-- Page Header-->
     <header class="masthead"
-            {% block header_bg_style %}style="background-image: url({{ post.filename ?? 'img/home-bg.jpg' }})"{% endblock %}>
+            {% block header_bg_style %}style="background-image: url({{ (post.filename is empty) ? 'img/home-bg.jpg' :'/uploads/' ~ post.filename }})"{% endblock %}>
         <div class="container position-relative px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-10">
                     <div class="site-heading">
                         {% block page_title %}
                             <h1>{{ post.title }}</h1>
-                            <span class="subheading mt-5">{{ post.excerpt ?? post.content|slice(0, 300)|secure|striptags ~ '...' }}</span>
+                            <span class="subheading mt-5">
+                                {% if post.excerpt is not empty %}
+                                    {{ post.excerpt|secure|striptags }}
+                                {% else %}
+                                    {{ post.content|secure|striptags|slice(0, 300) ~ '...' }}
+                                {% endif %}
+                            </span>
                         {% endblock %}
                     </div>
                 </div>

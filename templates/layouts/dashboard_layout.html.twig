@@ -1,5 +1,10 @@
 {% extends "base.html.twig" %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('dashboard_layout') }}
+{% endblock %}
+
 {% block header %}
     {% block header_nav %}
         <!-- Navigation-->

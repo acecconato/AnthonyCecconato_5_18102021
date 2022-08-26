@@ -1,0 +1,55 @@
+nav.navbar.is-fixed {
+  p, a {
+    color: white !important;
+  }
+}
+
+table {
+  #btn-delete {
+    &:hover {
+      background: var(--bs-danger);
+
+      svg, i, .fa {
+        color: white !important;
+      }
+    }
+  }
+
+  #btn-display {
+    &:hover {
+      background: var(--bs-info);
+
+      svg, i, .fa {
+        color: white !important;
+      }
+    }
+  }
+
+  #btn-update {
+    &:hover {
+      background: var(--bs-warning);
+
+      svg, i, .fa {
+        color: white !important;
+      }
+    }
+  }
+
+  td, tr {
+    text-align: left;
+    vertical-align: middle;
+
+    &.actions {
+      text-align: right;
+    }
+  }
+
+  th {
+    text-transform: uppercase;
+  }
+}
+
+#post-add {
+  width: fit-content;
+  margin-left: auto;
+}

@@ -12,7 +12,8 @@ CREATE TABLE `user`
     remember_token VARCHAR(255),
     is_admin       INT          NOT NULL DEFAULT 0,
     enabled        INT          NOT NULL DEFAULT 0,
-    reset_token    VARCHAR(255)
+    reset_token    VARCHAR(255),
+    created_at     DATETIME     NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE `post`

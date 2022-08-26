@@ -17,21 +17,24 @@ class ImageConstraintValidator implements ConstraintValidatorInterface
      * @param mixed $value
      * @param Image $constraint
      * @param string|null $propertyPath
+     *
      * @return bool
      * @throws InvalidArgumentException
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
-        if (!$value) {
+        if (! $value) {
             return true;
         }
 
+        // @todo Check size
+
         // @phpstan-ignore-next-line
-        if (!is_object($value) || $value::class !== File::class && $value::class !== UploadedFile::class) {
+        if (! is_object($value) || $value::class !== File::class && $value::class !== UploadedFile::class) {
             throw new InvalidArgumentException($value . ' is not a file', 0, $propertyPath);
         }
 
-        $mimeTypes = new MimeTypes();
+        $mimeTypes    = new MimeTypes();
         $allowedTypes = ['jpg', 'png', 'svg', 'gif'];
 
         foreach ($allowedTypes as $type) {

@@ -14,7 +14,8 @@
                         attente d'acceptation
                     </li>
                     <li class="list-inline-item">Il y a <b>{{ nbPosts }}</b> articles publiés</li>
-                    <li class="list-inline-item">Il y a <b>{{ nbComments }}</b> commentaires en attente d'acceptation
+                    <li class="list-inline-item">Il y a <b>{{ nbComments }}</b> commentaires, dont
+                        <b>{{ nbCommentsAwaiting }}</b> en attente d'acceptation
                     </li>
                 </ul>
             </section>
@@ -28,7 +29,8 @@
                         </a>
                     </li>
                     <li class="list-inline-item">
-                        <a href="{{ path('admin_articles') }}" class="btn btn-outline-primary" title="Voir les articles">
+                        <a href="{{ path('admin_articles') }}" class="btn btn-outline-primary"
+                           title="Voir les articles">
                             Articles
                         </a>
                     </li>
@@ -36,8 +38,8 @@
                         <a href="{{ path('admin_comments') }}" class="btn btn-outline-primary"
                            title="Voir les commentaires">
                             Commentaires
-                            {% if nbComments > 0 %}
-                                <span class="badge bg-danger">{{ nbComments }}</span>
+                            {% if nbCommentsAwaiting > 0 %}
+                                <span class="badge bg-danger">{{ nbCommentsAwaiting }}</span>
                             {% endif %}
                         </a>
                     </li>

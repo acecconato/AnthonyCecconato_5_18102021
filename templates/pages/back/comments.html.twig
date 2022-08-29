@@ -2,7 +2,7 @@
 
 {% block page_content %}
     <main id="dashboard" class="mt-5 pt-md-5 mb-5">
-        <div class="container mt-5 pt-5 px-4 px-lg-5">
+        <div class="container-fluid mt-5 pt-5 px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="row col-12">
 
@@ -12,6 +12,7 @@
                             <th scope="col">Date</th>
                             <th scope="col">Auteur</th>
                             <th scope="col">Contenu</th>
+                            <th scope="col">Article</th>
                             <th scope="col">Signalements</th>
                             <th scope="col"></th>
                         </tr>
@@ -23,9 +24,14 @@
                                     <td>
                                         {{ comment.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
                                     </td>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
+                                    <td>{{ comment.user.username }}</td>
+                                    <td>{{ comment.content }}</td>
+                                    <td>
+                                        <a href="{{ path('post', {slug: comment.post.slug}) }}" target="_blank">
+                                            {{ comment.post.title }}
+                                        </a>
+                                    </td>
+                                    <td>TODO</td>
                                     <td class="actions d-flex flex-column">
                                         <a href="{{ path('admin_delete_comment', {id: comment.id}) }}"
                                            id="btn-delete"
@@ -34,6 +40,24 @@
                                         >
                                             <i class="fa fa-trash text-secondary"></i>
                                         </a>
+
+                                        {% if comment.enabled %}
+                                            <a href="{{ path('admin_toggle_comment', {id: comment.id}) }}"
+                                               id="btn-enable"
+                                               class="btn btn-lg"
+                                               title="Désactiver"
+                                            >
+                                                <i class="fa fa-check-square text-success"></i>
+                                            </a>
+                                        {% else %}
+                                            <a href="{{ path('admin_toggle_comment', {id: comment.id}) }}"
+                                               id="btn-disable"
+                                               class="btn btn-lg"
+                                               title="Activer"
+                                            >
+                                                <i class="fa fa-xmark-square text-danger"></i>
+                                            </a>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -27,6 +27,8 @@ return function (RouterInterface $router) {
         ->add(new Route('admin_comments', '/dashboard/commentaires', [DashboardController::class, 'showComments']))
         ->add(new Route('admin_create_comment', '/dashboard/commentaires/ajouter', [DashboardController::class, 'createComment']))
         ->add(new Route('admin_update_comment', '/dashboard/commentaires/{id:[a-zA-Z0-9-_]+}/modifier', [DashboardController::class, 'updateComment']))
+        ->add(new Route('admin_delete_comment', '/dashboard/commentaires/{id:[a-zA-Z0-9-_]+}/supprimer', [DashboardController::class, 'deleteComment']))
+        ->add(new Route('admin_toggle_comment', '/dashboard/commentaires/{id:[a-zA-Z0-9-_]+}/basculer', [DashboardController::class, 'toggleComment']))
 
         ->add(new Route('admin_users', '/dashboard/utilisateurs', [DashboardController::class, 'showUsers']))
         ->add(new Route('admin_delete_user', '/dashboard/utilisateurs/{id:[a-zA-Z0-9-_]+}/supprimer', [DashboardController::class, 'deleteUser']))

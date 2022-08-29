@@ -46,7 +46,8 @@ class DashboardController extends AbstractController
         return $this->render('pages/back/index.html.twig', [
             'nbUsers' => $userRepository->countAll(),
             'nbDisabledUsers' => $userRepository->countUserAwaitingValidation(),
-            'nbComments' => $commentRepository->countAwaitingValidation(),
+            'nbCommentsAwaiting' => $commentRepository->countAwaitingValidation(),
+            'nbComments' => $commentRepository->countAll(),
             'nbPosts' => $postRepository->countAll(),
         ]);
     }
@@ -125,15 +126,15 @@ class DashboardController extends AbstractController
 
         $comments = $commentRepository->findAll();
 
+        $users = [];
+        $posts = [];
         /** @var Comment $comment */
         foreach ($comments as $comment) {
-            /** @var User $author */
-            $author = $userRepository->find($comment->getUserId());
-            /** @var Post $post */
-            $post = $postRepository->find($comment->getPostId());
+            $userId = $comment->getUserId();
+            $comment->setUser($users[$userId] ?? $users[$userId] = $userRepository->find($userId));
 
-            $comment->setUser($author);
-            $comment->setPost($post);
+            $postId = $comment->getPostId();
+            $comment->setPost($posts[$postId] ?? $posts[$postId] = $postRepository->find($postId));
         }
 
         return $this->render('pages/back/comments.html.twig', ['comments' => $comments]);
@@ -284,11 +285,11 @@ class DashboardController extends AbstractController
 
         $posts = $postRepository->findAll();
 
+        $users = [];
         /** @var Post $post */
         foreach ($posts as $post) {
-            /** @var User $author */
-            $author = $userRepository->find($post->getUserId());
-            $post->setUser($author);
+            $userId = $post->getUserId();
+            $post->setUser($users[$userId] ?? $users[$userId] = $userRepository->find($userId));
         }
 
         return $this->render('pages/back/posts.html.twig', ['posts' => $posts]);

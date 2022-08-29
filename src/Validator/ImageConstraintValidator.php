@@ -27,8 +27,6 @@ class ImageConstraintValidator implements ConstraintValidatorInterface
             return true;
         }
 
-        // @todo Check size
-
         // @phpstan-ignore-next-line
         if (! is_object($value) || $value::class !== File::class && $value::class !== UploadedFile::class) {
             throw new InvalidArgumentException($value . ' is not a file', 0, $propertyPath);

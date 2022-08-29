@@ -67,8 +67,6 @@
                         <li class="list-group-item border-0"><a href="#">Mentions légales</a></li>
                         <li class="list-group-item border-0"><a href="#">Politique de confidentialité</a></li>
                         {% if auth.isLoggedIn %}
-                            <li class="list-group-item border-0"><a href="{{ path('logout') }}">Déconnexion</a></li>
-
                             {% if auth.user.isAdmin %}
                                 <li class="list-group-item border-0">
                                     <a href="{{ path('admin_dashboard') }}">
@@ -76,6 +74,8 @@
                                     </a>
                                 </li>
                             {% endif %}
+
+                            <li class="list-group-item border-0"><a href="{{ path('logout') }}">Déconnexion</a></li>
                         {% else %}
                             <li class="list-group-item border-0"><a href="{{ path('login') }}">Connexion</a></li>
                         {% endif %}

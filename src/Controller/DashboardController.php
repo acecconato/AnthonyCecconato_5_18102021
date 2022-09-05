@@ -44,11 +44,11 @@ class DashboardController extends AbstractController
         $this->denyAccessUnlessIsAdmin();
 
         return $this->render('pages/back/index.html.twig', [
-            'nbUsers' => $userRepository->countAll(),
-            'nbDisabledUsers' => $userRepository->countUserAwaitingValidation(),
+            'nbUsers'            => $userRepository->countAll(),
+            'nbDisabledUsers'    => $userRepository->countUserAwaitingValidation(),
             'nbCommentsAwaiting' => $commentRepository->countAwaitingValidation(),
-            'nbComments' => $commentRepository->countAll(),
-            'nbPosts' => $postRepository->countAll(),
+            'nbComments'         => $commentRepository->countAll(),
+            'nbPosts'            => $postRepository->countAll(),
         ]);
     }
 
@@ -103,14 +103,55 @@ class DashboardController extends AbstractController
     }
 
     /**
+     * @throws ContainerExceptionInterface
      * @throws Exception\UnauthorizedException
+     * @throws NotFoundExceptionInterface
+     * @throws ReflectionException
+     * @throws ResourceNotFound
+     * @throws ImageResizeException
      */
-    public function updatePost(int $id): Response
-    {
+    public function updatePost(
+        string $id,
+        PostRepository $postRepository,
+        FormHandler $formHandler,
+        Request $request,
+        FileUploader $fileUploader,
+        EntityManager $entityManager,
+        string $uploadDir
+    ): Response {
         $this->denyAccessUnlessIsAdmin();
-        $post = new Post();
+        /** @var ?Post $post */
+        $post = $postRepository->find($id);
+        $tempFilename = $post->getFilename();
 
-        return $this->render('pages/back/form_post.html.twig', ['post' => $post]);
+        if (!$post) {
+            throw new ResourceNotFound('Article introuvable');
+        }
+
+        $form = $formHandler->loadFromRequest($request, $post, true);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            if ($post->getFile()) {
+                $filename = $fileUploader->replace($tempFilename, $post->getFile());
+                $post->setFilename($filename);
+
+                // Generate image thumbnail
+                $thumbnail = new ImageResize($uploadDir . '/' . $filename);
+                $thumbnail->resizeToHeight(400);
+                $thumbnail->save(filename: $uploadDir . '/thumbs/' . $filename);
+            }
+
+            $entityManager->update($post);
+            $entityManager->flush();
+
+            /** @var Session $session */
+            $session = $request->getSession();
+            $session->getFlashBag()->add('success', 'Article modifié');
+
+            return $this->redirect($request->headers->get('referer'));
+        }
+
+        return $this->render('pages/back/form_edit_post.html.twig', ['post' => $post, 'form' => $form]);
     }
 
     /**
@@ -241,8 +282,8 @@ class DashboardController extends AbstractController
         $emailContent = $this->renderView(
             'mails/toggle_user.html.twig',
             [
-                'url' => $loginUrl,
-                'status' => $status
+                'url'    => $loginUrl,
+                'status' => $status,
             ],
             false
         );
@@ -279,7 +320,8 @@ class DashboardController extends AbstractController
      */
     public function showPosts(
         PostRepository $postRepository,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        CommentRepository $commentRepository
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
@@ -290,6 +332,9 @@ class DashboardController extends AbstractController
         foreach ($posts as $post) {
             $userId = $post->getUserId();
             $post->setUser($users[$userId] ?? $users[$userId] = $userRepository->find($userId));
+            /** @var Comment[] $comments */
+            $comments = $commentRepository->findAllBy(['post_id' => $post->getId(), 'enabled' => true]);
+            $post->setComments($comments);
         }
 
         return $this->render('pages/back/posts.html.twig', ['posts' => $posts]);
@@ -327,6 +372,73 @@ class DashboardController extends AbstractController
         /** @var Session $session */
         $session = $request->getSession();
         $session->getFlashBag()->add('success', 'Article supprimé');
+
+        return $this->redirect($request->headers->get('referer'));
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws Exception\UnauthorizedException
+     * @throws ResourceNotFound
+     */
+    public function toggleComment(
+        string $id,
+        CommentRepository $commentRepository,
+        EntityManager $entityManager,
+        Request $request,
+    ): Response {
+        $this->denyAccessUnlessIsAdmin();
+
+        /** @var ?Comment $comment */
+        $comment = $commentRepository->find($id);
+
+        if (! $comment) {
+            throw new ResourceNotFound('Utilisateur introuvable');
+        }
+
+        $comment->setEnabled((int) ! $comment->getEnabled());
+
+        $entityManager->update($comment);
+        $entityManager->flush();
+
+        $status = ($comment->getEnabled()) ? 'activé' : 'désactivé';
+
+        /** @var Session $session */
+        $session = $request->getSession();
+        $session->getFlashBag()->add(
+            'success',
+            "Commentaire $status"
+        );
+
+        return $this->redirect($request->headers->get('referer'));
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ResourceNotFound
+     * @throws Exception\UnauthorizedException
+     */
+    public function deleteComment(
+        string $id,
+        CommentRepository $commentRepository,
+        EntityManager $entityManager,
+        Request $request,
+    ): Response {
+        $this->denyAccessUnlessIsAdmin();
+
+        /** @var ?Comment $comment */
+        $comment = $commentRepository->find($id);
+
+        if (! $comment) {
+            throw new ResourceNotFound('Utilisateur introuvable');
+        }
+
+        $entityManager->delete($comment);
+        $entityManager->flush();
+
+        /** @var Session $session */
+        $session = $request->getSession();
+        $session->getFlashBag()->add('success', 'Commentaire supprimé');
 
         return $this->redirect($request->headers->get('referer'));
     }

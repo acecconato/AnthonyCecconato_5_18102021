@@ -81,7 +81,7 @@
         <div class="row gx-4 gx-lg-5 justify-content-center">
 
             {% for comment in post.comments %}
-                <div class="col-md-10 col-xl-8">
+                <div class="col-md-10 col-xl-8" id="{{ comment.id }}">
                     <div class="comment__heading d-flex justify-content-between align-content-center">
                         <p>Par {{ comment.user.username }}
                             <span>

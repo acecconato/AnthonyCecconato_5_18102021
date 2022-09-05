@@ -23,8 +23,12 @@ class FileUploader
         return $fileName;
     }
 
-    public function replace(string $pathToFileFromUploadDir, UploadedFile $file): string
+    public function replace(?string $pathToFileFromUploadDir, UploadedFile $file): ?string
     {
+        if (!$pathToFileFromUploadDir) {
+            return null;
+        }
+
         unlink($this->uploadDir . '/' . $pathToFileFromUploadDir);
 
         return $this->upload($file);

@@ -13,7 +13,7 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-xl-8">
 
-                    <h1 class="mb-5">Ajouter un article</h1>
+                    <h1 class="mb-5">Éditer un article</h1>
 
                     {% if form is defined and form.hasErrors %}
                         {% for error in form.errors %}
@@ -31,7 +31,7 @@
                                    name="form[title]"
                                    type="text"
                                    placeholder="Titre"
-                                   value="{{ form.get('title')|default('') }}"
+                                   value="{{ form.get('title') ?: post.title }}"
                                    required
                             />
                             <label for="title" class="mb-2 mt-3">Titre</label>
@@ -39,13 +39,18 @@
 
                         <div class="form-floating mb-4">
                             <input class="form-control" id="excerpt" name="form[excerpt]" type="text"
-                                   placeholder="Résumé" value="{{ form.get('excerpt')|default('') }}"/>
+                                   placeholder="Résumé" value="{{ form.get('excerpt') ?: post.excerpt }}"/>
                             <label for="excerpt" class="mb-2 mt-3">Résumé</label>
                         </div>
 
                         <div class="row align-items-center mb-4">
                             <div class="col-3">
-                                <img src="/img/noimage.jpg"
+                                <img src="
+                                    {% if (post.filename) %}
+                                        {{ '/uploads/thumbs/' ~ post.filename }}
+                                    {% else %}
+                                        /img/noimage.jpg
+                                    {% endif %}"
                                      id="imagePreview"
                                      class="img-thumbnail featured-image-form mt-3"
                                      alt="Image mise en avant">
@@ -57,18 +62,23 @@
                         </div>
 
                         <div class="form-floating mb-4">
-                            <input class="form-control" id="slug" name="form[slug]" type="text"
-                                   placeholder="slug"/>
+                            <input class="form-control"
+                                   id="slug"
+                                   name="form[slug]"
+                                   type="text"
+                                   placeholder="slug"
+                                   value="{{ form.get('slug') ?: post.slug }}"/>
                             <label for="slug" class="mb-2 mt-3">Slug (optionnel)</label>
                         </div>
 
                         <label for="editor" class="text-muted mb-2 mt-3">Contenu</label>
 
-                        <textarea class="form-control editor" id="editor" name="form[content]" required>{{ form.get('content')|default('') }}</textarea>
+                        <textarea class="form-control editor" id="editor" name="form[content]"
+                                  required>{{ form.get('content') ?: post.content }}</textarea>
 
                         <button class="btn btn-primary mt-5" id="submitButton" name="submit"
                                 type="submit" value="submit">
-                            Ajouter
+                            Mettre à jour
                         </button>
                     </form>
                 </div>

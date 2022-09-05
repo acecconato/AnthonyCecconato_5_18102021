@@ -6,9 +6,13 @@
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="row col-12">
 
-                    <a href="{{ path('admin_create_post') }}" class="btn btn-outline-primary mb-5" id="post-add">
-                        <i class="fa fa-lg fa-pencil mx-2"></i> Rédiger un nouvel article
-                    </a>
+                    <div class="d-flex justify-content-between">
+                        <h1 class="mb-5">Gestion des articles</h1>
+
+                        <a href="{{ path('admin_create_post') }}" class="btn btn-outline-primary mb-5" id="post-add">
+                            <i class="fa fa-lg fa-pencil mx-2"></i> Rédiger un nouvel article
+                        </a>
+                    </div>
 
                     <table class="table table-borderless table-striped">
                         <thead>
@@ -17,6 +21,7 @@
                             <th scope="col">Titre</th>
                             <th scope="col">Slug</th>
                             <th scope="col">Auteur</th>
+                            <th scope="col">Commentaires</th>
                             <th scope="col"></th>
                         </tr>
                         </thead>
@@ -27,19 +32,15 @@
                                     <td>
                                         {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
                                     </td>
-                                    <td>{{ post.title }}</td>
+                                    <td>
+                                        <a href="{{ path('post', {slug: post.slug}) }}" target="_blank">
+                                            {{ post.title }}
+                                        </a>
+                                    </td>
                                     <td>{{ post.slug }}</td>
                                     <td>{{ post.user.username }}</td>
+                                    <td>{{ post.comments|length }}</td>
                                     <td class="actions d-flex flex-column">
-                                        <a href="{{ path('post', {slug: post.slug}) }}"
-                                           id="btn-display"
-                                           class="btn btn-lg"
-                                           title="Voir l'article"
-                                           target="_blank"
-                                        >
-                                            <i class="fa fa-eye text-secondary"></i>
-                                        </a>
-
                                         <a href="{{ path('admin_update_post', {id: post.id}) }}"
                                            id="btn-update"
                                            class="btn btn-lg"

@@ -16,7 +16,7 @@ class FileUploader
 
     public function upload(UploadedFile $file): string
     {
-        $fileName         = UuidV4::uuid4() . '.' . $file->guessExtension();
+        $fileName = UuidV4::uuid4() . '.' . $file->guessExtension();
 
         $file->move($this->getTargetDirectory(), $fileName);
 
@@ -25,11 +25,9 @@ class FileUploader
 
     public function replace(?string $pathToFileFromUploadDir, UploadedFile $file): ?string
     {
-        if (!$pathToFileFromUploadDir) {
-            return null;
+        if (file_exists($this->uploadDir . '/' . $pathToFileFromUploadDir)) {
+            unlink($this->uploadDir . '/' . $pathToFileFromUploadDir);
         }
-
-        unlink($this->uploadDir . '/' . $pathToFileFromUploadDir);
 
         return $this->upload($file);
     }

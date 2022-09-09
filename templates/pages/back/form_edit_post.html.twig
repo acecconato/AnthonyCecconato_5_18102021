@@ -37,6 +37,16 @@
                             <label for="title" class="mb-2 mt-3">Titre</label>
                         </div>
 
+                        <div class="form-group">
+                            <label class="mb-2" for="author">Auteur</label>
+                            <select class="form-select" name="form[author]" id="author">
+                                <option selected value="{{ owner.id }}">{{ owner.username }}</option>
+                                {% for author in authors %}
+                                    <option value="{{ author.id }}">{{ author.username }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
                         <div class="form-floating mb-4">
                             <input class="form-control" id="excerpt" name="form[excerpt]" type="text"
                                    placeholder="Résumé" value="{{ form.get('excerpt') ?: post.excerpt }}"/>

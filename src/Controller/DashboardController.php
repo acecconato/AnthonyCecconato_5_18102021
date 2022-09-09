@@ -17,6 +17,7 @@ use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Router;
 use Blog\Security\Authenticator;
 use Blog\Service\FileUploader;
+use DateTime;
 use Gumlet\ImageResize;
 use Gumlet\ImageResizeException;
 use Psr\Container\ContainerExceptionInterface;
@@ -109,24 +110,32 @@ class DashboardController extends AbstractController
      * @throws ReflectionException
      * @throws ResourceNotFound
      * @throws ImageResizeException
+     * @throws \Exception
      */
     public function updatePost(
         string $id,
+        string $uploadDir,
         PostRepository $postRepository,
+        UserRepository $userRepository,
+        EntityManager $entityManager,
         FormHandler $formHandler,
         Request $request,
         FileUploader $fileUploader,
-        EntityManager $entityManager,
-        string $uploadDir
     ): Response {
         $this->denyAccessUnlessIsAdmin();
         /** @var ?Post $post */
-        $post = $postRepository->find($id);
+        $post         = $postRepository->find($id);
         $tempFilename = $post->getFilename();
 
-        if (!$post) {
+        if (! $post) {
             throw new ResourceNotFound('Article introuvable');
         }
+
+        $owner   = $userRepository->find($post->getUserId());
+        $authors = array_filter(
+            $userRepository->findAllBy(['is_admin' => 1]),
+            fn($user) => $user->getId() !== $post->getUserId()
+        );
 
         $form = $formHandler->loadFromRequest($request, $post, true);
 
@@ -141,6 +150,9 @@ class DashboardController extends AbstractController
                 $thumbnail->save(filename: $uploadDir . '/thumbs/' . $filename);
             }
 
+            $post->setUpdatedAt(new DateTime());
+            $post->setUserId($form->get('author'));
+
             $entityManager->update($post);
             $entityManager->flush();
 
@@ -151,7 +163,15 @@ class DashboardController extends AbstractController
             return $this->redirect($request->headers->get('referer'));
         }
 
-        return $this->render('pages/back/form_edit_post.html.twig', ['post' => $post, 'form' => $form]);
+        return $this->render(
+            'pages/back/form_edit_post.html.twig',
+            [
+                'post'    => $post,
+                'form'    => $form,
+                'authors' => $authors,
+                'owner'   => $owner,
+            ]
+        );
     }
 
     /**

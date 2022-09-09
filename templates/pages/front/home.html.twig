@@ -88,8 +88,13 @@
                                         {% endif %}
                                     </p>
                                     <p class="opacity-50 small">
-                                        Publié par {{ post.user.username }},
-                                        le {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM yy') }}
+                                        {% if not post.updatedAt %}
+                                            Publié le {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM yyyy') }}
+                                            par {{ post.user.username }}
+                                        {% else %}
+                                            Mis à jour le {{ post.updatedAt|format_datetime(locale='fr', pattern='dd MMM yyyy') }}
+                                            par {{ post.user.username }}
+                                        {% endif %}
                                     </p>
                                 </div>
                             </a>

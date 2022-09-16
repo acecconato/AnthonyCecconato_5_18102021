@@ -22,7 +22,7 @@ Then update the file as your needs.
 ### Database setup
 
 You will need a MySQL or Mariadb database ready to receive the database import. When it's done, do the following:
-> `mysql -u username -p dbname < sql/structure.sql
+> `mysql -u username -p dbname < sql/structure.sql`
 
 ### Generate demo fixtures
 > `php ./src/Fixture/generate.php`

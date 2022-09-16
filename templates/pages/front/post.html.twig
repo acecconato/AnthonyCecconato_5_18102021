@@ -5,22 +5,22 @@
     {{ encore_entry_link_tags('single') }}
 {% endblock %}
 
-{% block javascripts %}
-    {{ parent() }}
-    {{ encore_entry_script_tags('single', {defer: true}) }}
-{% endblock %}
-
 {% block header_content %}
-    <!-- Page Header-->
     <header class="masthead"
-            {% block header_bg_style %}style="background-image: url({{ post.filename ?? 'img/home-bg.jpg' }})"{% endblock %}>
+            {% block header_bg_style %}style="background-image: url({{ (post.filename is empty) ? 'img/home-bg.jpg' :'/uploads/' ~ post.filename }})"{% endblock %}>
         <div class="container position-relative px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="col-md-10 col-lg-8 col-xl-10">
                     <div class="site-heading">
                         {% block page_title %}
-                            <h1>{{ post.title }}</h1>
-                            <span class="subheading mt-5">{{ post.excerpt ?? post.content|slice(0, 300)|secure|striptags ~ '...' }}</span>
+                            <h1 id="post-title">{{ post.title }}</h1>
+                            <span class="subheading mt-5">
+                                {% if post.excerpt is not empty %}
+                                    {{ post.excerpt|secure|striptags }}
+                                {% else %}
+                                    {{ post.content|secure|striptags|slice(0, 300) ~ '...' }}
+                                {% endif %}
+                            </span>
                         {% endblock %}
                     </div>
                 </div>
@@ -30,29 +30,47 @@
 {% endblock %}
 
 {% block page_content %}
+    <section aria-labelledby="post-title">
+        <div class="container">
 
-    <div class="container">
-        <div class="row gx-4 gx-lg-5 justify-content-center">
-            <div class="m-0 col-md-10 col-xl-8 d-flex justify-content-between align-items-center">
-                <p class="m-0">Publié
-                    le {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM yy à HH:mm') }}</p>
-                <p class="m-0">par {{ post.user.username|capitalize }}</p>
-            </div>
-        </div>
-    </div>
+            {% if form is defined and form.hasErrors %}
+                <div class="row gx-4 gx-lg-5 justify-content-center mb-5">
+                    <div class="m-0 col-md-10 col-xl-8">
+                        {% for error in form.errors %}
+                            <p class="alert alert-danger">{{ error['message'] }}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
 
-    <!-- Post Content-->
-    <article class="mb-4">
-        <div class="container px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-md-10 col-xl-8 mt-5">
-                    {% autoescape %}
-                        {{ post.content|secure|raw }}
-                    {% endautoescape %}
+                <div class="m-0 col-md-10 col-xl-8 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center">
+                    <p class="m-0">
+                        {% if not post.updatedAt %}
+                            Publié le {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM yy') }}
+                        {% else %}
+                            Modifié le {{ post.updatedAt|format_datetime(locale='fr', pattern='dd MMM yy') }}
+                        {% endif %}
+                    </p>
+                    <p class="m-0">par {{ post.user.username|capitalize }}</p>
                 </div>
             </div>
         </div>
-    </article>
+
+        <!-- Post Content-->
+        <article class="mb-md-4">
+            <div class="container px-4 px-lg-5">
+                <div class="row gx-4 gx-lg-5 justify-content-center">
+                    <div class="col-md-10 col-xl-8 mt-5">
+                        {% autoescape %}
+                            {{ post.content|secure|raw }}
+                        {% endautoescape %}
+                    </div>
+                </div>
+            </div>
+        </article>
+    </section>
+
 
     <section id="comments" class="container px-4 px-lg-5 mb-5 pb-5" aria-labelledby="comments-title">
         <div class="row gx-4 gx-lg-5 justify-content-center mb-4">
@@ -62,26 +80,28 @@
             </div>
         </div>
 
-        <div class="row gx-4 gx-lg-5 justify-content-center">
+        <div class="row gx-4 gx-lg-5 justify-content-center comments-list">
 
             {% for comment in post.comments %}
-                <div class="col-md-10 col-xl-8">
+                <div class="m-0 col-md-10 col-xl-8" id="{{ comment.id }}">
                     <div class="comment__heading d-flex justify-content-between align-content-center">
-                        <p>Par {{ comment.user.username }}
+                        <p class="mb-3">{{ comment.user.username }}
                             <span>
-                                le {{ comment.createdAt|format_datetime(locale='fr', pattern='dd MMM yy à HH:mm') }}
+                                {{ comment.createdAt|format_datetime(locale='fr', pattern='dd MMM yy') }}
                             </span>
                         </p>
-                        <span class="align-self-center">
-                       <a href="#"><i class="fa fa-exclamation-circle text-warning"></i></a>
 
                         {% if auth.user.isAdmin %}
-                            <a href="#" class="m-2"><i class="fa fa-close text-danger"></i></a>
+                            <span class="align-self-center">
+                                <a href="{{ path('admin_delete_comment', {id: comment.id}) }}"
+                                   class="m-2 delete-comment">
+                                    <i class="fa fa-close text-danger"></i>
+                                </a>
+                            </span>
                         {% endif %}
-                   </span>
-                    </div>
 
-                    <p class="mt-2">{{ comment.content|nl2br }}</p>
+                    </div>
+                    <p class="mt-0 mb-2">{{ comment.content|nl2br }}</p>
                 </div>
             {% endfor %}
 
@@ -91,12 +111,6 @@
             <div class="col-md-10 col-xl-8 mt-4 shadow p-5">
 
                 {% if auth.isLoggedIn %}
-
-                    {% if errors is defined and errors is iterable %}
-                        {% for error in errors %}
-                            <p class="alert alert-danger">{{ error['message'] }}</p>
-                        {% endfor %}
-                    {% endif %}
 
                     <form action="" method="post" id="comments-form">
 
@@ -118,10 +132,28 @@
                     </form>
                 {% else %}
                     <p>Vous devez être connecté pour publier un commentaire</p>
-                    <a href="{{ path('login') }}?redirect={{ app.request_uri }}" class="btn btn-primary">Se
-                        connecter</a>
+                    <a href="{{ path('login') }}?redirect={{ app.request_uri }}" class="btn btn-primary">
+                        Se connecter
+                    </a>
                 {% endif %}
             </div>
         </div>
     </section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    {{ encore_entry_script_tags('single', {defer: true}) }}
+
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.delete-comment').forEach((delCommentBtn) => {
+                delCommentBtn.addEventListener('click', (e) => {
+                    if (!window.confirm("Souhaitez-vous vraiment supprimer ce commentaire ?")) {
+                        e.preventDefault()
+                    }
+                })
+            })
+        })
+    </script>
 {% endblock %}

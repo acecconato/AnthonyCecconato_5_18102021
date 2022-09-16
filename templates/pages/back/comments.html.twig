@@ -1,61 +1,103 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
 {% block page_content %}
-    <main id="dashboard" class="mt-5 pt-md-5 mb-5">
-        <div class="container mt-5 pt-5 px-4 px-lg-5">
+    <main id="dashboard" class="dashboard mb-5">
+        <div class="container-fluid mt-5 pt-5 px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="row col-10">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">First</th>
-                            <th scope="col">Last</th>
-                            <th scope="col">Handle</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td colspan="2">Larry the Bird</td>
-                            <td>@twitter</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="row col-12">
 
-                    <div class="col-md-10 col-xl-8 mt-5">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                    <h1 class="mb-5">Gestion des commentaires</h1>
+
+                    <div class="overflow-auto">
+                        <table class="table table-borderless table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Auteur</th>
+                                <th scope="col">Contenu</th>
+                                <th scope="col">Article</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if comments is not empty and comments is iterable %}
+                                {% for comment in comments %}
+                                    <tr>
+                                        <td>
+                                            {{ comment.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
+                                        </td>
+                                        <td>{{ comment.user.username }}</td>
+                                        <td>{{ comment.content }}</td>
+                                        <td>
+                                            <a href="{{ path('post', {slug: comment.post.slug}) }}" target="_blank">
+                                                {{ comment.post.title }}
+                                            </a>
+                                        </td>
+                                        <td class="actions d-flex flex-column">
+                                            {% if comment.enabled %}
+                                                <a href="{{ path('admin_toggle_comment', {id: comment.id}) }}"
+                                                   id="btn-enable"
+                                                   class="btn btn-lg"
+                                                   title="Désactiver"
+                                                >
+                                                    <i class="fa fa-check-square text-success"></i>
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ path('admin_toggle_comment', {id: comment.id}) }}"
+                                                   id="btn-disable"
+                                                   class="btn btn-lg"
+                                                   title="Activer"
+                                                >
+                                                    <i class="fa fa-xmark-square text-danger"></i>
+                                                </a>
+                                            {% endif %}
+
+                                            <a href="{{ path('post', {slug: comment.post.slug}) }}#{{ comment.id }}"
+                                               id="btn-display"
+                                               class="btn btn-lg {% if not comment.enabled %}disabled{% endif %}"
+                                               title="Voir le commentaire"
+                                               target="_blank"
+                                            >
+                                                <i class="fa fa-eye text-secondary"></i>
+                                            </a>
+
+                                            <a href="{{ path('admin_delete_comment', {id: comment.id}) }}"
+                                               id="btn-delete"
+                                               class="btn btn-lg"
+                                               title="Supprimer"
+                                            >
+                                                <i class="fa fa-trash text-secondary"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
                     </div>
+
+                    {% if comments is empty %}
+                        <p class="alert alert-info">Il n y a pas encore de commentaires</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </main>
 {% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btns = document.querySelectorAll('#btn-delete');
+            btns.forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    if (!window.confirm('Êtes-vous certain de vouloir supprimer ce commentaire ?')) {
+                        event.preventDefault();
+                    }
+                });
+            })
+        })
+    </script>
+{% endblock %}
+

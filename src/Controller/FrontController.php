@@ -18,6 +18,7 @@ use Blog\Router\Router;
 use Blog\Security\Authenticator;
 use Blog\Service\Paginator;
 use Exception;
+use Blog\Controller\Exception\UnauthorizedException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionException;
@@ -45,7 +46,7 @@ class FrontController extends AbstractController
         Router $router,
         MailerInterface $mailer
     ): Response {
-        $page = (int)$request->query->get('page', 0);
+        $page   = (int)$request->query->get('page', 0);
         $nbItem = $postRepository->countAll();
         $pDatas = $paginator->getPaginatingDatas($page, $nbItem, 6);
 
@@ -59,18 +60,16 @@ class FrontController extends AbstractController
 
         $form = $formHandler->loadFromRequest($request, $contact);
 
-        $username = $form->get('name');
-        $userEmail = $form->get('email');
-        $message = $form->get('message');
+        $emailContent = $this->renderView('mails/contact.html.twig', ['form' => $form], false);
 
         if ($form->isSubmitted() && $form->isValid()) {
             $email = (new Email())
                 ->from($_ENV['MAILER_SENDER'])
-                ->to($userEmail)
+                ->to($form->get('email'))
                 ->priority(Email::PRIORITY_NORMAL)
-                ->subject("Vous avez un nouveau message de la part de $username")
-                ->text(strip_tags($message))
-                ->html(nl2br($message));
+                ->subject("Vous avez reçu un nouveau message")
+                ->text(strip_tags($emailContent))
+                ->html(nl2br($emailContent));
 
             /** @var Session $session */
             $session = $request->getSession();
@@ -87,11 +86,11 @@ class FrontController extends AbstractController
         return $this->render(
             'pages/front/home.html.twig',
             [
-                'posts' => $posts,
-                'pages' => $pDatas['pagesCount'],
-                'page' => $page,
+                'posts'            => $posts,
+                'pages'            => $pDatas['pagesCount'],
+                'page'             => $page,
                 'pagination_range' => $pDatas['range'],
-                'form' => $form
+                'form'             => $form,
             ]
         );
     }
@@ -106,6 +105,7 @@ class FrontController extends AbstractController
      * @throws NotFoundExceptionInterface
      * @throws ReflectionException
      * @throws ResourceNotFound
+     * @throws UnauthorizedException
      */
     public function showSinglePost(
         string $slug,
@@ -119,7 +119,7 @@ class FrontController extends AbstractController
         /** @var ?Post $post */
         $post = $postRepository->findOneBy(['slug' => $slug]);
 
-        if (!$post) {
+        if (! $post) {
             throw new ResourceNotFound("Publication '$slug' introuvable");
         }
 
@@ -131,16 +131,17 @@ class FrontController extends AbstractController
         $comments = $commentRepository->findAllBy(['post_id' => $post->getId(), 'enabled' => 1]);
         $post->setComments($comments);
 
+        $users = [];
         foreach ($comments as $comment) {
-            /** @var User $commentAuthor */
-            $commentAuthor = $userRepository->find($comment->getUserId());
-            $comment->setUser($commentAuthor);
+            $userId = $comment->getUserId();
+            $comment->setUser($users[$userId] ?? $users[$userId] = $userRepository->find($userId));
         }
 
         $comment = new Comment();
-        $form = $formHandler->loadFromRequest($request, $comment);
+        $form    = $formHandler->loadFromRequest($request, $comment);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $this->denyAccessUnlessLoggedIn();
             $em = $postRepository->getEntityManager();
             $em->add($comment);
             $em->flush();
@@ -152,6 +153,6 @@ class FrontController extends AbstractController
             return $this->redirect($request->getRequestUri());
         }
 
-        return $this->render('pages/front/post.html.twig', ['post' => $post]);
+        return $this->render('pages/front/post.html.twig', ['post' => $post, 'form' => $form]);
     }
 }

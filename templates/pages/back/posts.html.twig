@@ -1,61 +1,90 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
 {% block page_content %}
-    <main id="dashboard" class="mt-5 pt-md-5 mb-5">
-        <div class="container mt-5 pt-5 px-4 px-lg-5">
+    <main id="dashboard" class="dashboard mb-5">
+        <div class="container-fluid mt-5 pt-5 px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="row col-10">
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">First</th>
-                            <th scope="col">Last</th>
-                            <th scope="col">Handle</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Jacob</td>
-                            <td>Thornton</td>
-                            <td>@fat</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td colspan="2">Larry the Bird</td>
-                            <td>@twitter</td>
-                        </tr>
-                        </tbody>
-                    </table>
+                <div class="row col-12">
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between align-items-md-center">
+                        <h1 class="mb-3 mb-md-5">Gestion des articles</h1>
 
-                    <div class="col-md-10 col-xl-8 mt-5">
-                        <nav aria-label="Page navigation example">
-                            <ul class="pagination">
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Previous">
-                                        <span aria-hidden="true">&laquo;</span>
-                                    </a>
-                                </li>
-                                <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#" aria-label="Next">
-                                        <span aria-hidden="true">&raquo;</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </nav>
+                        <a href="{{ path('admin_create_post') }}" class="btn btn-outline-primary mb-5" id="post-add">
+                            <i class="fa fa-lg fa-pencil mx-2"></i> Rédiger un nouvel article
+                        </a>
                     </div>
+
+                    <div class="overflow-auto">
+                        <table class="table table-borderless table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Titre</th>
+                                <th scope="col">Slug</th>
+                                <th scope="col">Auteur</th>
+                                <th scope="col">Commentaires</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if posts is not empty and posts is iterable %}
+                                {% for post in posts %}
+                                    <tr>
+                                        <td>
+                                            {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('post', {slug: post.slug}) }}" target="_blank">
+                                                {{ post.title }}
+                                            </a>
+                                        </td>
+                                        <td>{{ post.slug }}</td>
+                                        <td>{{ post.user.username }}</td>
+                                        <td>{{ post.comments|length }}</td>
+                                        <td class="actions d-flex flex-column">
+                                            <a href="{{ path('admin_update_post', {id: post.id}) }}"
+                                               id="btn-update"
+                                               class="btn btn-lg"
+                                               title="Éditer"
+                                            >
+                                                <i class="fa fa-pencil text-secondary"></i>
+                                            </a>
+
+                                            <a href="{{ path('admin_delete_post', {id: post.id}) }}"
+                                               id="btn-delete"
+                                               class="btn btn-lg"
+                                               title="Supprimer">
+                                                <i class="fa fa-trash text-secondary"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                    {% if posts is empty %}
+                        <p class="alert alert-info">Il n y a pas encore d'articles publiés</p>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </main>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <script defer>
+        document.addEventListener('DOMContentLoaded', () => {
+            const btns = document.querySelectorAll('#btn-delete');
+            btns.forEach((btn) => {
+                btn.addEventListener('click', (event) => {
+                    if (!window.confirm('Êtes-vous certain de vouloir supprimer cet article ?')) {
+                        event.preventDefault();
+                    }
+                });
+            })
+        })
+    </script>
 {% endblock %}

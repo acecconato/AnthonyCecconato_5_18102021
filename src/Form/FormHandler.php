@@ -63,7 +63,7 @@ class FormHandler
      * @throws ReflectionException
      * @throws Exception
      */
-    public function loadFromRequest(Request $request, object $object): self
+    public function loadFromRequest(Request $request, object $object, bool $edition = false): self
     {
         $this->request = $request;
 
@@ -84,6 +84,8 @@ class FormHandler
                 $this->formData[$filename] = $file;
             }
         }
+
+        $this->validator->setEditionMode($edition);
 
         $this->formObject = $object;
         $this->hydrator->hydrateSingle($this->formData, $object);

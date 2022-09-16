@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="fr">
+<head>
+    <title>Compte {{ status }}</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<h1>Votre compte a été {{ status }}</h1>
+{% if status == 'activé' %}
+    <p>Vous pouvez désormais vous connecter grâce au lien suivant : <a href="{{ url }}">{{ url }}</a></p>
+{% else %}
+    <p>Vous ne pouvez plus vous connecter au site. Veuillez contacter un administrateur pour toute réclamation.</p>
+{% endif %}
+<p>Cordialement,<br>Anthony Cecconato</p>
+</body>
+</html>

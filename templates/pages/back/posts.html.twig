@@ -1,67 +1,68 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
 {% block page_content %}
-    <main id="dashboard" class="mt-5 pt-md-5 mb-5">
+    <main id="dashboard" class="dashboard mb-5">
         <div class="container-fluid mt-5 pt-5 px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="row col-12">
-
-                    <div class="d-flex justify-content-between">
-                        <h1 class="mb-5">Gestion des articles</h1>
+                    <div class="d-flex flex-column flex-md-row align-items-center justify-content-md-between align-items-md-center">
+                        <h1 class="mb-3 mb-md-5">Gestion des articles</h1>
 
                         <a href="{{ path('admin_create_post') }}" class="btn btn-outline-primary mb-5" id="post-add">
                             <i class="fa fa-lg fa-pencil mx-2"></i> Rédiger un nouvel article
                         </a>
                     </div>
 
-                    <table class="table table-borderless table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Titre</th>
-                            <th scope="col">Slug</th>
-                            <th scope="col">Auteur</th>
-                            <th scope="col">Commentaires</th>
-                            <th scope="col"></th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% if posts is not empty and posts is iterable %}
-                            {% for post in posts %}
-                                <tr>
-                                    <td>
-                                        {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
-                                    </td>
-                                    <td>
-                                        <a href="{{ path('post', {slug: post.slug}) }}" target="_blank">
-                                            {{ post.title }}
-                                        </a>
-                                    </td>
-                                    <td>{{ post.slug }}</td>
-                                    <td>{{ post.user.username }}</td>
-                                    <td>{{ post.comments|length }}</td>
-                                    <td class="actions d-flex flex-column">
-                                        <a href="{{ path('admin_update_post', {id: post.id}) }}"
-                                           id="btn-update"
-                                           class="btn btn-lg"
-                                           title="Éditer"
-                                        >
-                                            <i class="fa fa-pencil text-secondary"></i>
-                                        </a>
+                    <div class="overflow-auto">
+                        <table class="table table-borderless table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Date</th>
+                                <th scope="col">Titre</th>
+                                <th scope="col">Slug</th>
+                                <th scope="col">Auteur</th>
+                                <th scope="col">Commentaires</th>
+                                <th scope="col"></th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if posts is not empty and posts is iterable %}
+                                {% for post in posts %}
+                                    <tr>
+                                        <td>
+                                            {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('post', {slug: post.slug}) }}" target="_blank">
+                                                {{ post.title }}
+                                            </a>
+                                        </td>
+                                        <td>{{ post.slug }}</td>
+                                        <td>{{ post.user.username }}</td>
+                                        <td>{{ post.comments|length }}</td>
+                                        <td class="actions d-flex flex-column">
+                                            <a href="{{ path('admin_update_post', {id: post.id}) }}"
+                                               id="btn-update"
+                                               class="btn btn-lg"
+                                               title="Éditer"
+                                            >
+                                                <i class="fa fa-pencil text-secondary"></i>
+                                            </a>
 
-                                        <a href="{{ path('admin_delete_post', {id: post.id}) }}"
-                                           id="btn-delete"
-                                           class="btn btn-lg"
-                                           title="Supprimer"
-                                        >
-                                            <i class="fa fa-trash text-secondary"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
-                        </tbody>
-                    </table>
+                                            <a href="{{ path('admin_delete_post', {id: post.id}) }}"
+                                               id="btn-delete"
+                                               class="btn btn-lg"
+                                               title="Supprimer">
+                                                <i class="fa fa-trash text-secondary"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+
 
                     {% if posts is empty %}
                         <p class="alert alert-info">Il n y a pas encore d'articles publiés</p>

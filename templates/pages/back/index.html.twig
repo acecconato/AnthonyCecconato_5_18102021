@@ -1,40 +1,44 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
 {% block page_content %}
-    <main id="dashboard" class="mt-5 pt-md-5 mb-5">
+    <main id="dashboard" class="dashboard mb-5">
         <div class="container mt-5 pt-5 px-4 px-lg-5">
 
             <h1 class="mb-5">Tableau de bord</h1>
 
-            <section class="mb-5">
-                <h2>Statistiques</h2>
+            <section class="mb-4 dashboard__stats">
+                <h2>Résumé</h2>
                 <ul class="list-group">
                     <li class="list-inline-item">Il y a <b>{{ nbUsers }}</b> utilisateurs enregistrés, dont
                         <b>{{ nbDisabledUsers }}</b> en
-                        attente d'acceptation
+                        attente d'acceptation.
                     </li>
-                    <li class="list-inline-item">Il y a <b>{{ nbPosts }}</b> articles publiés</li>
+                    <li class="list-inline-item">Il y a <b>{{ nbPosts }}</b> articles publiés.</li>
                     <li class="list-inline-item">Il y a <b>{{ nbComments }}</b> commentaires, dont
-                        <b>{{ nbCommentsAwaiting }}</b> en attente d'acceptation
+                        <b>{{ nbCommentsAwaiting }}</b> en attente d'acceptation.
                     </li>
                 </ul>
             </section>
 
             <section class="mb-5">
-                <h2>Accès rapide</h2>
-                <ul class="list-group mt-4 d-flex flex-row">
-                    <li class="list-inline-item">
+                <h2 class="mt-5">Accès rapide</h2>
+
+                <ul class="list-group">
+
+                    <li class="list-inline-item mt-2">
                         <a href="{{ path('admin_create_post') }}" class="btn btn-primary" title="Écrire un article">
                             <i class="fa fa-lg fa-pencil mx-2"></i> Rédiger un article
                         </a>
                     </li>
-                    <li class="list-inline-item">
+
+                    <li class="list-inline-item mt-2">
                         <a href="{{ path('admin_articles') }}" class="btn btn-outline-primary"
                            title="Voir les articles">
                             Articles
                         </a>
                     </li>
-                    <li class="list-inline-item">
+
+                    <li class="list-inline-item mt-2">
                         <a href="{{ path('admin_comments') }}" class="btn btn-outline-primary"
                            title="Voir les commentaires">
                             Commentaires
@@ -43,7 +47,8 @@
                             {% endif %}
                         </a>
                     </li>
-                    <li class="list-inline-item">
+
+                    <li class="list-inline-item mt-2">
                         <a href="{{ path('admin_users') }}" class="btn btn-outline-primary"
                            title="Voir les utilisateurs">
                             Utilisateurs
@@ -52,6 +57,7 @@
                             {% endif %}
                         </a>
                     </li>
+
                 </ul>
             </section>
         </div>

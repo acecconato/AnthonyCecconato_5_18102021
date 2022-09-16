@@ -9,29 +9,28 @@
     {% block header_nav %}
         <!-- Navigation-->
         <nav class="navbar navbar-expand-lg bg-primary" id="mainNav">
-            <div class="container px-4 px-lg-5">
+            <div class="container px-4 px-lg-5 text-white" id="dashboard-header">
                 {% block navbar_brand %}
-                    <p class="navbar-brand">Anthony Cecconato</p>
+                    <p class="navbar-brand text-white">Anthony Cecconato</p>
                 {% endblock %}
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarResponsive"
                         aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-                    Menu
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarResponsive">
-                    <ul class="navbar-nav ms-auto py-4 py-lg-0">
-                        <li class="nav-item">
-                            <a class="nav-link px-lg-3 py-3 mx-5 py-lg-4 btn btn-info"
+                    <ul class="navbar-nav ms-auto py-4 py-lg-0 align-items-center justify-content-center">
+                        <li class="nav-item mb-3 mb-lg-0 flex-nowrap">
+                            <a class="nav-link px-lg-3 py-3 mx-5 py-lg-4 btn px-3 btn-info"
                                title="Revenir sur le site"
                                href="{{ path('home') }}">
-                                <i class="fa fa-angle-left mx-2"></i> Quitter
+                                <i class="fa fa-angle-left d-none mx-2 d-xl-inline-block"></i> Quitter
                             </a>
                         </li>
 
                         <li class="nav-item">
                             <a class="nav-link px-lg-3 py-3 py-lg-4" href="{{ path('admin_dashboard') }}">
-                                <i class="fa fa-home mx-2"></i> Dashboard
+                                <i class="fa d-none d-xl-inline-block fa-home mx-2"></i> Dashboard
                             </a>
                         </li>
                         <li class="nav-item">

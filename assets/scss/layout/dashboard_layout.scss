@@ -51,5 +51,26 @@ table {
 
 #post-add {
   width: fit-content;
-  margin-left: auto;
+}
+
+#dashboard-header {
+  ul.navbar-nav {
+    li {
+      a {
+        color: white;
+      }
+    }
+  }
+}
+
+#dashboard {
+  margin-top: 130px;
+}
+
+.dashboard {
+  &__stats {
+    li.list-inline-item {
+      margin: 5px 0;
+    }
+  }
 }

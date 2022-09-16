@@ -1,67 +1,69 @@
 {% extends 'layouts/dashboard_layout.html.twig' %}
 
 {% block page_content %}
-    <main id="dashboard" class="mt-5 pt-md-5 mb-5">
+    <main id="dashboard" class="dashboard mb-5">
         <div class="container-fluid mt-5 pt-5 px-4 px-lg-5">
             <div class="row gx-4 gx-lg-5 justify-content-center">
                 <div class="row col-12">
 
                     <h1 class="mb-5">Gestion des utilisateurs</h1>
 
-                    <table class="table table-borderless table-striped">
-                        <thead>
-                        <tr>
-                            <th scope="col">Utilisateur</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Activé</th>
-                            <th scope="col">Suppr.</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% if users is not empty and users is iterable %}
-                            {% for user in users %}
-                                <tr>
-                                    <td>
-                                        {% if user.isAdmin %}
-                                            <i class="fa fa-crown text-warning"></i>
-                                        {% endif %}
-                                        {{ user.username|capitalize }}
-                                    </td>
-                                    <td>{{ user.email }}</td>
-                                    <td>
-                                        {% if user.enabled %}
-                                            <a href="{{ path('admin_toggle_user', {id: user.id}) }}"
-                                               id="btn-disable"
+                    <div class="overflow-auto">
+                        <table class="table table-borderless table-striped">
+                            <thead>
+                            <tr>
+                                <th scope="col">Utilisateur</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Activé</th>
+                                <th scope="col">Suppr.</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% if users is not empty and users is iterable %}
+                                {% for user in users %}
+                                    <tr>
+                                        <td>
+                                            {% if user.isAdmin %}
+                                                <i class="fa fa-crown text-warning"></i>
+                                            {% endif %}
+                                            {{ user.username|capitalize }}
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            {% if user.enabled %}
+                                                <a href="{{ path('admin_toggle_user', {id: user.id}) }}"
+                                                   id="btn-disable"
+                                                   class="btn btn-lg"
+                                                   title="Désactiver"
+                                                >
+                                                    <i class="fa fa-check-circle text-success"></i>
+                                                </a>
+                                            {% else %}
+                                                <a href="{{ path('admin_toggle_user', {id: user.id}) }}"
+                                                   id="btn-enable"
+                                                   class="btn btn-lg"
+                                                   title="Activer"
+                                                >
+                                                    <i class="fa fa-xmark-circle text-danger"></i>
+                                                </a>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <a href="{{ path('admin_delete_user', {id: user.id}) }}"
+                                               id="btn-delete"
                                                class="btn btn-lg"
-                                               title="Désactiver"
+                                               title="Supprimer"
                                             >
-                                                <i class="fa fa-check-circle text-success"></i>
+                                                <i class="fa fa-trash text-secondary"></i>
                                             </a>
-                                        {% else %}
-                                            <a href="{{ path('admin_toggle_user', {id: user.id}) }}"
-                                               id="btn-enable"
-                                               class="btn btn-lg"
-                                               title="Activer"
-                                            >
-                                                <i class="fa fa-xmark-circle text-danger"></i>
-                                            </a>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        <a href="{{ path('admin_delete_user', {id: user.id}) }}"
-                                           id="btn-delete"
-                                           class="btn btn-lg"
-                                           title="Supprimer"
-                                        >
-                                            <i class="fa fa-trash text-secondary"></i>
-                                        </a>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>

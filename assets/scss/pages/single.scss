@@ -5,3 +5,18 @@
 #update-date > p {
   font-size: 1rem;
 }
+
+#comments {
+  .comment__heading {
+    span {
+      display: block;
+      font-size: 0.9rem;
+    }
+  }
+
+  .comments-list {
+    & > div:first-child p:first-child {
+      margin-top: 5px;
+    }
+  }
+}

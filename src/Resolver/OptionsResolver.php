@@ -38,8 +38,8 @@ class OptionsResolver
     }
 
     /**
-     * @param  array $options
-     * @return array
+     * @param  array<mixed> $options
+     * @return array<mixed>
      */
     public function resolve(array $options): array
     {
@@ -80,7 +80,7 @@ class OptionsResolver
     }
 
     /**
-     * @param  array $options
+     * @param  array<mixed> $options
      * @return void
      */
     public function checkdiff(array $options): void

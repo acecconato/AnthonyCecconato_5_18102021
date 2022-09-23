@@ -20,6 +20,9 @@ class FormHandler
 
     private bool $wasSubmitted = false;
 
+    /**
+     * @var array<mixed>
+     */
     private array $formData = [];
 
     public function __construct(

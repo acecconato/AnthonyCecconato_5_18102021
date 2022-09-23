@@ -12,12 +12,6 @@ use ZxcvbnPhp\Zxcvbn;
 
 class StrongPasswordConstraintValidator implements ConstraintValidatorInterface
 {
-    private const VERY_WEAK = 0;
-    private const WEAK = 1;
-    private const MEDIUM = 2;
-    private const STRONG = 3;
-    private const VERY_STRONG = 4;
-
     /**
      * @param StrongPassword $constraint
      *

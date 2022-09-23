@@ -9,7 +9,7 @@ use Closure;
 class Option
 {
     public function __construct(
-        private string $name,
+        private readonly string $name,
         private string $defaultValue = '',
         private Closure|null $validator = null
     ) {
@@ -69,11 +69,7 @@ class Option
         return $this;
     }
 
-    /**
-     * @param  $value
-     * @return bool
-     */
-    public function isValid($value): bool
+    public function isValid(mixed $value): bool
     {
         if ($this->validator instanceof \Closure) {
             return (bool)call_user_func($this->validator, $value);

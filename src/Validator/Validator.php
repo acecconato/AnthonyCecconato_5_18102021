@@ -83,7 +83,7 @@ final class Validator implements ValidatorInterface
     {
         /**
          * @var ?ConstraintValidatorInterface $validator
-        */
+         */
         $validator = $this->container->get($constraint->getValidator());
 
         if (! $validator) {
@@ -99,6 +99,9 @@ final class Validator implements ValidatorInterface
         }
     }
 
+    /**
+     * @return array<array-key, array{propertyPath: string, message: string}>
+     */
     public function getErrors(): array
     {
         $tempErrors = $this->errors;

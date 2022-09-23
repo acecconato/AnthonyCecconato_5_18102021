@@ -22,7 +22,7 @@ interface RouteInterface
     public function test(string $path): bool;
 
     /**
-     * @return array
+     * @return array<mixed>
      */
     public function getCallable(): array;
 
@@ -34,7 +34,7 @@ interface RouteInterface
     /**
      * @param Request $request
      *
-     * @return array
+     * @return array<mixed>
      */
     public function getArgs(Request $request): array;
 }

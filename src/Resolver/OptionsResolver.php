@@ -9,11 +9,13 @@ use InvalidArgumentException;
 
 class OptionsResolver
 {
-    /** @var ArrayObject<string, Option> */
+    /**
+     * @var ArrayObject<string, Option>
+     */
     private ArrayObject $options;
 
     /**
-     * @param array<Option> $options
+     * @param  array<Option> $options
      * @return void
      */
     public function setOptions(array $options = []): void
@@ -25,7 +27,7 @@ class OptionsResolver
     }
 
     /**
-     * @param Option $option
+     * @param  Option $option
      * @return $this
      */
     public function add(Option $option): self
@@ -36,14 +38,16 @@ class OptionsResolver
     }
 
     /**
-     * @param array $options
+     * @param  array $options
      * @return array
      */
     public function resolve(array $options): array
     {
         $resolvedOptions = [];
 
-        /** @var Option $option */
+        /**
+         * @var Option $option
+        */
         foreach ($this->options as $option) {
             $optionName = $option->getName();
 
@@ -76,7 +80,7 @@ class OptionsResolver
     }
 
     /**
-     * @param array $options
+     * @param  array $options
      * @return void
      */
     public function checkdiff(array $options): void

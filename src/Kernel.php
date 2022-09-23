@@ -35,10 +35,14 @@ final class Kernel
 {
     public const DATE_FORMAT = 'Y-m-d H:i:s';
 
-    /** @var RouterInterface */
+    /**
+     * @var RouterInterface
+     */
     private RouterInterface $router;
 
-    /** @var ContainerInterface */
+    /**
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
 
     /**
@@ -66,9 +70,11 @@ final class Kernel
      */
     private function configureEvents(): void
     {
-        $registerEvents = require dirname(__DIR__) . '/config/registerEvents.php';
+        $registerEvents = include dirname(__DIR__) . '/config/registerEvents.php';
 
-        /** @var ListenerProvider $listenerProvider */
+        /**
+         * @var ListenerProvider $listenerProvider
+        */
         $listenerProvider = $this->container->get(ListenerProvider::class);
 
         $registerEvents($listenerProvider);
@@ -84,12 +90,16 @@ final class Kernel
      */
     public function run(): void
     {
-        /** @var Request $request */
+        /**
+         * @var Request $request
+        */
         $request = $this->container->get(Request::class);
 
         $request->setSession(new Session());
 
-        /** @var EventDispatcher $eventDispatcher */
+        /**
+         * @var EventDispatcher $eventDispatcher
+        */
         $eventDispatcher = $this->container->get(EventDispatcher::class);
         $eventDispatcher->dispatch(new PreRequestHandlingEvent($request));
 
@@ -211,7 +221,7 @@ final class Kernel
      */
     public function configureRoutes(): void
     {
-        $configRoute = require dirname(__DIR__) . '/config/routes.php';
+        $configRoute = include dirname(__DIR__) . '/config/routes.php';
 
         $this->router = $this->container->get(Router::class);
 

@@ -12,11 +12,11 @@ use Blog\Validator\Constraint\Email;
 class EmailConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param Email $constraint
+     * @param  Email $constraint
      * @throws AssertionFailedException
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {
-       return Assertion::email($value, $constraint->message, $propertyPath);
+        return Assertion::email($value, $constraint->message, $propertyPath);
     }
 }

@@ -19,10 +19,10 @@ final class Definition
     /**
      * Definition constructor.
      *
-     * @param string $id
-     * @param bool $shared
-     * @param array<string> $aliases
-     * @param array<string> $dependencies
+     * @param  string        $id
+     * @param  bool          $shared
+     * @param  array<string> $aliases
+     * @param  array<string> $dependencies
      * @throws ReflectionException
      */
     public function __construct(

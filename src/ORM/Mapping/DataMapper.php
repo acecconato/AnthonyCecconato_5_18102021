@@ -13,7 +13,9 @@ use ReflectionException;
 
 class DataMapper implements MapperInterface
 {
-    /** @var ArrayObject<string, Metadata> $mapping */
+    /**
+     * @var ArrayObject<string, Metadata> $mapping
+     */
     private ArrayObject $mapping;
 
     public function __construct()
@@ -38,7 +40,7 @@ class DataMapper implements MapperInterface
     }
 
     /**
-     * @param string $fqcn
+     * @param  string $fqcn
      * @return Metadata
      * @throws ReflectionException
      * @throws Exception
@@ -58,11 +60,15 @@ class DataMapper implements MapperInterface
 
             switch ($attribute->getName()) {
                 case Entity::class:
-                    /** @var \Blog\ORM\Mapping\Attribute\Entity $attributeInstance */
+                    /**
+                     * @var \Blog\ORM\Mapping\Attribute\Entity $attributeInstance
+                    */
                     $metadatas->setEntity($attributeInstance);
                     break;
                 case Table::class:
-                    /** @var Table $attributeInstance */
+                    /**
+                     * @var Table $attributeInstance
+                    */
                     $metadatas->setTable($attributeInstance);
                     break;
                 default:
@@ -79,7 +85,9 @@ class DataMapper implements MapperInterface
                         // Dynamically set
                         $propAttributesInstance->propertyName = $property->getName();
 
-                        /** @var Column $propAttributesInstance */
+                        /**
+                         * @var Column $propAttributesInstance
+                        */
                         $metadatas->addColumns($propAttributesInstance);
                         break;
 

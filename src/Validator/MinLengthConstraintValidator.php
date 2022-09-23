@@ -12,8 +12,7 @@ use Blog\Validator\Constraint\MinLength;
 class MinLengthConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param MinLength $constraint
-     * @throws AssertionFailedException
+     * @param  MinLength $constraint
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool
     {

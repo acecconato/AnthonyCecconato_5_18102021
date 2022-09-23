@@ -32,7 +32,7 @@ class Option
     }
 
     /**
-     * @param string $defaultValue
+     * @param  string $defaultValue
      * @return Option
      */
     public function setDefaultValue(string $defaultValue): self
@@ -59,7 +59,7 @@ class Option
     }
 
     /**
-     * @param Closure $validator
+     * @param  Closure $validator
      * @return Option
      */
     public function setValidator(Closure $validator): self
@@ -70,7 +70,7 @@ class Option
     }
 
     /**
-     * @param $value
+     * @param  $value
      * @return bool
      */
     public function isValid($value): bool

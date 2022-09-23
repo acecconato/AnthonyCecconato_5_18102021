@@ -38,8 +38,8 @@ class ObjectHydrator implements HydratorInterface
     }
 
     /**
-     * @param array<string> $data
-     * @param object $object
+     * @param  array<string> $data
+     * @param  object        $object
      * @return object
      * @throws ReflectionException
      * @throws Exception

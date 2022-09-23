@@ -29,7 +29,9 @@ class RequestHandlingListener implements EventListenerInterface
         $username = $request->cookies->get('username');
         $rememberToken = $request->cookies->get('remember_token');
 
-        /** Login automatically if is remembered */
+        /**
+         * Login automatically if is remembered
+        */
         if (!$this->authenticator->isValid() && $username && $rememberToken) {
             $user = $this->userRepository->getUserByUsernameOrEmail($username);
 

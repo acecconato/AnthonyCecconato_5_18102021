@@ -11,8 +11,7 @@ use Blog\Validator\StrongPasswordConstraintValidator;
 final class StrongPassword extends Constraint
 {
     public function __construct(
-        public string $message = "Le mot de passe n'est pas suffisamment sécurisé. Vous devriez y rajouter des 
-        caractères spéciaux, des lettres, des symboles, etc..."
+        public string $message = "Le mot de passe n'est pas suffisamment sécurisé. Vous devriez y rajouter des caractères spéciaux, des lettres, des symboles, etc..."
     ) {
     }
 

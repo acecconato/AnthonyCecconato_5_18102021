@@ -27,6 +27,7 @@ class Comment
     #[Assert\NotBlank("Le commentaire ne doit pas être vide")]
     #[Assert\NotNull("Le commentaire ne doit pas être vide")]
     #[Assert\MaxLength(message: "Le commentaire ne peut excéder 500 caractères", max: 500)]
+    #[Assert\MinLength(message: "Le commentaire doit faire au moins 3 caractères", min: 3)]
     private string $content;
 
     #[Column(name: 'created_at', type: Type::DATE)]
@@ -49,7 +50,7 @@ class Comment
 
     public function __construct()
     {
-        if (!isset($this->id)) {
+        if (! isset($this->id)) {
             $this->id = (string)Uuid::uuid4();
         }
     }
@@ -62,6 +63,7 @@ class Comment
     public function setId(string $id): Comment
     {
         $this->id = $id;
+
         return $this;
     }
 
@@ -73,6 +75,7 @@ class Comment
     public function setContent(string $content): Comment
     {
         $this->content = $content;
+
         return $this;
     }
 
@@ -84,6 +87,7 @@ class Comment
     public function setUserId(?string $userId): Comment
     {
         $this->userId = $userId;
+
         return $this;
     }
 
@@ -118,6 +122,7 @@ class Comment
     public function setUser(User $user): Comment
     {
         $this->user = $user;
+
         return $this;
     }
 
@@ -134,6 +139,7 @@ class Comment
     public function setPostId(string $postId): Comment
     {
         $this->postId = $postId;
+
         return $this;
     }
 
@@ -145,6 +151,7 @@ class Comment
     public function setPost(Post $post): Comment
     {
         $this->post = $post;
+
         return $this;
     }
 
@@ -156,6 +163,7 @@ class Comment
     public function setEnabled(int $enabled): Comment
     {
         $this->enabled = $enabled;
+
         return $this;
     }
 }

@@ -44,13 +44,16 @@ class DashboardController extends AbstractController
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
-        return $this->render('pages/back/index.html.twig', [
+        return $this->render(
+            'pages/back/index.html.twig',
+            [
             'nbUsers'            => $userRepository->countAll(),
             'nbDisabledUsers'    => $userRepository->countUserAwaitingValidation(),
             'nbCommentsAwaiting' => $commentRepository->countAwaitingValidation(),
             'nbComments'         => $commentRepository->countAll(),
             'nbPosts'            => $postRepository->countAll(),
-        ]);
+            ]
+        );
     }
 
     /**
@@ -93,7 +96,9 @@ class DashboardController extends AbstractController
             $entityManager->add($post);
             $entityManager->flush();
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add('success', 'Article publié');
 
@@ -123,7 +128,9 @@ class DashboardController extends AbstractController
         FileUploader $fileUploader,
     ): Response {
         $this->denyAccessUnlessIsAdmin();
-        /** @var ?Post $post */
+        /**
+         * @var ?Post $post
+        */
         $post         = $postRepository->find($id);
         $tempFilename = $post->getFilename();
 
@@ -156,7 +163,9 @@ class DashboardController extends AbstractController
             $entityManager->update($post);
             $entityManager->flush();
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add('success', 'Article modifié');
 
@@ -189,7 +198,9 @@ class DashboardController extends AbstractController
 
         $users = [];
         $posts = [];
-        /** @var Comment $comment */
+        /**
+         * @var Comment $comment
+        */
         foreach ($comments as $comment) {
             $userId = $comment->getUserId();
             $comment->setUser($users[$userId] ?? $users[$userId] = $userRepository->find($userId));
@@ -249,7 +260,9 @@ class DashboardController extends AbstractController
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
-        /** @var ?User $user */
+        /**
+         * @var ?User $user
+        */
         $user = $userRepository->find($id);
 
         if (! $user) {
@@ -259,7 +272,9 @@ class DashboardController extends AbstractController
         $entityManager->delete($user);
         $entityManager->flush();
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $request->getSession();
         $session->getFlashBag()->add('success', 'Utilisateur ' . $user->getUsername() . ' supprimé');
 
@@ -283,7 +298,9 @@ class DashboardController extends AbstractController
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
-        /** @var ?User $user */
+        /**
+         * @var ?User $user
+        */
         $user = $userRepository->find($id);
 
         if (! $user) {
@@ -319,16 +336,59 @@ class DashboardController extends AbstractController
         try {
             $mailer->send($email);
         } catch (Throwable $exception) {
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add('danger', "Impossible d'envoyer la notification mail");
         }
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $request->getSession();
         $session->getFlashBag()->add(
             'success',
             'Utilisateur ' . $user->getUsername() . ' ' . $status
+        );
+
+        return $this->redirect($request->headers->get('referer'));
+    }
+
+    /**
+     * @throws Exception\UnauthorizedException
+     * @throws ResourceNotFound
+     * @throws ReflectionException
+     */
+    public function toggleAdmin(
+        string $id,
+        UserRepository $userRepository,
+        EntityManager $entityManager,
+        Request $request,
+    ): Response {
+        $this->denyAccessUnlessIsAdmin();
+
+        /**
+         * @var ?User $user
+        */
+        $user = $userRepository->find($id);
+
+        if (! $user) {
+            throw new ResourceNotFound('Utilisateur introuvable');
+        }
+
+        $user->setIsAdmin((int) ! $user->getIsAdmin());
+
+        $entityManager->update($user);
+        $entityManager->flush();
+
+        /**
+         * @var Session $session
+        */
+        $session = $request->getSession();
+        $session->getFlashBag()->add(
+            'success',
+            'Utilisateur ' . $user->getUsername() . ' modifié'
         );
 
         return $this->redirect($request->headers->get('referer'));
@@ -348,11 +408,15 @@ class DashboardController extends AbstractController
         $posts = $postRepository->findAll();
 
         $users = [];
-        /** @var Post $post */
+        /**
+         * @var Post $post
+        */
         foreach ($posts as $post) {
             $userId = $post->getUserId();
             $post->setUser($users[$userId] ?? $users[$userId] = $userRepository->find($userId));
-            /** @var Comment[] $comments */
+            /**
+             * @var Comment[] $comments
+            */
             $comments = $commentRepository->findAllBy(['post_id' => $post->getId(), 'enabled' => true]);
             $post->setComments($comments);
         }
@@ -374,7 +438,9 @@ class DashboardController extends AbstractController
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
-        /** @var ?Post $post */
+        /**
+         * @var ?Post $post
+        */
         $post = $postRepository->find($id);
 
         if (! $post) {
@@ -389,7 +455,9 @@ class DashboardController extends AbstractController
             $fileUploader->remove('/thumbs/' . $post->getFilename());
         }
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $request->getSession();
         $session->getFlashBag()->add('success', 'Article supprimé');
 
@@ -409,7 +477,9 @@ class DashboardController extends AbstractController
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
-        /** @var ?Comment $comment */
+        /**
+         * @var ?Comment $comment
+        */
         $comment = $commentRepository->find($id);
 
         if (! $comment) {
@@ -423,7 +493,9 @@ class DashboardController extends AbstractController
 
         $status = ($comment->getEnabled()) ? 'activé' : 'désactivé';
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $request->getSession();
         $session->getFlashBag()->add(
             'success',
@@ -446,7 +518,9 @@ class DashboardController extends AbstractController
     ): Response {
         $this->denyAccessUnlessIsAdmin();
 
-        /** @var ?Comment $comment */
+        /**
+         * @var ?Comment $comment
+        */
         $comment = $commentRepository->find($id);
 
         if (! $comment) {
@@ -456,7 +530,9 @@ class DashboardController extends AbstractController
         $entityManager->delete($comment);
         $entityManager->flush();
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $request->getSession();
         $session->getFlashBag()->add('success', 'Commentaire supprimé');
 

@@ -14,13 +14,19 @@ use ReflectionObject;
 
 class UnitOfWork
 {
-    /** @var array<int, object> */
+    /**
+     * @var array<int, object>
+     */
     private array $entityInsertions = [];
 
-    /** @var array<int, object> */
+    /**
+     * @var array<int, object>
+     */
     private array $entityUpdates = [];
 
-    /** @var array<string> */
+    /**
+     * @var array<string>
+     */
     private array $entityDeletions = [];
 
     public function __construct(
@@ -45,15 +51,18 @@ class UnitOfWork
             $tableName = $mapping->getTable()->tableName;
             $reflObj = new ReflectionObject($object);
 
-            $prepValues = array_map(function ($prop) use ($object, $mapping) {
-                if ($prop->isInitialized($object)) {
-                    if ($column = $mapping->getColumn($prop->getName())) {
-                        return ':' . $column->name;
+            $prepValues = array_map(
+                function ($prop) use ($object, $mapping) {
+                    if ($prop->isInitialized($object)) {
+                        if ($column = $mapping->getColumn($prop->getName())) {
+                            return ':' . $column->name;
+                        }
                     }
-                }
 
-                return null;
-            }, $reflObj->getProperties());
+                    return null;
+                },
+                $reflObj->getProperties()
+            );
 
             // Remove null values
             $prepValues = array_filter($prepValues, fn($value) => ($value));
@@ -77,7 +86,9 @@ class UnitOfWork
                         if ($prop->isInitialized($object)) {
                             // DateTime to string conversion
                             if ($column->type === Type::DATE) {
-                                /** @var ?DateTime $datetime */
+                                /**
+                                 * @var ?DateTime $datetime
+                                */
                                 $datetime = $prop->getValue($object);
 
                                 $bind[':' . $column->name] = null;
@@ -109,7 +120,9 @@ class UnitOfWork
     {
         $adapter = $this->entityManager->getAdapter();
 
-        /** @var object $object */
+        /**
+         * @var object $object
+        */
         foreach ($this->entityUpdates as $object) {
             if (!is_object($object)) {
                 throw new Exception("$object is not a valid object");
@@ -128,7 +141,10 @@ class UnitOfWork
             foreach ($mapping->getColumns() as $column) {
                 // DateTime to string conversion
                 if ($column->type === Type::DATE) {
-                    /** @var ?DateTime $datetime */
+                    /**
+                     * @var ?DateTime $datetime`
+                     * @phpstan-ignore-next-line
+                    */
                     $datetime = $object->{'get' . ucfirst($column->propertyName)}() ?? new DateTime();
 
                     $bind[':' . $column->name] = $datetime?->format(Kernel::DATE_FORMAT);
@@ -154,13 +170,17 @@ class UnitOfWork
     {
         $adapter = $this->entityManager->getAdapter();
 
-        /** @var mixed $object */
+        /**
+         * @var mixed $object
+        */
         foreach ($this->entityDeletions as $object) {
             if (!is_object($object)) {
                 throw new Exception("$object is not a valid object");
             }
 
-            /** @var object $object */
+            /**
+             * @var object $object
+            */
             $mapping = $this->mapper->resolve($object::class);
             $tableName = $mapping->getTable()->tableName;
             $query = "DELETE FROM $tableName WHERE " . $mapping->getId() . " = :id";

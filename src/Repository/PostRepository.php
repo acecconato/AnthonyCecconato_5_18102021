@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Blog\Repository;
 
-use Blog\Entity\Comment;
 use Blog\Entity\Post;
 use Blog\Entity\User;
 use ReflectionException;
@@ -21,10 +20,14 @@ class PostRepository extends Repository
         string $orderBy = 'created_at',
         string $orderWay = 'DESC'
     ): array {
-        /** @var Post[] $posts */
+        /**
+         * @var Post[] $posts
+        */
         $posts = $this->findAll($offset, $limit, $orderBy, $orderWay);
         foreach ($posts as $post) {
-            /** @var User $user */
+            /**
+             * @var User $user
+            */
             $user = $this->getEntityManager()->find(User::class, $post->getUserId());
             $post->setUser($user);
         }

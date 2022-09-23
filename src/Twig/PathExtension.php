@@ -22,8 +22,8 @@ class PathExtension extends AbstractExtension
     }
 
     /**
-     * @param string $name
-     * @param array<mixed> $parameters
+     * @param  string       $name
+     * @param  array<mixed> $parameters
      * @return string
      */
     public function getPath(string $name, array $parameters = []): string

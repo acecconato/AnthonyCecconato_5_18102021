@@ -47,12 +47,15 @@ class Templating implements TemplatingInterface
 
         $this->isDevMode = $_ENV['APP_ENV'] === 'development';
 
-        $this->twig = new Environment($loader, [
+        $this->twig = new Environment(
+            $loader,
+            [
             'cache' => sprintf('%s/twig', $this->cacheDir),
             'debug' => $this->isDevMode,
             'auto_reload' => $this->isDevMode,
             'strict_variables' => $this->isDevMode,
-        ]);
+            ]
+        );
 
         $this->twig->addExtension($this->getWebpackEncoreExtension());
         $this->twig->addExtension(new DebugExtension());
@@ -65,7 +68,7 @@ class Templating implements TemplatingInterface
     }
 
     /**
-     * @param array<mixed> $context
+     * @param  array<mixed> $context
      * @throws LoaderError
      * @throws RuntimeError
      * @throws SyntaxError
@@ -80,7 +83,9 @@ class Templating implements TemplatingInterface
             ];
         }
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $this->request->getSession();
 
         $context = [

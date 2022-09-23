@@ -31,8 +31,8 @@ abstract class AbstractController
     }
 
     /**
-     * @param string $to
-     * @param int $status
+     * @param string       $to
+     * @param int          $status
      * @param array<mixed> $headers
      *
      * @return RedirectResponse
@@ -43,7 +43,7 @@ abstract class AbstractController
     }
 
     /**
-     * @param string $view
+     * @param string       $view
      * @param array<mixed> $context
      *
      * @return Response

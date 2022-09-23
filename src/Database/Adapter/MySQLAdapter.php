@@ -12,7 +12,9 @@ class MySQLAdapter implements AdapterInterface
 {
     private PDO|null $connection = null;
 
-    /** @var array<array-key, array{query: string, bind: array<string>}> */
+    /**
+     * @var array<array-key, array{query: string, bind: array<string>}> 
+     */
     private array $transactions;
 
     /**

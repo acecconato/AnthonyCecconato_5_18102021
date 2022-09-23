@@ -12,16 +12,14 @@ use PDO;
 use ReflectionClass;
 use ReflectionException;
 
-use function _PHPStan_1d2f63169\React\Promise\resolve;
-
 class EntityManager
 {
     private UnitOfWork $unitOfWork;
 
     public function __construct(
-        private AdapterInterface $adapter,
-        private MapperInterface $mapper,
-        private ObjectHydrator $hydrator
+        private readonly AdapterInterface $adapter,
+        private readonly MapperInterface $mapper,
+        private readonly ObjectHydrator $hydrator
     ) {
         $this->unitOfWork = new UnitOfWork($this, $this->mapper);
     }
@@ -101,8 +99,8 @@ class EntityManager
     }
 
     /**
-     * @param string $entityFqcn
-     * @param array<string> $criteria
+     * @param  string        $entityFqcn
+     * @param  array<string> $criteria
      * @return object|false
      * @throws ReflectionException
      */
@@ -133,7 +131,7 @@ class EntityManager
     }
 
     /**
-     * @param array<mixed> $criteria
+     * @param  array<mixed> $criteria
      * @return object[]
      * @throws ReflectionException
      */
@@ -196,8 +194,8 @@ class EntityManager
     }
 
     /**
-     * @param string $entityFqcn
-     * @param array<string> $ids
+     * @param  string        $entityFqcn
+     * @param  array<string> $ids
      * @return int
      */
     public function deleteById(string $entityFqcn, array $ids): int

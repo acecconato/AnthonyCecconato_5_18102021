@@ -2,6 +2,8 @@
 
 Objectif : Développer un blog avec une architecture MVC, et la mise en place des bonnes pratiques.
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/7b11d8126b1e49b5976118ad7abb5bae)](https://www.codacy.com/gh/acecconato/AnthonyCecconato_5_18102021/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=acecconato/AnthonyCecconato_5_18102021&amp;utm_campaign=Badge_Grade)
+
 ## Get started
 
 ### Installation

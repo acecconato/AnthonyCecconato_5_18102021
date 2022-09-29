@@ -116,7 +116,6 @@ class FrontController extends AbstractController
         UserRepository $userRepository,
         FormHandler $formHandler,
         Request $request,
-        Authenticator $auth
     ): Response {
         /**
          * @var ?Post $post
@@ -150,9 +149,9 @@ class FrontController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessLoggedIn();
-            $em = $postRepository->getEntityManager();
-            $em->add($comment);
-            $em->flush();
+            $entityManager = $postRepository->getEntityManager();
+            $entityManager->add($comment);
+            $entityManager->flush();
 
             /**
              * @var Session $session

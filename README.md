@@ -12,14 +12,14 @@ Objectif : Développer un blog avec une architecture MVC, et la mise en place de
 
 > `cd anthonycecconato`
 
-> `composer install`
+> `composer install --no-dev --optimize-autoloader`
 
 > `npm install` or `yarn install`
 
 ### Environment configuration
 > `cp .env.example .env`
 
-Then update the file as your needs.
+Then update the file as your needs. You must fill the database connection informations.
 
 ### Database setup
 
@@ -34,3 +34,14 @@ You will need a MySQL or Mariadb database ready to receive the database import. 
 
 ### Running the app
 > `php -S localhost:8001 -t public`
+
+### Demo user
+The following demo admin user is available to test the web application:
+- Username : demo
+- Password : demo_password
+
+## Testing emails
+### Get started
+To test the sending of the emails, you can install maildev : https://github.com/maildev/maildev.
+
+Then you will need to update the .env file to edit the DSN and the SENDER values.

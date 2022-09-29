@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@symfony/webpack-encore": "^1.8.1",
+    "@symfony/webpack-encore": "^2.0.0",
     "bootstrap": "^5.2.1",
     "core-js": "^3.23.3",
     "font-awesome": "^4.7.0",

@@ -35,7 +35,7 @@
   },
   "scripts": {
     "phpstan": "phpstan analyse --level=6 src/",
-    "phpcs": "phpcs --standard=PSR12",
+    "phpcs": "phpcs ./src --standard=PSR12",
     "php-cs-fixer": "php-cs-fixer fix ./src --rules=@PSR12",
     "phpcpd": "phpcpd src/",
     "tests": "phpunit tests",

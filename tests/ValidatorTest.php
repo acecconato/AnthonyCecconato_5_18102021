@@ -17,7 +17,6 @@ use Blog\Validator\Constraint\MinLength;
 use Blog\Validator\Constraint\NotBlank;
 use Blog\Validator\Constraint\NotNull;
 use Blog\Validator\Constraint\Slug;
-use Blog\Validator\Constraint\Unique;
 use Blog\Validator\Validator;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +27,6 @@ use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 class ValidatorTest extends TestCase
 {
     private Validator $validator;
-    private EntityManager $em;
     private ObjectHydrator $hydrator;
 
     protected function setUp(): void
@@ -44,18 +42,9 @@ class ValidatorTest extends TestCase
         $kernel = new Kernel('test');
         $container = $kernel->getContainer();
 
-        $container
-            ->addAlias(AdapterInterface::class, MySQLAdapter::class)
-            ->addAlias(MapperInterface::class, DataMapper::class);
-
-        $container
-            ->addParameter('host', 'localhost')
-            ->addParameter('dbName', 'anthony5')
-            ->addParameter('dbUser', 'root')
-            ->addParameter('dbPassword', '');
+        $container->addAlias(MapperInterface::class, DataMapper::class);
 
         $this->validator = $container->get(Validator::class);
-        $this->em = $container->get(EntityManager::class);
         $this->hydrator = $container->get(ObjectHydrator::class);
     }
 
@@ -70,7 +59,7 @@ class ValidatorTest extends TestCase
     {
         /** @var MaxLength $constraint */
         $constraint = MaxLength::getInstance();
-        $constraint->maxLength = 5;
+        $constraint->max = 5;
 
         $this->assertTrue($this->validator->validate('okay', $constraint));
         $this->assertFalse($this->validator->validate('too much characters', $constraint));
@@ -80,7 +69,7 @@ class ValidatorTest extends TestCase
     {
         /** @var MinLength $constraint */
         $constraint = MinLength::getInstance();
-        $constraint->minLength = 5;
+        $constraint->min = 5;
 
         $this->assertTrue($this->validator->validate('okay!', $constraint));
         $this->assertFalse($this->validator->validate('no', $constraint));
@@ -116,44 +105,5 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($this->validator->validate((string)Uuid::uuid4(), $constraint));
         $this->assertFalse($this->validator->validate("not an uuid", $constraint));
-    }
-
-    public function testUnique()
-    {
-        $constraint = new Unique(User::class, 'username');
-        $user = new User();
-        $user
-            ->setUsername('johndoe')
-            ->setEmail('demo@demo.fr')
-            ->setPassword(User::encodePassword('plain_password'));
-
-        $this->em->add($user);
-        $this->em->flush();
-
-        $this->assertTrue($this->validator->validate('shouldBeUnique', $constraint));
-        $this->assertFalse($this->validator->validate('johndoe', $constraint));
-
-        $this->assertGreaterThan(0, count($this->validator->getErrors()));
-
-        $this->em->delete($user);
-        $this->em->flush();
-    }
-
-    public function testValidateObject()
-    {
-        $post = new Post();
-        $post
-            ->setTitle('title')
-            ->setContent('test');
-
-        $newPost = $this->hydrator->hydrateSingle([
-            'title' => 'My awesome title',
-            'content' => 'Content of the post'
-        ], new Post());
-
-        $this->assertTrue($this->validator->validateObject($newPost));
-
-        $this->expectException(Exception::class);
-        $this->validator->validateObject($post);
     }
 }

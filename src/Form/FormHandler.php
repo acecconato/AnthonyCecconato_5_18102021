@@ -20,6 +20,9 @@ class FormHandler
 
     private bool $wasSubmitted = false;
 
+    /**
+     * @var array<mixed>
+     */
     private array $formData = [];
 
     public function __construct(
@@ -77,7 +80,7 @@ class FormHandler
 
         $this->wasSubmitted = true;
 
-        $this->formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
+        $this->formData = array_map(fn ($field) => trim($field), $this->request->request->all('form'));
 
         if ($request->files->has('form')) {
             foreach ($request->files->all('form') as $filename => $file) {

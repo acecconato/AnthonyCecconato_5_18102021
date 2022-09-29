@@ -12,7 +12,7 @@ use Blog\Validator\Constraint\HIBP;
 class HIBPConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param HIBP $constraint
+     * @param  HIBP $constraint
      * @throws AssertionFailedException
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool

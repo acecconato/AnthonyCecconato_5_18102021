@@ -1,0 +1,726 @@
+   1) src/Database/Adapter/MySQLAdapter.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Database/Adapter/MySQLAdapter.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Database/Adapter/MySQLAdapter.php
+@@ -13,7 +13,7 @@
+     private PDO|null $connection = null;
+ 
+     /**
+-     * @var array<array-key, array{query: string, bind: array<string>}> 
++     * @var array<array-key, array{query: string, bind: array<string>}>
+      */
+     private array $transactions;
+ 
+@@ -108,4 +108,4 @@
+         unset($this->transactions);
+         $this->transactions = [];
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+   2) src/Form/FormHandler.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Form/FormHandler.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Form/FormHandler.php
+@@ -80,7 +80,7 @@
+ 
+         $this->wasSubmitted = true;
+ 
+-        $this->formData = array_map(fn($field) => trim($field), $this->request->request->all('form'));
++        $this->formData = array_map(fn ($field) => trim($field), $this->request->request->all('form'));
+ 
+         if ($request->files->has('form')) {
+             foreach ($request->files->all('form') as $filename => $file) {
+
+      ----------- end diff -----------
+
+   3) src/Validator/UuidConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/UuidConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/UuidConstraintValidator.php
+@@ -19,4 +19,4 @@
+     {
+         return Assertion::uuid($value, $constraint->message, $propertyPath);
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+   4) src/Validator/NotBlankConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/NotBlankConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/NotBlankConstraintValidator.php
+@@ -19,4 +19,4 @@
+     {
+         return Assertion::notBlank($value, $constraint->message, $propertyPath);
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+   5) src/Validator/ImageConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/ImageConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/ImageConstraintValidator.php
+@@ -43,7 +43,7 @@
+         }
+ 
+         throw new InvalidArgumentException(
+-        // @phpstan-ignore-next-line
++            // @phpstan-ignore-next-line
+             sprintf($constraint->message ?: '%s is not a valid image', $value->getClientOriginalName()),
+             0,
+             $propertyPath
+
+      ----------- end diff -----------
+
+   6) src/Validator/SlugConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/SlugConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/SlugConstraintValidator.php
+@@ -10,7 +10,7 @@
+ 
+ class SlugConstraintValidator implements ConstraintValidatorInterface
+ {
+-    const INVALID_SLUG = 991;
++    public const INVALID_SLUG = 991;
+ 
+     /**
+      * @param Slug $constraint
+@@ -27,4 +27,4 @@
+ 
+         return true;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+   7) src/Validator/HIBPConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/HIBPConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/HIBPConstraintValidator.php
+@@ -27,4 +27,4 @@
+ 
+         return true;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+   8) src/Validator/UniqueConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/UniqueConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/UniqueConstraintValidator.php
+@@ -11,7 +11,7 @@
+ 
+ class UniqueConstraintValidator implements ConstraintValidatorInterface
+ {
+-    const NOT_UNIQUE = 992;
++    public const NOT_UNIQUE = 992;
+ 
+     public function __construct(
+         private EntityManager $entityManager
+@@ -33,4 +33,4 @@
+ 
+         return true;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+   9) src/Validator/NotNullConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/NotNullConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/NotNullConstraintValidator.php
+@@ -30,4 +30,4 @@
+             $propertyPath
+         );
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  10) src/Validator/EmailConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/EmailConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/EmailConstraintValidator.php
+@@ -19,4 +19,4 @@
+     {
+         return Assertion::email($value, $constraint->message, $propertyPath);
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  11) src/Validator/ConstraintValidatorInterface.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/ConstraintValidatorInterface.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/ConstraintValidatorInterface.php
+@@ -9,4 +9,4 @@
+ interface ConstraintValidatorInterface
+ {
+     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool;
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  12) src/Validator/MaxLengthConstraintValidator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/MaxLengthConstraintValidator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/MaxLengthConstraintValidator.php
+@@ -17,4 +17,4 @@
+     {
+         return Assertion::nullOrMaxLength($value, $constraint->max, $constraint->message, $propertyPath);
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  13) src/Validator/Constraint/Email.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Email.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Email.php
+@@ -19,4 +19,4 @@
+     {
+         return EmailConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  14) src/Validator/Constraint/Unique.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Unique.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Unique.php
+@@ -21,4 +21,4 @@
+     {
+         return UniqueConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  15) src/Validator/Constraint/Uuid.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Uuid.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Uuid.php
+@@ -19,4 +19,4 @@
+     {
+         return UuidConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  16) src/Validator/Constraint/NotNull.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/NotNull.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/NotNull.php
+@@ -19,4 +19,4 @@
+     {
+         return NotNullConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  17) src/Validator/Constraint/Username.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Username.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Username.php
+@@ -19,4 +19,4 @@
+     {
+         return UsernameConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  18) src/Validator/Constraint/MaxLength.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/MaxLength.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/MaxLength.php
+@@ -20,4 +20,4 @@
+     {
+         return MaxLengthConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  19) src/Validator/Constraint/ConstraintInterface.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/ConstraintInterface.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/ConstraintInterface.php
+@@ -9,4 +9,4 @@
+     public function getValidator(): string;
+ 
+     public static function getInstance(): ConstraintInterface;
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  20) src/Validator/Constraint/MinLength.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/MinLength.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/MinLength.php
+@@ -20,4 +20,4 @@
+     {
+         return MinLengthConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  21) src/Validator/Constraint/Constraint.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Constraint.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Constraint.php
+@@ -13,4 +13,4 @@
+         $constraint = static::class;
+         return new $constraint();
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  22) src/Validator/Constraint/HIBP.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/HIBP.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/HIBP.php
+@@ -19,4 +19,4 @@
+     {
+         return HIBPConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  23) src/Validator/Constraint/Image.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Image.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/Image.php
+@@ -19,4 +19,4 @@
+     {
+         return ImageConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  24) src/Validator/Constraint/NotBlank.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/NotBlank.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Validator/Constraint/NotBlank.php
+@@ -19,4 +19,4 @@
+     {
+         return NotBlankConstraintValidator::class;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  25) src/Hydration/ObjectHydrator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Hydration/ObjectHydrator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Hydration/ObjectHydrator.php
+@@ -15,7 +15,6 @@
+ 
+ class ObjectHydrator implements HydratorInterface
+ {
+-
+     public function __construct(
+         protected DataMapper $mapper
+     ) {
+
+      ----------- end diff -----------
+
+  26) src/Hydration/HydratorInterface.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Hydration/HydratorInterface.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Hydration/HydratorInterface.php
+@@ -29,4 +29,4 @@
+      * @return array<string>
+      */
+     public function extract(object|array $entry): array;
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  27) src/Fixture/generate.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Fixture/generate.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Fixture/generate.php
+@@ -27,7 +27,7 @@
+ $container = $kernel->getContainer();
+ 
+ /**
+- * @var EntityManager $em 
++ * @var EntityManager $em
+ */
+ $em = $container->get(EntityManager::class);
+ 
+
+      ----------- end diff -----------
+
+  28) src/Security/Authenticator.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Security/Authenticator.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Security/Authenticator.php
+@@ -29,7 +29,8 @@
+         $session->set('userAgent', $userAgent);
+         $session->set('clientIp', $clientIp);
+         $session->set(
+-            'user', [
++            'user',
++            [
+             'userId' => $user->getId(),
+             'username' => $user->getUsername(),
+             'email' => $user->getEmail(),
+
+      ----------- end diff -----------
+
+  29) src/Entity/Contact.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Entity/Contact.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Entity/Contact.php
+@@ -61,4 +61,4 @@
+         $this->message = $message;
+         return $this;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  30) src/Controller/DashboardController.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Controller/DashboardController.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Controller/DashboardController.php
+@@ -141,7 +141,7 @@
+         $owner   = $userRepository->find($post->getUserId());
+         $authors = array_filter(
+             $userRepository->findAllBy(['is_admin' => 1]),
+-            fn($user) => $user->getId() !== $post->getUserId()
++            fn ($user) => $user->getId() !== $post->getUserId()
+         );
+ 
+         $form = $formHandler->loadFromRequest($request, $post, true);
+
+      ----------- end diff -----------
+
+  31) src/ORM/Mapping/Attribute/Enum/Type.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Enum/Type.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Enum/Type.php
+@@ -11,4 +11,4 @@
+     case INT;
+     case UUID;
+     case DATE;
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  32) src/ORM/Mapping/Attribute/Id.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Id.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Id.php
+@@ -5,4 +5,4 @@
+ #[\Attribute]
+ final class Id
+ {
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  33) src/ORM/Mapping/Attribute/Column.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Column.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Column.php
+@@ -15,4 +15,4 @@
+         public Type $type = Type::STRING,
+     ) {
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  34) src/ORM/Mapping/Attribute/Table.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Table.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Table.php
+@@ -13,4 +13,4 @@
+         public string $tableName
+     ) {
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  35) src/ORM/Mapping/Attribute/Entity.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Entity.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/Attribute/Entity.php
+@@ -13,4 +13,4 @@
+         public string $repositoryClass
+     ) {
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  36) src/ORM/Mapping/MapperInterface.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/MapperInterface.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/MapperInterface.php
+@@ -5,4 +5,4 @@
+ interface MapperInterface
+ {
+     public function resolve(string $entity): Metadata;
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  37) src/ORM/Mapping/DataMapper.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/DataMapper.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/Mapping/DataMapper.php
+@@ -51,7 +51,7 @@
+         $reflClass = new ReflectionClass($fqcn);
+         $reflAttribute = $reflClass->getAttributes();
+ 
+-        $classAttributesName = array_map(fn($reflAttribute) => $reflAttribute->getName(), $reflAttribute);
++        $classAttributesName = array_map(fn ($reflAttribute) => $reflAttribute->getName(), $reflAttribute);
+ 
+         $metadatas->setFqcn($fqcn);
+ 
+
+      ----------- end diff -----------
+
+  38) src/ORM/UnitOfWork.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/UnitOfWork.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/ORM/UnitOfWork.php
+@@ -65,7 +65,7 @@
+             );
+ 
+             // Remove null values
+-            $prepValues = array_filter($prepValues, fn($value) => ($value));
++            $prepValues = array_filter($prepValues, fn ($value) => ($value));
+ 
+             $prepValues = implode(', ', $prepValues);
+ 
+@@ -131,7 +131,7 @@
+             $mapping = $this->mapper->resolve($object::class);
+             $tableName = $mapping->getTable()->tableName;
+ 
+-            $prepValues = array_map(fn($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
++            $prepValues = array_map(fn ($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
+ 
+             $query = "UPDATE $tableName SET " . implode(', ', $prepValues) . " WHERE " . $mapping->getId() . " = :id";
+ 
+
+      ----------- end diff -----------
+
+  39) src/Twig/PathExtension.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Twig/PathExtension.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Twig/PathExtension.php
+@@ -30,4 +30,4 @@
+     {
+         return $this->router->generateUri($name, $parameters);
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  40) src/Twig/CsrfTokenExtension.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Twig/CsrfTokenExtension.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Twig/CsrfTokenExtension.php
+@@ -34,4 +34,4 @@
+ 
+         return $token;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  41) src/Twig/SecureFilter.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Twig/SecureFilter.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Twig/SecureFilter.php
+@@ -20,4 +20,4 @@
+     {
+         return preg_replace('#<script(.*?)>(.*?)</script>#is', '', $value);
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  42) src/DependencyInjection/Container.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/DependencyInjection/Container.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/DependencyInjection/Container.php
+@@ -52,8 +52,8 @@
+ 
+         if (null !== $reflectionClass->getConstructor()) {
+             $dependencies = array_map(
+-            // @phpstan-ignore-next-line
+-                fn(ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
++                // @phpstan-ignore-next-line
++                fn (ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
+                 array_filter(
+                     $reflectionClass->getConstructor()->getParameters(),
+                     function (ReflectionParameter $parameter) {
+@@ -69,7 +69,7 @@
+             );
+         }
+ 
+-        $aliases = array_filter($this->aliases, fn(string $alias) => $id === $alias);
++        $aliases = array_filter($this->aliases, fn (string $alias) => $id === $alias);
+ 
+         // @phpstan-ignore-next-line
+         $this->definitions[$id] = new Definition(id: $id, aliases: $aliases, dependencies: $dependencies);
+
+      ----------- end diff -----------
+
+  43) src/DependencyInjection/Definition.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/DependencyInjection/Definition.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/DependencyInjection/Definition.php
+@@ -67,7 +67,6 @@
+         return $this->class->newInstanceArgs(
+             array_map(
+                 function (ReflectionParameter $param) use ($container) {
+-
+                     // @phpstan-ignore-next-line
+                     if ($param->getType() !== null && $param->getType()->isBuiltin()) {
+                         // @phpstan-ignore-next-line
+@@ -82,4 +81,3 @@
+         );
+     }
+ }
+-
+
+      ----------- end diff -----------
+
+  44) src/Event/PreRequestHandlingEvent.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Event/PreRequestHandlingEvent.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Event/PreRequestHandlingEvent.php
+@@ -15,4 +15,4 @@
+     {
+         return $this->object;
+     }
+-}
+\ No newline at end of file
++}
+
+      ----------- end diff -----------
+
+  45) src/Resolver/Option.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Resolver/Option.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Resolver/Option.php
+@@ -78,4 +78,3 @@
+         return true;
+     }
+ }
+-
+
+      ----------- end diff -----------
+
+  46) src/Kernel.php
+      ---------- begin diff ----------
+--- /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Kernel.php
++++ /Users/anthony/Desktop/Openclassrooms/AnthonyCecconato_5_18102021/src/Kernel.php
+@@ -114,7 +114,7 @@
+ 
+         $expectedFromMethod = array_filter(
+             $reflectionMethod->getParameters(),
+-            fn($param) => ! array_key_exists($param->getName(), $routeArgs)
++            fn ($param) => ! array_key_exists($param->getName(), $routeArgs)
+         );
+ 
+         $methodArgs = [];
+@@ -144,7 +144,7 @@
+         $args = array_merge($routeArgs, $methodArgs);
+ 
+         $expectedCallOrder = array_map(
+-            fn($param) => $param->getName(),
++            fn ($param) => $param->getName(),
+             $reflectionMethod->getParameters()
+         );
+ 
+
+      ----------- end diff -----------
+
+
+Checked all files in 0.425 seconds, 16.000 MB memory used

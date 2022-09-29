@@ -31,7 +31,9 @@ class EventDispatcher implements EventDispatcherInterface
         }
 
         foreach ($this->listenerProvider->getListenersForEvent($event) as $eventListenerFqcn) {
-            /** @var EventListenerInterface $eventListener */
+            /**
+             * @var EventListenerInterface $eventListener
+            */
             $eventListener = $this->container->get($eventListenerFqcn);
             $eventListener->execute($event);
         }

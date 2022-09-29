@@ -23,17 +23,17 @@
                             {% if comments is not empty and comments is iterable %}
                                 {% for comment in comments %}
                                     <tr>
-                                        <td>
+                                        <td data-label="Date">
                                             {{ comment.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
                                         </td>
-                                        <td>{{ comment.user.username }}</td>
-                                        <td>{{ comment.content }}</td>
-                                        <td>
+                                        <td data-label="Auteur">{{ comment.user.username }}</td>
+                                        <td data-label="Contenu">{{ comment.content }}</td>
+                                        <td data-label="Article">
                                             <a href="{{ path('post', {slug: comment.post.slug}) }}" target="_blank">
                                                 {{ comment.post.title }}
                                             </a>
                                         </td>
-                                        <td class="actions d-flex flex-column">
+                                        <td class="actions">
                                             {% if comment.enabled %}
                                                 <a href="{{ path('admin_toggle_comment', {id: comment.id}) }}"
                                                    id="btn-enable"

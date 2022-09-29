@@ -32,5 +32,6 @@ return function (RouterInterface $router) {
 
         ->add(new Route('admin_users', '/dashboard/utilisateurs', [DashboardController::class, 'showUsers']))
         ->add(new Route('admin_delete_user', '/dashboard/utilisateurs/{id:[a-zA-Z0-9-_]+}/supprimer', [DashboardController::class, 'deleteUser']))
-        ->add(new Route('admin_toggle_user', '/dashboard/utilisateurs/{id:[a-zA-Z0-9-_]+}/basculer', [DashboardController::class, 'toggleUser']));
+        ->add(new Route('admin_toggle_user', '/dashboard/utilisateurs/{id:[a-zA-Z0-9-_]+}/basculer', [DashboardController::class, 'toggleUser']))
+        ->add(new Route('admin_toggle_admin', '/dashboard/utilisateurs/{id:[a-zA-Z0-9-_]+}/admin', [DashboardController::class, 'toggleAdmin']));
 };

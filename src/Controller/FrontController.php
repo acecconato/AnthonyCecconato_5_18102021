@@ -71,7 +71,9 @@ class FrontController extends AbstractController
                 ->text(strip_tags($emailContent))
                 ->html(nl2br($emailContent));
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
 
             try {
@@ -114,20 +116,25 @@ class FrontController extends AbstractController
         UserRepository $userRepository,
         FormHandler $formHandler,
         Request $request,
-        Authenticator $auth
     ): Response {
-        /** @var ?Post $post */
+        /**
+         * @var ?Post $post
+        */
         $post = $postRepository->findOneBy(['slug' => $slug]);
 
         if (! $post) {
             throw new ResourceNotFound("Publication '$slug' introuvable");
         }
 
-        /** @var User $user */
+        /**
+         * @var User $user
+        */
         $user = $userRepository->find($post->getUserId());
         $post->setUser($user);
 
-        /** @var Comment[] $comments */
+        /**
+         * @var Comment[] $comments
+        */
         $comments = $commentRepository->findAllBy(['post_id' => $post->getId(), 'enabled' => 1]);
         $post->setComments($comments);
 
@@ -142,11 +149,13 @@ class FrontController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->denyAccessUnlessLoggedIn();
-            $em = $postRepository->getEntityManager();
-            $em->add($comment);
-            $em->flush();
+            $entityManager = $postRepository->getEntityManager();
+            $entityManager->add($comment);
+            $entityManager->flush();
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add('success', "Votre commentaire est en attente de validation");
 

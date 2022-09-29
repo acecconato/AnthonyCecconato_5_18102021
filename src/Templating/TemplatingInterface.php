@@ -6,11 +6,12 @@ namespace Blog\Templating;
 
 interface TemplatingInterface
 {
-    /** Render a template from a view.
+    /**
+     * Render a template from a view.
      *
-     * @param string $view
+     * @param string        $view
      * @param array<string> $context
-     * @param bool $mainRequest
+     * @param bool          $mainRequest
      *
      * @return string
      */

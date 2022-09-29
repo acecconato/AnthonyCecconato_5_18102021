@@ -30,7 +30,7 @@ final class Router implements RouterInterface
     }
 
     /**
-     * @param Request $request
+     * @param  Request $request
      * @return Route|null
      * @throws RouteNotFoundException
      */
@@ -86,8 +86,8 @@ final class Router implements RouterInterface
     /**
      * Generate a route from route name and parameters
      *
-     * @param string $name
-     * @param array<mixed> $parameters
+     * @param  string       $name
+     * @param  array<mixed> $parameters
      * @return string
      * @throws RouteNotFoundException
      */

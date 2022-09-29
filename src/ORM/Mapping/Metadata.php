@@ -18,7 +18,9 @@ class Metadata
 
     private string $id;
 
-    /** @var Column[] */
+    /**
+     * @var Column[]
+     */
     private array $columns = [];
 
     public function getFqcn(): string

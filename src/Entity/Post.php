@@ -68,7 +68,9 @@ class Post
 
     private User $user;
 
-    /** @var Comment[] */
+    /**
+     * @var Comment[]
+     */
     private array $comments = [];
 
     public function __construct()

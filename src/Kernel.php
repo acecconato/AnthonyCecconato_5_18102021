@@ -15,6 +15,7 @@ use Blog\Event\EventListener\ListenerProvider;
 use Blog\Event\PreRequestHandlingEvent;
 use Blog\ORM\Mapping\DataMapper;
 use Blog\ORM\Mapping\MapperInterface;
+use Blog\Router\Exceptions\RouteNotFoundException;
 use Blog\Router\Router;
 use Blog\Router\RouterInterface;
 use Blog\Templating\Templating;
@@ -28,17 +29,20 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport;
-use Symfony\Component\Mailer\Transport\TransportInterface;
 use Throwable;
 
 final class Kernel
 {
     public const DATE_FORMAT = 'Y-m-d H:i:s';
 
-    /** @var RouterInterface */
+    /**
+     * @var RouterInterface
+     */
     private RouterInterface $router;
 
-    /** @var ContainerInterface */
+    /**
+     * @var ContainerInterface
+     */
     private ContainerInterface $container;
 
     /**
@@ -66,9 +70,11 @@ final class Kernel
      */
     private function configureEvents(): void
     {
-        $registerEvents = require dirname(__DIR__) . '/config/registerEvents.php';
+        $registerEvents = include dirname(__DIR__) . '/config/registerEvents.php';
 
-        /** @var ListenerProvider $listenerProvider */
+        /**
+         * @var ListenerProvider $listenerProvider
+         */
         $listenerProvider = $this->container->get(ListenerProvider::class);
 
         $registerEvents($listenerProvider);
@@ -84,63 +90,67 @@ final class Kernel
      */
     public function run(): void
     {
-        /** @var Request $request */
-        $request = $this->container->get(Request::class);
+        try {
+            /**
+             * @var Request $request
+             */
+            $request = $this->container->get(Request::class);
 
-        $request->setSession(new Session());
+            $request->setSession(new Session());
 
-        /** @var EventDispatcher $eventDispatcher */
-        $eventDispatcher = $this->container->get(EventDispatcher::class);
-        $eventDispatcher->dispatch(new PreRequestHandlingEvent($request));
+            /**
+             * @var EventDispatcher $eventDispatcher
+             */
+            $eventDispatcher = $this->container->get(EventDispatcher::class);
+            $eventDispatcher->dispatch(new PreRequestHandlingEvent($request));
 
-        $route = $this->router->match($request->getRequestUri());
-        $routeArgs = $route->getArgs($request);
+            $route = $this->router->match($request->getRequestUri());
+            $routeArgs = $route->getArgs($request);
 
-        $callable = $route->getCallable();
-        $class    = $this->container->get($callable[0]);
-        $method   = $callable[1];
+            $callable = $route->getCallable();
+            $class    = $this->container->get($callable[0]);
+            $method   = $callable[1];
 
-        $reflectionMethod = new ReflectionMethod($class::class, $method);
+            $reflectionMethod = new ReflectionMethod($class::class, $method);
 
-        $expectedFromMethod = array_filter(
-            $reflectionMethod->getParameters(),
-            fn($param) => ! array_key_exists($param->getName(), $routeArgs)
-        );
+            $expectedFromMethod = array_filter(
+                $reflectionMethod->getParameters(),
+                fn ($param) => ! array_key_exists($param->getName(), $routeArgs)
+            );
 
-        $methodArgs = [];
-        foreach ($expectedFromMethod as $param) {
-            if ($this->container->has($param->getName())) {
-                $methodArgs[$param->getName()] = $this->container->get($param->getName());
-                continue;
-            }
-
-            if ($param->getType() !== null) {
-                // It's a builtin parameter, or we need to instantiate it?
-                // @phpstan-ignore-next-line
+            $methodArgs = [];
+            foreach ($expectedFromMethod as $param) {
                 if ($this->container->has($param->getName())) {
                     $methodArgs[$param->getName()] = $this->container->get($param->getName());
-                    $methodArgs[$param->getName()] = $this->container->get($param->getName());
+                    continue;
                 }
 
-                // Use the container to instantiate the required class
-                // @phpstan-ignore-next-line
-                if (! $param->getType()?->isBuiltin()) {
+                if ($param->getType() !== null) {
+                    // It's a builtin parameter, or we need to instantiate it?
                     // @phpstan-ignore-next-line
-                    $methodArgs[$param->getName()] = $this->container->get($param->getType()->getName());
+                    if ($this->container->has($param->getName())) {
+                        $methodArgs[$param->getName()] = $this->container->get($param->getName());
+                        $methodArgs[$param->getName()] = $this->container->get($param->getName());
+                    }
+
+                    // Use the container to instantiate the required class
+                    // @phpstan-ignore-next-line
+                    if (! $param->getType()?->isBuiltin()) {
+                        // @phpstan-ignore-next-line
+                        $methodArgs[$param->getName()] = $this->container->get($param->getType()->getName());
+                    }
                 }
-            }
-        };
+            };
 
-        $args = array_merge($routeArgs, $methodArgs);
+            $args = array_merge($routeArgs, $methodArgs);
 
-        $expectedCallOrder = array_map(
-            fn($param) => $param->getName(),
-            $reflectionMethod->getParameters()
-        );
+            $expectedCallOrder = array_map(
+                fn ($param) => $param->getName(),
+                $reflectionMethod->getParameters()
+            );
 
-        $args = array_merge(array_flip($expectedCallOrder), $args);
+            $args = array_merge(array_flip($expectedCallOrder), $args);
 
-        try {
             $response = call_user_func_array([$class, $method], $args);
             $response->send();
         } catch (Throwable $e) {
@@ -150,13 +160,18 @@ final class Kernel
 
             $errorController = $this->container->get(ErrorController::class);
 
-            if ($e::class === UnauthorizedException::class) {
-                $response = call_user_func([$errorController, 'redirect'], $this->router->generateUri('login'));
-                $response->send();
-                return;
-            }
+            $response = match ($e::class) {
+                RouteNotFoundException::class => call_user_func(
+                    [$errorController, 'redirect'],
+                    $this->router->generateUri('home')
+                ),
+                UnauthorizedException::class => call_user_func(
+                    [$errorController, 'redirect'],
+                    $this->router->generateUri('login')
+                ),
+                default => call_user_func([$errorController, 'displayError']),
+            };
 
-            $response = call_user_func([$errorController, 'displayError']);
             $response->send();
         }
     }
@@ -211,7 +226,7 @@ final class Kernel
      */
     public function configureRoutes(): void
     {
-        $configRoute = require dirname(__DIR__) . '/config/routes.php';
+        $configRoute = include dirname(__DIR__) . '/config/routes.php';
 
         $this->router = $this->container->get(Router::class);
 

@@ -6,7 +6,6 @@ namespace Blog\DependencyInjection;
 
 use Blog\DependencyInjection\Exceptions\ContainerException;
 use Blog\DependencyInjection\Exceptions\NotFoundException;
-use Blog\Router\Router;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use ReflectionClass;
@@ -53,8 +52,8 @@ final class Container implements ContainerInterface
 
         if (null !== $reflectionClass->getConstructor()) {
             $dependencies = array_map(
-            // @phpstan-ignore-next-line
-                fn(ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
+                // @phpstan-ignore-next-line
+                fn (ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
                 array_filter(
                     $reflectionClass->getConstructor()->getParameters(),
                     function (ReflectionParameter $parameter) {
@@ -70,8 +69,9 @@ final class Container implements ContainerInterface
             );
         }
 
-        $aliases = array_filter($this->aliases, fn(string $alias) => $id === $alias);
+        $aliases = array_filter($this->aliases, fn (string $alias) => $id === $alias);
 
+        // @phpstan-ignore-next-line
         $this->definitions[$id] = new Definition(id: $id, aliases: $aliases, dependencies: $dependencies);
 
         return $this;
@@ -169,11 +169,13 @@ final class Container implements ContainerInterface
             $this->addAlias($alias, $obj::class);
         }
 
+        // @phpstan-ignore-next-line
         $this->instances[$obj::class ?? $alias] = $obj;
 
         return $this;
     }
 
+    // @phpstan-ignore-next-line
     public function getAliases(): array
     {
         return $this->aliases;

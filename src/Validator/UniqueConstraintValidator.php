@@ -11,7 +11,7 @@ use Blog\Validator\Constraint\Unique;
 
 class UniqueConstraintValidator implements ConstraintValidatorInterface
 {
-    const NOT_UNIQUE = 992;
+    public const NOT_UNIQUE = 992;
 
     public function __construct(
         private EntityManager $entityManager

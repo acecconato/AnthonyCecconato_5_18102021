@@ -12,7 +12,7 @@ use Blog\Validator\Constraint\NotNull;
 class NotNullConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param NotNull $constraint
+     * @param  NotNull $constraint
      * @throws AssertionFailedException
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool

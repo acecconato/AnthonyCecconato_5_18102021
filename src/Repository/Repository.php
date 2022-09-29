@@ -55,7 +55,7 @@ abstract class Repository
     }
 
     /**
-     * @param array<mixed> $criteria
+     * @param  array<mixed> $criteria
      * @return object[]
      * @throws ReflectionException
      */
@@ -94,7 +94,7 @@ abstract class Repository
     }
 
     /**
-     * @param array<string> $criteria
+     * @param  array<string> $criteria
      * @return object|false
      * @throws ReflectionException
      */
@@ -108,7 +108,7 @@ abstract class Repository
     }
 
     /**
-     * @param array<string> $ids
+     * @param  array<string> $ids
      * @return int
      */
     public function delete(array $ids): int

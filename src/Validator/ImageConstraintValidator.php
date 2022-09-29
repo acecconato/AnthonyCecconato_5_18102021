@@ -14,8 +14,8 @@ use Symfony\Component\Mime\MimeTypes;
 class ImageConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param mixed $value
-     * @param Image $constraint
+     * @param mixed       $value
+     * @param Image       $constraint
      * @param string|null $propertyPath
      *
      * @return bool
@@ -43,7 +43,7 @@ class ImageConstraintValidator implements ConstraintValidatorInterface
         }
 
         throw new InvalidArgumentException(
-        // @phpstan-ignore-next-line
+            // @phpstan-ignore-next-line
             sprintf($constraint->message ?: '%s is not a valid image', $value->getClientOriginalName()),
             0,
             $propertyPath

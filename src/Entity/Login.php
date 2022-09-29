@@ -49,7 +49,7 @@ class Login
         return $this->rememberMe;
     }
 
-    public function setRememberMe(bool $rememberMe): User
+    public function setRememberMe(bool $rememberMe): Login
     {
         $this->rememberMe = $rememberMe;
         return $this;

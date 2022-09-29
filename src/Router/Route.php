@@ -23,9 +23,9 @@ final class Route implements RouteInterface
      * @param array<mixed> $callable $callable
      */
     public function __construct(
-        private string $name,
-        private string $path,
-        private array $callable
+        private readonly string $name,
+        private readonly string $path,
+        private readonly array $callable
     ) {
     }
 
@@ -127,7 +127,7 @@ final class Route implements RouteInterface
     /**
      * @param Request $request
      *
-     * @return array
+     * @return array<mixed>
      * @throws ReflectionException
      */
     public function getArgs(Request $request): array

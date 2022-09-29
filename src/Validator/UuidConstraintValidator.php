@@ -12,7 +12,7 @@ use Blog\Validator\Constraint\Uuid;
 class UuidConstraintValidator implements ConstraintValidatorInterface
 {
     /**
-     * @param Uuid $constraint
+     * @param  Uuid $constraint
      * @throws AssertionFailedException
      */
     public function validate(mixed $value, ConstraintInterface $constraint, ?string $propertyPath = null): bool

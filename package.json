@@ -3,6 +3,7 @@
     "@symfony/webpack-encore": "^1.8.1",
     "bootstrap": "^5.2.1",
     "core-js": "^3.23.3",
+    "font-awesome": "^4.7.0",
     "install": "^0.13.0",
     "jquery": "^3.6.1",
     "slugify": "^1.6.5",

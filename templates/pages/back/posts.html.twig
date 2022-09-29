@@ -29,17 +29,17 @@
                             {% if posts is not empty and posts is iterable %}
                                 {% for post in posts %}
                                     <tr>
-                                        <td>
+                                        <td data-label="Date">
                                             {{ post.createdAt|format_datetime(locale='fr', pattern='dd MMM YYYY') }}
                                         </td>
-                                        <td>
+                                        <td data-label="Titre">
                                             <a href="{{ path('post', {slug: post.slug}) }}" target="_blank">
                                                 {{ post.title }}
                                             </a>
                                         </td>
-                                        <td>{{ post.slug }}</td>
-                                        <td>{{ post.user.username }}</td>
-                                        <td>{{ post.comments|length }}</td>
+                                        <td data-label="Slug">{{ post.slug }}</td>
+                                        <td data-label="Auteur">{{ post.user.username }}</td>
+                                        <td data-label="Commentaires">{{ post.comments|length }}</td>
                                         <td class="actions d-flex flex-column">
                                             <a href="{{ path('admin_update_post', {id: post.id}) }}"
                                                id="btn-update"

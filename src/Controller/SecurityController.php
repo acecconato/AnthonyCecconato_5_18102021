@@ -57,7 +57,9 @@ class SecurityController extends AbstractController
             if (! $form->hasErrors()) {
                 $auth->authenticate($user, (bool)$form->get('rememberMe'));
 
-                /** @var Session $session */
+                /**
+                 * @var Session $session
+                */
                 $session = $request->getSession();
                 $session->getFlashBag()->add('success', 'Bonjour, ' . ucfirst($user->getUsername()) . ' !');
 
@@ -101,7 +103,9 @@ class SecurityController extends AbstractController
             $entityManager->add($user);
             $entityManager->flush();
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add(
                 'success',
@@ -132,10 +136,14 @@ class SecurityController extends AbstractController
         $form          = $formHandler->loadFromRequest($request, $resetPassword);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User|false $user */
+            /**
+             * @var User|false $user
+            */
             $user = $userRepository->getUserByUsernameOrEmail($resetPassword->getUsername());
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add('success', "Un mail vous a été envoyé à l'adresse associée au compte");
 
@@ -195,7 +203,9 @@ class SecurityController extends AbstractController
 
         $token = (string)$request->query->get('reset_token');
 
-        /** @var User|false $user */
+        /**
+         * @var User|false $user
+        */
         $user = $userRepository->findOneBy(['reset_token' => $token]);
 
         if (! $token || ! $user) {
@@ -215,7 +225,9 @@ class SecurityController extends AbstractController
             $entityManager->update($user);
             $entityManager->flush();
 
-            /** @var Session $session */
+            /**
+             * @var Session $session
+            */
             $session = $request->getSession();
             $session->getFlashBag()->add(
                 'success',
@@ -235,7 +247,9 @@ class SecurityController extends AbstractController
     {
         $auth->logout();
 
-        /** @var Session $session */
+        /**
+         * @var Session $session
+        */
         $session = $request->getSession();
         $session->getFlashBag()->add('success', 'Vous êtes désormais déconnecté');
 

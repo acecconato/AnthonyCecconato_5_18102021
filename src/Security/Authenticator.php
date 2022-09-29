@@ -28,12 +28,15 @@ class Authenticator
         $session->set('isLoggedIn', true);
         $session->set('userAgent', $userAgent);
         $session->set('clientIp', $clientIp);
-        $session->set('user', [
+        $session->set(
+            'user',
+            [
             'userId' => $user->getId(),
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),
             'isAdmin' => $user->getIsAdmin()
-        ]);
+            ]
+        );
 
         if ($remember) {
             $now = new DateTimeImmutable();

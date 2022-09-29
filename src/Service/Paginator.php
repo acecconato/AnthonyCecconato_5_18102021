@@ -7,19 +7,21 @@ use JetBrains\PhpStorm\ArrayShape;
 class Paginator
 {
     /**
-     * @param int $page
-     * @param int $nbItem
-     * @param int $maxPerPage
+     * @param  int $page
+     * @param  int $nbItem
+     * @param  int $maxPerPage
      * @return array<mixed>
      */
-    #[ArrayShape([
+    #[ArrayShape(
+        [
         'itemsCount' => "int",
         'pagesCount' => "int",
         'page' => "int",
         'offset' => "int",
         'maxPerPage' => "int",
         'range' => "array"
-    ])] public static function getPaginatingDatas(int $page, int $nbItem, int $maxPerPage): array
+        ]
+    )] public static function getPaginatingDatas(int $page, int $nbItem, int $maxPerPage): array
     {
         $page = ($page >= 0) ? $page : 0;
         $pagesCount = (int)ceil($nbItem / $maxPerPage);

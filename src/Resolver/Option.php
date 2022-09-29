@@ -9,7 +9,7 @@ use Closure;
 class Option
 {
     public function __construct(
-        private string $name,
+        private readonly string $name,
         private string $defaultValue = '',
         private Closure|null $validator = null
     ) {
@@ -32,7 +32,7 @@ class Option
     }
 
     /**
-     * @param string $defaultValue
+     * @param  string $defaultValue
      * @return Option
      */
     public function setDefaultValue(string $defaultValue): self
@@ -59,7 +59,7 @@ class Option
     }
 
     /**
-     * @param Closure $validator
+     * @param  Closure $validator
      * @return Option
      */
     public function setValidator(Closure $validator): self
@@ -69,11 +69,7 @@ class Option
         return $this;
     }
 
-    /**
-     * @param $value
-     * @return bool
-     */
-    public function isValid($value): bool
+    public function isValid(mixed $value): bool
     {
         if ($this->validator instanceof \Closure) {
             return (bool)call_user_func($this->validator, $value);
@@ -82,4 +78,3 @@ class Option
         return true;
     }
 }
-

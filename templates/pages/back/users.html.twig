@@ -11,25 +11,30 @@
                     <div class="overflow-auto">
                         <table class="table table-borderless table-striped">
                             <thead>
-                            <tr>
-                                <th scope="col">Utilisateur</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Activé</th>
-                                <th scope="col">Suppr.</th>
-                            </tr>
+                                <tr>
+                                    <th scope="col">Utilisateur</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Activé</th>
+                                    <th scope="col">Suppr.</th>
+                                </tr>
                             </thead>
+
                             <tbody>
                             {% if users is not empty and users is iterable %}
                                 {% for user in users %}
                                     <tr>
-                                        <td>
-                                            {% if user.isAdmin %}
-                                                <i class="fa fa-crown text-warning"></i>
-                                            {% endif %}
+                                        <td data-label="Utilisateur">
+                                            <a href="{{ path('admin_toggle_admin', {id: user.id}) }}"
+                                               id="btn-admin"
+                                               class="btn btn-lg"
+                                               title="Changer en {% if user.isAdmin %}utilisateur{% else %}administratuer{% endif %}"
+                                            >
+                                                <i class="fa fa-crown {% if user.isAdmin %}text-warning{% else %}text-secondary{% endif %}"></i>
+                                            </a>
                                             {{ user.username|capitalize }}
                                         </td>
-                                        <td>{{ user.email }}</td>
-                                        <td>
+                                        <td data-label="Email">{{ user.email }}</td>
+                                        <td data-label="Activé">
                                             {% if user.enabled %}
                                                 <a href="{{ path('admin_toggle_user', {id: user.id}) }}"
                                                    id="btn-disable"
@@ -48,7 +53,7 @@
                                                 </a>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td data-label="Suppr.">
                                             <a href="{{ path('admin_delete_user', {id: user.id}) }}"
                                                id="btn-delete"
                                                class="btn btn-lg"

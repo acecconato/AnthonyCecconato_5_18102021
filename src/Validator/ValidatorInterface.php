@@ -10,6 +10,9 @@ interface ValidatorInterface
 
     public function validate(mixed $value, ConstraintInterface $constraint, string $propertyPath = ''): bool;
 
+    /**
+     * @return  array<array-key, array{propertyPath: string, message: string}>
+     */
     public function getErrors(): array;
 
     public function clear(): void;

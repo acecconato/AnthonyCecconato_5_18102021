@@ -15,7 +15,9 @@ use Psr\Container\NotFoundExceptionInterface;
 
 final class Validator implements ValidatorInterface
 {
-    /** @var array<array-key, array{propertyPath: string, message: string}> */
+    /**
+     * @var array<array-key, array{propertyPath: string, message: string}>
+     */
     private array $errors = [];
 
     private bool $editionMode = false;
@@ -79,7 +81,9 @@ final class Validator implements ValidatorInterface
      */
     public function validate(mixed $value, ConstraintInterface $constraint, string $propertyPath = ''): bool
     {
-        /** @var ConstraintValidatorInterface $validator */
+        /**
+         * @var ?ConstraintValidatorInterface $validator
+         */
         $validator = $this->container->get($constraint->getValidator());
 
         if (! $validator) {
@@ -95,6 +99,9 @@ final class Validator implements ValidatorInterface
         }
     }
 
+    /**
+     * @return array<array-key, array{propertyPath: string, message: string}>
+     */
     public function getErrors(): array
     {
         $tempErrors = $this->errors;

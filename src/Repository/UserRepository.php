@@ -10,7 +10,7 @@ use PDO;
 class UserRepository extends Repository
 {
     /**
-     * @param string $search
+     * @param  string $search
      * @return User|null
      */
     public function getUserByUsernameOrEmail(string $search): ?object

@@ -10,7 +10,7 @@ use Blog\Validator\Constraint\Slug;
 
 class SlugConstraintValidator implements ConstraintValidatorInterface
 {
-    const INVALID_SLUG = 991;
+    public const INVALID_SLUG = 991;
 
     /**
      * @param Slug $constraint

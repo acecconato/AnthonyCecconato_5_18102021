@@ -114,7 +114,7 @@ final class Kernel
 
         $expectedFromMethod = array_filter(
             $reflectionMethod->getParameters(),
-            fn($param) => ! array_key_exists($param->getName(), $routeArgs)
+            fn ($param) => ! array_key_exists($param->getName(), $routeArgs)
         );
 
         $methodArgs = [];
@@ -144,7 +144,7 @@ final class Kernel
         $args = array_merge($routeArgs, $methodArgs);
 
         $expectedCallOrder = array_map(
-            fn($param) => $param->getName(),
+            fn ($param) => $param->getName(),
             $reflectionMethod->getParameters()
         );
 

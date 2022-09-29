@@ -51,7 +51,7 @@ class DataMapper implements MapperInterface
         $reflClass = new ReflectionClass($fqcn);
         $reflAttribute = $reflClass->getAttributes();
 
-        $classAttributesName = array_map(fn($reflAttribute) => $reflAttribute->getName(), $reflAttribute);
+        $classAttributesName = array_map(fn ($reflAttribute) => $reflAttribute->getName(), $reflAttribute);
 
         $metadatas->setFqcn($fqcn);
 

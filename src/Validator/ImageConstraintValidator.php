@@ -43,7 +43,7 @@ class ImageConstraintValidator implements ConstraintValidatorInterface
         }
 
         throw new InvalidArgumentException(
-        // @phpstan-ignore-next-line
+            // @phpstan-ignore-next-line
             sprintf($constraint->message ?: '%s is not a valid image', $value->getClientOriginalName()),
             0,
             $propertyPath

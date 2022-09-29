@@ -65,7 +65,7 @@ class UnitOfWork
             );
 
             // Remove null values
-            $prepValues = array_filter($prepValues, fn($value) => ($value));
+            $prepValues = array_filter($prepValues, fn ($value) => ($value));
 
             $prepValues = implode(', ', $prepValues);
 
@@ -131,7 +131,7 @@ class UnitOfWork
             $mapping = $this->mapper->resolve($object::class);
             $tableName = $mapping->getTable()->tableName;
 
-            $prepValues = array_map(fn($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
+            $prepValues = array_map(fn ($column) => $column->name . '=:' . $column->name, $mapping->getColumns());
 
             $query = "UPDATE $tableName SET " . implode(', ', $prepValues) . " WHERE " . $mapping->getId() . " = :id";
 

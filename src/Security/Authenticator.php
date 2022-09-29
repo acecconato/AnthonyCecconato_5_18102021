@@ -29,7 +29,8 @@ class Authenticator
         $session->set('userAgent', $userAgent);
         $session->set('clientIp', $clientIp);
         $session->set(
-            'user', [
+            'user',
+            [
             'userId' => $user->getId(),
             'username' => $user->getUsername(),
             'email' => $user->getEmail(),

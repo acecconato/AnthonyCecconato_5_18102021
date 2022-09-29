@@ -15,7 +15,6 @@ use ReflectionObject;
 
 class ObjectHydrator implements HydratorInterface
 {
-
     public function __construct(
         protected DataMapper $mapper
     ) {

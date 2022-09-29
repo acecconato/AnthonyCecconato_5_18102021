@@ -78,4 +78,3 @@ class Option
         return true;
     }
 }
-

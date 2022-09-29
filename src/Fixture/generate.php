@@ -27,7 +27,7 @@ $kernel = new Kernel('dev');
 $container = $kernel->getContainer();
 
 /**
- * @var EntityManager $em 
+ * @var EntityManager $em
 */
 $em = $container->get(EntityManager::class);
 

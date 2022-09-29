@@ -52,8 +52,8 @@ final class Container implements ContainerInterface
 
         if (null !== $reflectionClass->getConstructor()) {
             $dependencies = array_map(
-            // @phpstan-ignore-next-line
-                fn(ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
+                // @phpstan-ignore-next-line
+                fn (ReflectionParameter $parameter) => $this->getDefinition($parameter->getType()->getName()),
                 array_filter(
                     $reflectionClass->getConstructor()->getParameters(),
                     function (ReflectionParameter $parameter) {
@@ -69,7 +69,7 @@ final class Container implements ContainerInterface
             );
         }
 
-        $aliases = array_filter($this->aliases, fn(string $alias) => $id === $alias);
+        $aliases = array_filter($this->aliases, fn (string $alias) => $id === $alias);
 
         // @phpstan-ignore-next-line
         $this->definitions[$id] = new Definition(id: $id, aliases: $aliases, dependencies: $dependencies);

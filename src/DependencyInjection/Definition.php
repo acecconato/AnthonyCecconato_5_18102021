@@ -67,7 +67,6 @@ final class Definition
         return $this->class->newInstanceArgs(
             array_map(
                 function (ReflectionParameter $param) use ($container) {
-
                     // @phpstan-ignore-next-line
                     if ($param->getType() !== null && $param->getType()->isBuiltin()) {
                         // @phpstan-ignore-next-line
@@ -82,4 +81,3 @@ final class Definition
         );
     }
 }
-

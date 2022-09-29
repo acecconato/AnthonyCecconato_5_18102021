@@ -141,7 +141,7 @@ class DashboardController extends AbstractController
         $owner   = $userRepository->find($post->getUserId());
         $authors = array_filter(
             $userRepository->findAllBy(['is_admin' => 1]),
-            fn($user) => $user->getId() !== $post->getUserId()
+            fn ($user) => $user->getId() !== $post->getUserId()
         );
 
         $form = $formHandler->loadFromRequest($request, $post, true);

@@ -31,7 +31,7 @@ end
 
 Server -> Database : Save new blog post
 
-Server --> Client : Redirect to the new blog post
+Server --> Client : Success message
 
 deactivate Server
 

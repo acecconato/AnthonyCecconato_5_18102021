@@ -5,7 +5,7 @@ title Blog use case
 
 '  Actors
 actor Admin
-actor User
+actor "Logged In User" as User
 actor Visitor
 
 ' <<system>>
@@ -18,16 +18,11 @@ package Blog {
     usecase "Delete a blog post" as DeleteBlogPost
     usecase "Update a blog post" as UpdateBlogPost
     usecase "Read a blog post" as ReadBlogPost
-    usecase "Comment a blog post" as CommentBlogPost
-    usecase "List reported comments" as ListReportedComments
     usecase "Delete a comment" as DeleteComment
-    usecase "Delete a report" as DeleteReport
-    usecase "Report a comment" as ReportComment
+    usecase "Comment a blog post" as CommentBlogPost
+    usecase "Contact form" as ContactForm
+    usecase "Active or deactivate a comment" as toggleComment
 }
-
-' Extends
-ReadBlogPost <.. CommentBlogPost : extends
-ReadBlogPost <.. ReportComment : extends
 
 ' Relations
 Admin -|> User
@@ -35,14 +30,16 @@ User -|> Visitor
 
 Visitor -- ReadBlogPost
 Visitor -- PostListing
+Visitor -- ContactForm
 
-User -- AddBlogPost
-User -- DeleteBlogPost
-User -- UpdateBlogPost
+User -- CommentBlogPost
 
-Admin -- ListReportedComments
+Admin -- AddBlogPost
+Admin -- DeleteBlogPost
+Admin -- UpdateBlogPost
+Admin -- toggleComment
+
 Admin -- DeleteComment
-Admin -- DeleteReport
 
 Blog --- Database
 

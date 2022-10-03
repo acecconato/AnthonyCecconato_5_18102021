@@ -5,19 +5,13 @@ title Blog class diagram
 
 class Comment {
     - id: uuidv4
-    - user: ?User
-    - author: string
     - content: string
     - createdAt: datetime
-    - updatedAt: datetime
-    - reports: array[Report]
-
-    addReport() : self
-    getReports() : array[Report]
-}
-
-class Admin {
-
+    - postId: uuidv4
+    - enabled: boolean
+    - userId: uuidv4
+    - User: User
+    - Post: Post
 }
 
 class User {
@@ -25,29 +19,30 @@ class User {
     - username: string
     - email: string
     - password: string
-    - role: array
+    - plainPassword: string
+    - rememberToken: string
+    - enabled: boolean
+    - isAdmin: boolean
+    - resetToken: string
 }
 
 class Post {
     - id: uuidv4
     - title: string
+    - filename: string
+    - file: UploadedFile
+    - content: string
     - excerpt: string
-    - content: string 
-    - slug: string 
-    - user: User
+    - slug: string
     - createdAt: datetime
     - updatedAt: datetime
+    - userId: uuidv4
+    - User: User
+    - comments: Comment[]
 }
 
-class Report {
-    - id: uuidv4
-    - createdAt: datetime
-}
 
 ' Relations
-User <|- Admin
-
-Comment "1" --> "0,n" Report : has
 
 Post "1" *.. "0,n" Comment : contains
 

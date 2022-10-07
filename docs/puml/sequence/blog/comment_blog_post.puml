@@ -31,7 +31,7 @@ end
 
 Server -> Database: Save comment
 
-Server --> Client: Display single post page with the new post
+Server --> Client: Success message
 
 deactivate Server
 

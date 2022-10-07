@@ -12,7 +12,7 @@ Client -> Server : Login page request
 activate Server
 
 alt Client is already logged in
-    Server --> Client : Redirect to "My account page"
+    Server --> Client : Redirect to the homepage
 end
 
 Server --> Client : Display login form
@@ -37,7 +37,7 @@ end
 
 Server -> Server : Create the user session
 
-Server --> Client : Redirect to the "My account" page
+Server --> Client : Redirect to the homepage
 
 deactivate Server
 

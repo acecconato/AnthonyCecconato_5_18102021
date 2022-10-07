@@ -3,17 +3,17 @@
 title Delete a comment
 autonumber
 
-actor Client 
-entity Server 
-Database Database 
+actor Client
+entity Server
+Database Database
 
 Client -> Server : Delete comment request
 
 activate Server
 
-Server -> Server : Check client is owner or admin
+Server -> Server : Check is admin
 
-alt Client is not the owner or an admin
+alt Client is not an admin
     Server --> Client : Redirect to "Login" page
 end
 

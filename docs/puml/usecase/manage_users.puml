@@ -13,17 +13,19 @@ actor "Symfony Mailer" as SymfonyMailer <<system>>
 ' Package definition
 package "Manage users" as ManageUsersPackage {
     usecase "User listing" as UserListing
-    usecase "Validate a user" as ValidateUser
+    usecase "Activate or deactivate a user" as toggleUser
     usecase "Delete a user" as DeleteUser
+    usecase "Set/unset admin" as toggleAdmin
 }
 
 ' Relations
 Admin -- UserListing
-Admin -- ValidateUser
+Admin -- toggleUser
 Admin -- DeleteUser
+Admin -- toggleAdmin
 
 ManageUsersPackage -- Database
 
-ValidateUser -- SymfonyMailer
+toggleUser -- SymfonyMailer
 
 @enduml

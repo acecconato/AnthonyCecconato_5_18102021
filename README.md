@@ -8,7 +8,6 @@ Objectif : Développer un blog avec une architecture MVC, et la mise en place de
 The following demo admin user is available to test the web application:
 - Username : demo
 - Password : demo_password
-- 
 
 ## Quick setup (require make)
 

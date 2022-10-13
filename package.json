@@ -20,7 +20,8 @@
     "webpack-notifier": "^1.15.0"
   },
   "scripts": {
-    "dev": "npx encore dev --watch",
+    "dev": "npx encore dev",
+    "watch": "npx encore dev --watch",
     "build": "npx encore production"
   }
 }

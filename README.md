@@ -45,7 +45,7 @@ Start the webapp with
 ## Manual installation (without make)
 
 
-### Download the projet and build it
+### Download the project and build it
 
 > `git clone git@github.com:acecconato/AnthonyCecconato_5_18102021.git anthonycecconato`
 

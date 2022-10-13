@@ -35,16 +35,11 @@ Configure the environment
 
 You can configure the .env file manually if required.
 
-Create the database  
-`make create-database DB_USER=root DB_PASSWORD=root DB_NAME=anthonyc5`
+Prepare
+`make prepare DB_USER=root DB_PASSWORD=root DB_NAME=anthonyc5`
 
 Start the webapp with  
 `make run`
-
-
-
-
-### Create the database
 
 
 ## Manual installation (without make)
